@@ -7,7 +7,7 @@ gostApp.controller('SensorsCtrl', function ($scope, $http) {
     });
 
      $scope.deleteSensorClicked = function (sensor) {
-        var res = $http.delete(getUrl() + '/v1.0/Sensors(' + sensor["@iot.id"] + ')');
+        var res = $http.delete(getUrl() + '/v1.0/Sensors(' + getId(sensor["@iot.id"]) + ')');
         res.success(function(data, status, headers, config) {
             var index = $scope.sensorsList.indexOf(sensor);
             $scope.sensorsList.splice(index, 1);

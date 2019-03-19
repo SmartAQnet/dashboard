@@ -3,7 +3,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
     $scope.Page.setTitle('THING(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
 
-    $http.get(getUrl() + "/v1.0/Things(" + $scope.id + ")").then(function (response) {
+    $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")").then(function (response) {
         $scope.description = response.data["description"];
         $scope.properties = response.data["properties"];
         $scope.Page.selectedThing = response.data;
@@ -17,7 +17,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
         $scope.mapVisible = true;
         createMap();
 
-        $http.get(getUrl() + "/v1.0/Things(" + $scope.Page.selectedThing["@iot.id"] + ")/Locations").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/Locations").then(function (response) {
             $scope.locationsList = response.data.value;
             angular.forEach($scope.locationsList, function (value, key) {
                 addGeoJSONFeature(value["location"]);
@@ -30,7 +30,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
     $scope.tabHistoricalLocationsClicked = function () {
         $scope.mapVisible = false;
 
-        $http.get(getUrl() + "/v1.0/Things(" + $scope.Page.selectedThing["@iot.id"] + ")/HistoricalLocations").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/HistoricalLocations").then(function (response) {
             $scope.historicalLocationsList = response.data.value;
         });
     };
@@ -38,7 +38,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
     $scope.tabDatastreamsClicked = function () {
         $scope.mapVisible = false;
 
-        $http.get(getUrl() + "/v1.0/Things(" + $scope.Page.selectedThing["@iot.id"] + ")/Datastreams").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/Datastreams").then(function (response) {
             $scope.datastreamsList = response.data.value;
         });
     };

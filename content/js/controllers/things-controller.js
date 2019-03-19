@@ -28,7 +28,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http) {
     };
 
      $scope.deleteThingClicked = function (entity) {
-        var res = $http.delete(getUrl() + '/v1.0/Things(' + entity["@iot.id"] + ')');
+        var res = $http.delete(getUrl() + '/v1.0/Things(' + getId(entity["@iot.id"]) + ')');
         res.success(function(data, status, headers, config) {
             var index = $scope.thingsList.indexOf(entity);
             $scope.thingsList.splice(index, 1);

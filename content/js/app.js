@@ -54,6 +54,11 @@ function getUrl() {
     return window.location.origin + path;
 }
 
+function getId(id) {
+    return isNaN(id)?"'"+encodeURI(id)+"'":id;
+}
+
+
 var olMap;
 var geoJSONLayer;
 var olCollectionGeoJSON;
@@ -230,11 +235,18 @@ function guid() {
     s4() + '-' + s4() + s4() + s4();
 }
 
+
+var getLocation = function(href) {
+    var l = document.createElement("a");
+    l.href = href;
+    return l;
+};
+
 function getWebsocketUrl() {    
     if (typeof wsURL !== 'undefined' && wsURL != "") {
         return wsURL   
     } else {
         var scheme = getSSLEnabled() ? "wss://" : "ws://";
-        return scheme + location.hostname + ":" + getWebSocketPort() + "/"
+        return scheme + getLocation(getUrl()).hostname + ":" + getWebSocketPort() + "/"
     }   
 }

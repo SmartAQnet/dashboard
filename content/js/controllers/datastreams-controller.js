@@ -17,7 +17,7 @@ gostApp.controller('DatastreamsCtrl', function ($scope, $http) {
     };
 
      $scope.deleteDatastreamClicked = function (entity) {
-        var res = $http.delete(getUrl() + '/v1.0/Datastreams(' + entity["@iot.id"] + ')');
+        var res = $http.delete(getUrl() + '/v1.0/Datastreams(' + getId(entity["@iot.id"]) + ')');
         res.success(function(data, status, headers, config) {
             var index = $scope.datastreamsList.indexOf(entity);
             $scope.datastreamsList.splice(index, 1);

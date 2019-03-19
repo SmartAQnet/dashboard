@@ -56,7 +56,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         }
     }
 
-    $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")").then(function (response) {
+    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")").then(function (response) {
         $scope.description = response.data["description"];
         $scope.unitOfMeasurement = response.data["unitOfMeasurement"];
         $scope.observedArea = response.data["observedArea"];
@@ -68,7 +68,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     };
 
     $scope.tabThingClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/Thing").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing").then(function (response) {
             $scope.thingId = response.data["@iot.id"];
             $scope.thingDescription = response.data["description"];
             $scope.thingProperties = response.data["properties"];
@@ -76,7 +76,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     };
 
     $scope.tabSensorClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/Sensor").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Sensor").then(function (response) {
             $scope.sensorId = response.data["@iot.id"];
             $scope.sensorDescription = response.data["description"];
             $scope.sensorEncoding = response.data["encodingType"];
@@ -85,7 +85,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     };
 
     $scope.tabObservationsClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/Observations?$top=40").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$top=40").then(function (response) {
             response.data.value.reverse();
             $scope.observationsList = response.data.value;
 
@@ -101,7 +101,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     };
 
     $scope.tabObservedPropertyClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/ObservedProperty").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/ObservedProperty").then(function (response) {
             $scope.observedPropertyId = response.data["@iot.id"];
             $scope.observedPropertyName = response.data["name"];
             $scope.observedPropertyDescription = response.data["description"];

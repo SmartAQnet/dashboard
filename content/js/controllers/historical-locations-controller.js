@@ -7,7 +7,7 @@ gostApp.controller('HistoricalLocationsCtrl', function ($scope, $http) {
     });
 
      $scope.deleteHistoricalLocationClicked = function (entity) {
-        var res = $http.delete(getUrl() + '/v1.0/HistoricalLocations(' + entity["@iot.id"] + ')');
+        var res = $http.delete(getUrl() + '/v1.0/HistoricalLocations(' + getId(entity["@iot.id"]) + ')');
         res.success(function(data, status, headers, config) {
             var index = $scope.historicallocationsList.indexOf(entity);
             $scope.historicallocationsList.splice(index, 1);
