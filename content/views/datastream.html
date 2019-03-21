@@ -9,8 +9,8 @@
     <div class="tab-content">
         <div class="tab-pane active" id="properties">
             <div class="entityInfo">
-                <span class="entityInfoHeader">Id</span> <br />
-                <pre class="entityInfoInfo">{{id}}</pre>
+                <span class="entityInfoHeader">Name</span> <br />
+                <pre class="entityInfoInfo">{{name}}</pre>
                 <span class="entityInfoHeader">Description</span><br />
                 <pre class="entityInfoInfo">{{description}}</pre>
                 <span class="entityInfoHeader">Unit Of Measurement</span> <br />
@@ -54,7 +54,6 @@
             <table class="table table-bordered table-hover st-table">
                 <thead class="st-thead">
                 <tr>
-                    <th>ID</th>
                     <th>Phenomenon Time</th>
                     <th>Result</th>
                     <th>Result Time</th>
@@ -62,7 +61,6 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="x in observationsList">
-                    <td>{{x["@iot.id"]}}</td>
                     <td>{{x["phenomenonTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
                     <td>{{x["result"]}}</td>
                     <td>{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>

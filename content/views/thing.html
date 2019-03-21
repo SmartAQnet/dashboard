@@ -8,8 +8,8 @@
     <div class="tab-content">
         <div class="tab-pane active" id="properties">
             <div class="entityInfo">
-                <span class="entityInfoHeader">Id</span> <br />
-                <pre class="entityInfoInfo">{{id}}</pre>
+                <span class="entityInfoHeader">Name</span> <br />
+                <pre class="entityInfoInfo">{{name}}</pre>
                 <span class="entityInfoHeader">Description</span><br />
                 <pre class="entityInfoInfo">{{description}}</pre>
                 <span class="entityInfoHeader">Properties</span> <br />
@@ -20,7 +20,7 @@
             <table class="table table-bordered table-hover st-table">
                 <thead class="st-thead">
                     <tr>
-                        <th>ID</th>
+                        <th>Name</th>
                         <th>Description</th>
                         <th>Encoding</th>
                         <th>Location</th>
@@ -28,7 +28,7 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="x in locationsList">
-                        <td>{{x["@iot.id"]}}</td>
+                        <td>{{x["name"]}}</td>
                         <td>{{x["description"]}}</td>
                         <td>{{x["encodingtype"]}}</td>
                         <td>{{x["location"]}}</td>
@@ -41,13 +41,13 @@
             <table class="table table-bordered table-hover st-table">
                 <thead class="st-thead">
                 <tr>
-                    <th>ID</th>
+                    <th>Name</th>
                     <th>Time</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="x in historicalLocationsList">
-                    <td>{{x["@iot.id"]}}</td>
+                    <td>{{x["name"]}}</td>
                     <td>{{x["time"]}}</td>
                 </tr>
                 </tbody>
@@ -57,17 +57,17 @@
             <table class="table table-bordered table-hover st-table">
                 <thead class="st-thead">
                 <tr>
-                    <th>ID</th>
+                    <th>Name</th>
                     <th>Description</th>
-                    <th>Unit of Measurement</th>
+                    <!--th>Unit of Measurement</th-->
                     <th>Observed Area</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="x in datastreamsList" ng-click="datastreamClicked(x['@iot.id'])">
-                    <td>{{x["@iot.id"]}}</td>
+                    <td>{{x["name"]}}</td>
                     <td>{{x["description"]}}</td>
-                    <td>{{x["unitOfMeasurement"]}}</td>
+                    <!--td>{{x["unitOfMeasurement"]}}</td-->
                     <td>{{x["observedArea"]}}</td>
                 </tr>
                 </tbody>

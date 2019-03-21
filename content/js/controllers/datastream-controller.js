@@ -57,6 +57,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     }
 
     $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")").then(function (response) {
+        $scope.name = response.data["name"];
         $scope.description = response.data["description"];
         $scope.unitOfMeasurement = response.data["unitOfMeasurement"];
         $scope.observedArea = response.data["observedArea"];

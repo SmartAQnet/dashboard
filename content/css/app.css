@@ -32,6 +32,10 @@
 	margin-left: 10px;
 }
 
+[ng-click] {
+	cursor: pointer;
+}
+
 #header-title{
 	font-size: 22px;
 	font-weight:800;
