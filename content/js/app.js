@@ -2,7 +2,7 @@ var wsURL = "";
 var gostApp = angular.module('gostApp', ['ngRoute']);
 
 gostApp.factory('Page', function () {
-    var title = 'GOST';
+    var title = 'SmartAQnet';
     return {
         title: function () { return title; },
         setTitle: function (newTitle) { title = newTitle; }
@@ -49,9 +49,7 @@ function getWebSocketPort() {
 }
 
 function getUrl() {
-    var path = window.location.pathname;
-    // path = path.substring(0, path.lastIndexOf('/Dashboard'));
-    return window.location.origin + path;
+    return "";
 }
 
 function getId(id) {
