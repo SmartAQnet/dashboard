@@ -1,4 +1,3 @@
-var wsURL = "";
 var gostApp = angular.module('gostApp', ['ngRoute']);
 
 gostApp.factory('Page', function () {
@@ -49,7 +48,11 @@ function getWebSocketPort() {
 }
 
 function getUrl() {
-    return "";
+    if (typeof stURL !== 'undefined') {
+        return stURL   
+    } else {
+	    return "";
+    }
 }
 
 function getId(id) {
