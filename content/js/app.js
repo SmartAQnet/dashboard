@@ -39,13 +39,6 @@ function getSSLEnabled() {
 	return location.protocol == 'https:'
 }
 
-function getWebSocketPort() {
-	if (getSSLEnabled()){
-		return Number(9002);
-	} else {
-		return Number(9001);
-	}
-}
 
 function getUrl() {
     if (typeof stURL !== 'undefined') {
@@ -248,6 +241,6 @@ function getWebsocketUrl() {
         return wsURL   
     } else {
         var scheme = getSSLEnabled() ? "wss://" : "ws://";
-        return scheme + getLocation(getUrl()).hostname + ":" + getWebSocketPort() + "/"
+        return scheme + getLocation(getUrl()).hostname + "/mqtt"
     }   
 }
