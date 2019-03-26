@@ -178,13 +178,21 @@ function createObservationChart(labels, values){
         data: chartData,
         options: {
             scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:false
-                    }
-                }]
-            }
-        }
+		    yAxes: [{
+			    ticks: {
+				    beginAtZero:false
+			    }
+		    }],
+		    xAxes: [{
+			    type: 'time',
+			    time: {
+				    displayFormats: {
+					    minute: 'kk:mm'
+				    }
+			    }
+		    }]
+	    }
+	}
     });
 }
 
@@ -195,52 +203,52 @@ function observationChartAddData(l, d){
 }
 
 $('.fs-button').on('click', function(){
-      if (!document.fullscreenElement &&    // alternative standard method
-          !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
-        if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen();
-        } else if (document.documentElement.msRequestFullscreen) {
-          document.documentElement.msRequestFullscreen();
-        } else if (document.documentElement.mozRequestFullScreen) {
-          document.documentElement.mozRequestFullScreen();
-        } else if (document.documentElement.webkitRequestFullscreen) {
-          document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-        }
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        }
-      }
+	if (!document.fullscreenElement &&    // alternative standard method
+		!document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
+		if (document.documentElement.requestFullscreen) {
+			document.documentElement.requestFullscreen();
+		} else if (document.documentElement.msRequestFullscreen) {
+			document.documentElement.msRequestFullscreen();
+		} else if (document.documentElement.mozRequestFullScreen) {
+			document.documentElement.mozRequestFullScreen();
+		} else if (document.documentElement.webkitRequestFullscreen) {
+			document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+		}
+	} else {
+		if (document.exitFullscreen) {
+			document.exitFullscreen();
+		} else if (document.msExitFullscreen) {
+			document.msExitFullscreen();
+		} else if (document.mozCancelFullScreen) {
+			document.mozCancelFullScreen();
+		} else if (document.webkitExitFullscreen) {
+			document.webkitExitFullscreen();
+		}
+	}
 });
 
 function guid() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-    s4() + '-' + s4() + s4() + s4();
+	function s4() {
+		return Math.floor((1 + Math.random()) * 0x10000)
+			.toString(16)
+			.substring(1);
+	}
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+		s4() + '-' + s4() + s4() + s4();
 }
 
 
 var getLocation = function(href) {
-    var l = document.createElement("a");
-    l.href = href;
-    return l;
+	var l = document.createElement("a");
+	l.href = href;
+	return l;
 };
 
 function getWebsocketUrl() {    
-    if (typeof wsURL !== 'undefined' && wsURL != "") {
-        return wsURL   
-    } else {
-        var scheme = getSSLEnabled() ? "wss://" : "ws://";
-        return scheme + getLocation(getUrl()).hostname + "/mqtt"
-    }   
+	if (typeof wsURL !== 'undefined' && wsURL != "") {
+		return wsURL   
+	} else {
+		var scheme = getSSLEnabled() ? "wss://" : "ws://";
+		return scheme + getLocation(getUrl()).hostname + "/mqtt"
+	}   
 }

@@ -86,24 +86,38 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     };
 
     $scope.tabObservationsClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$top=40").then(function (response) {
-            response.data.value.reverse();
-            $scope.observationsList = response.data.value;
+	    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$orderby=phenomenonTime desc&$top=1").then(function (r) {
+		    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$filter=phenomenonTime gt "+r.data.value[0]['phenomenonTime'] +" sub duration'P1d'&$orderby=phenomenonTime desc&$top=10000").then(function (response) {
+			    response.data.value.reverse();
+			    $scope.observationsList = response.data.value;
 
-            labels = []
-            values = []
-            angular.forEach($scope.observationsList, function (value, key) {
-                labels.push(value['phenomenonTime']);
-                values.push(value['result']);
-            });
+			    labels = []
+			    values = []
+			    angular.forEach($scope.observationsList, function (value, key) {
+				    if(moment(value['phenomenonTime']).isValid())
+				    {
+					    labels.push(value['phenomenonTime']);
+					    values.push(value['result']);
+				    }
+				    else
+				    {
+					    interval = moment.interval(value['phenomenonTime'])
+					    labels.push(interval.start());
+					    values.push(value['result']);
+					    labels.push(interval.end());
+					    values.push(value['result']);
+				    }
 
-            createObservationChart(labels, values);
-        });
+			    });
+
+			    createObservationChart(labels, values);
+		    });
+	    });
     };
 
-    $scope.tabObservedPropertyClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/ObservedProperty").then(function (response) {
-            $scope.observedPropertyId = response.data["@iot.id"];
+	$scope.tabObservedPropertyClicked = function () {
+		$http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/ObservedProperty").then(function (response) {
+			$scope.observedPropertyId = response.data["@iot.id"];
             $scope.observedPropertyName = response.data["name"];
             $scope.observedPropertyDescription = response.data["description"];
             $scope.observedPropertyDefinition = response.data["definition"];
