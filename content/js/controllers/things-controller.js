@@ -3,7 +3,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http) {
     $scope.Page.setTitle('THINGS');
     $scope.Page.setHeaderIcon(iconThing);
 
-    $http.get(getUrl() + "/v1.0/Things").then(function (response) {
+    $http.get(getUrl() + "/v1.0/Things?$orderby=name asc").then(function (response) {
         $scope.thingsList = response.data.value;
     });
 
