@@ -2,7 +2,7 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 	$scope.Page.setTitle('smartAQnet');
 	$scope.Page.setHeaderIcon('');
 
-	$http.get(getUrl() + "/v1.0/Things?$filter=datastreams/Observations/phenomenontime%20gt%20now()%20sub%20duration%27P1d%27&$count=true").then(function (response) {
+	$http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$count=true&$top=0").then(function (response) {
 		$scope.active_devices = response.data["@iot.count"];
 	});
 
