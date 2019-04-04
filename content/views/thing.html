@@ -57,17 +57,21 @@
             <table class="table table-bordered table-hover st-table">
                 <thead class="st-thead">
                 <tr>
-                    <th>Name</th>
+		    <th ng-click="sortBy('name')"> Name </th>
                     <th>Description</th>
+                    <th>Observed Property</th>
                     <!--th>Unit of Measurement</th-->
-                    <th>Observed Area</th>
+                    <th>Time</th>
+                    <th>Area</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="x in datastreamsList" ng-click="datastreamClicked(x['@iot.id'])">
+                <tr ng-repeat="x in datastreamsList| orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
                     <td>{{x["name"]}}</td>
                     <td>{{x["description"]}}</td>
+                    <td>{{x["ObservedProperty"]["name"]}}</td>
                     <!--td>{{x["unitOfMeasurement"]}}</td-->
+                    <td>{{x["phenomenonTime"]}}</td>
                     <td>{{x["observedArea"]}}</td>
                 </tr>
                 </tbody>

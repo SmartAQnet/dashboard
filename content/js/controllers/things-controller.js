@@ -1,9 +1,14 @@
 // Things controller
-gostApp.controller('ThingsCtrl', function ($scope, $http) {
+gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams) {
     $scope.Page.setTitle('THINGS');
     $scope.Page.setHeaderIcon(iconThing);
 
-    $http.get(getUrl() + "/v1.0/Things?$orderby=name asc").then(function (response) {
+    if(! "$orderby" in $routeParams) $routeParams["$orderby"]="name asc";
+
+    var query=getUrl() + "/v1.0/Things"+ Object.keys($routeParams).reduce(
+	    (a, i) => a + i + "=" + $routeParams[i] + "&","?").slice(0,-1) 
+
+    $http.get(query).then(function (response) {
         $scope.thingsList = response.data.value;
     });
 

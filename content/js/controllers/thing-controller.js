@@ -39,7 +39,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
     $scope.tabDatastreamsClicked = function () {
         $scope.mapVisible = false;
 
-        $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/Datastreams").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/Datastreams?$expand=ObservedProperty").then(function (response) {
             $scope.datastreamsList = response.data.value;
         });
     };
@@ -53,4 +53,9 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
 
         $scope.Page.go("datastream/" + datastreamID);
     };
+
+  $scope.sortBy = function(propertyName) {
+    $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;
+    $scope.propertyName = propertyName;
+  };
 });
