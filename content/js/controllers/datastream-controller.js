@@ -4,7 +4,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     $scope.Page.setHeaderIcon(iconDatastream);
 
     $scope.$on("$destroy", function () {
-        client.unsubscribe("Datastreams(" + $scope.id + ")/Observations");
+        client.unsubscribe("v1.0/Datastreams(" + getId($scope.id) + ")/Observations");
     });
 
     labels = [];
@@ -16,8 +16,8 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     client.connect({ onSuccess: onConnect, useSSL: getSSLEnabled() });
 
       function onConnect() {
-        client.subscribe("Datastreams(" + $scope.id + ")/Observations");
-        console.log("Datastreams(" + $scope.id + ")/Observations subscribed");
+        client.subscribe("v1.0/Datastreams(" + getId($scope.id) + ")/Observations");
+        console.log("v1.0/Datastreams(" + getId($scope.id) + ")/Observations subscribed");
     }
 
     function onConnectionLost(responseObject) {
@@ -28,7 +28,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
 
     function onMessageArrived(message) {
         switch (message.destinationName) {
-            case 'Datastreams(' + $scope.id + ')/Observations':
+            case 'v1.0/Datastreams(' + getId($scope.id) + ')/Observations':
 				try {
 					  //$scope.brokerVersion = message.payloadString;
 					var r = JSON.parse(message.payloadString);

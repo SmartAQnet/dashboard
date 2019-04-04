@@ -41,15 +41,16 @@ function getSSLEnabled() {
 
 
 function getUrl() {
-    if (typeof stURL !== 'undefined') {
-        return stURL   
-    } else {
-	    return "";
-    }
+	if (typeof stURL !== 'undefined') {
+		return stURL   
+	} else if (window.location.protocol.localeCompare("file:"  !== '0')) {
+		return "https://smartaqnet.teco.edu"
+	}
+	return "";
 }
 
 function getId(id) {
-    return isNaN(id)?"'"+encodeURI(id)+"'":id;
+	return isNaN(id)?"'"+encodeURIComponent(id)+"'":id;
 }
 
 
@@ -57,81 +58,81 @@ var olMap;
 var geoJSONLayer;
 var olCollectionGeoJSON;
 var defaultMarkerStyle = new ol.style.Style({
-    image: new ol.style.Icon(({
-        anchor: [0.5, 1],
-        anchorXUnits: 'fraction',
-        anchorYUnits: 'fraction',
-        src: 'assets/img/map_marker.svg'
-    }))
+	image: new ol.style.Icon(({
+		anchor: [0.5, 1],
+		anchorXUnits: 'fraction',
+		anchorYUnits: 'fraction',
+		src: 'assets/img/map_marker.svg'
+	}))
 })
 
 function createMap(target) {
-    $(".map").empty();
+	$(".map").empty();
 
-    olCollectionGeoJSON = new ol.Collection();
-    jsonSource = new ol.source.Vector({
-        format: new ol.format.GeoJSON(),
-        features: olCollectionGeoJSON
-    });
+	olCollectionGeoJSON = new ol.Collection();
+	jsonSource = new ol.source.Vector({
+		format: new ol.format.GeoJSON(),
+		features: olCollectionGeoJSON
+	});
 
-    geoJSONLayer = new ol.layer.Vector({
-        source: jsonSource,
-        style: defaultMarkerStyle
-    });
+	geoJSONLayer = new ol.layer.Vector({
+		source: jsonSource,
+		style: defaultMarkerStyle
+	});
 
-    olMap = new ol.Map({
-        controls: ol.control.defaults({
-            attributionOptions: ({
-                collapsible: false
-            })
-        }).extend([
-        ]),
-        layers: [
-            /*new ol.layer.Tile({
-                source: new ol.source.OSM()
-            }),*/
-            new ol.layer.Tile({
-                source: new ol.source.XYZ({
-                    tileSize: [512, 512],
-                    url: 'https://api.mapbox.com/styles/v1/edenhalperin/cih84uopy000a95m41htugsnm/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWRlbmhhbHBlcmluIiwiYSI6IlFRZG0zMWMifQ.QUNKx4tIMjZfwmrE8SE6Bg'
-                })
-            }),
-            geoJSONLayer
-        ],
-        target: 'map',
-        view: new ol.View({
-            zoom: 8,
-            center: ol.proj.transform([5.3833333, 52.15], 'EPSG:4326', 'EPSG:3857'),
-            maxZoom: 20
-        }),
-        interactions: ol.interaction.defaults({ altShiftDragRotate: false, pinchRotate: false })
-    });
+	olMap = new ol.Map({
+		controls: ol.control.defaults({
+			attributionOptions: ({
+				collapsible: false
+			})
+		}).extend([
+		]),
+		layers: [
+			/*new ol.layer.Tile({
+		source: new ol.source.OSM()
+	    }),*/
+			new ol.layer.Tile({
+				source: new ol.source.XYZ({
+					tileSize: [512, 512],
+					url: 'https://api.mapbox.com/styles/v1/edenhalperin/cih84uopy000a95m41htugsnm/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWRlbmhhbHBlcmluIiwiYSI6IlFRZG0zMWMifQ.QUNKx4tIMjZfwmrE8SE6Bg'
+				})
+			}),
+			geoJSONLayer
+		],
+		target: 'map',
+		view: new ol.View({
+			zoom: 8,
+			center: ol.proj.transform([5.3833333, 52.15], 'EPSG:4326', 'EPSG:3857'),
+			maxZoom: 20
+		}),
+		interactions: ol.interaction.defaults({ altShiftDragRotate: false, pinchRotate: false })
+	});
 
-    setTimeout(delayedUpdateMap, 300);
+	setTimeout(delayedUpdateMap, 300);
 }
 
 function addGeoJSONFeature(geojson) {
-    var defaultGeoJSONProjection = 'EPSG:4326';
-    var mapProjection = olMap.getView().getProjection();
-    var geoJSONString = JSON.stringify(geojson);
+	var defaultGeoJSONProjection = 'EPSG:4326';
+	var mapProjection = olMap.getView().getProjection();
+	var geoJSONString = JSON.stringify(geojson);
 
-    if (geoJSONString.includes("FeatureCollection")) {
-        olCollectionGeoJSON.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
-    }
-    else {
-        var geom = (new ol.format.GeoJSON()).readGeometry(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
-        var feature = new ol.Feature(geom);
-        olCollectionGeoJSON.push(feature);
-    }
+	if (geoJSONString.includes("FeatureCollection")) {
+		olCollectionGeoJSON.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
+	}
+	else {
+		var geom = (new ol.format.GeoJSON()).readGeometry(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
+		var feature = new ol.Feature(geom);
+		olCollectionGeoJSON.push(feature);
+	}
 }
 
 function zoomToGeoJSONLayerExtent() {
-    var extent = geoJSONLayer.getSource().getExtent();
-    olMap.getView().fit(extent, olMap.getSize());
+	var extent = geoJSONLayer.getSource().getExtent();
+	olMap.getView().fit(extent, olMap.getSize());
 }
 
 function delayedUpdateMap() {
-    olMap.updateSize();
+	olMap.updateSize();
 }
 
 var myChart;
@@ -140,60 +141,60 @@ function createObservationChart(labels, values){
 	if(myChart != null){
 		myChart.destroy();	
 	}
-	
-    //$("#observationChartWrapper").empty();
-    Chart.defaults.global.responsive = true;
-    Chart.defaults.global.maintainAspectRatio = false;
-    Chart.defaults.global.legend.display = false;
-    chartData = {
-           labels: labels,
-           datasets: [
-               {
-                   fill: true,
-                   lineTension: 0.1,
-                   backgroundColor: "rgba(115,135,156,0.15)",
-                   borderColor: "rgba(115,135,156,1)",
-                   borderCapStyle: 'butt',
-                   borderDash: [],
-                   borderDashOffset: 0.0,
-                   borderJoinStyle: 'miter',
-                   pointBorderColor: "rgba(115,135,156,1)",
-                   pointBackgroundColor: "#fff",
-                   pointBorderWidth: 1,
-                   pointHoverRadius: 5,
-                   pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                   pointHoverBorderColor: "rgba(220,220,220,1)",
-                   pointHoverBorderWidth: 2,
-                   pointRadius: 2,
-                   pointHitRadius: 10,
-                   data: values,
-               }
-           ]
-       }
 
-    var ctx = $("#observationChart");
-	ctx.innerHTML = "";
-    myChart = new Chart(ctx, {
-        type: 'line',
-        data: chartData,
-        options: {
-            scales: {
-		    yAxes: [{
-			    ticks: {
-				    beginAtZero:false
-			    }
-		    }],
-		    xAxes: [{
-			    type: 'time',
-			    time: {
-				    displayFormats: {
-					    minute: 'kk:mm'
-				    }
-			    }
-		    }]
-	    }
+	//$("#observationChartWrapper").empty();
+	Chart.defaults.global.responsive = true;
+	Chart.defaults.global.maintainAspectRatio = false;
+	Chart.defaults.global.legend.display = false;
+	chartData = {
+		labels: labels,
+		datasets: [
+			{
+				fill: true,
+				lineTension: 0.1,
+				backgroundColor: "rgba(115,135,156,0.15)",
+				borderColor: "rgba(115,135,156,1)",
+				borderCapStyle: 'butt',
+				borderDash: [],
+				borderDashOffset: 0.0,
+				borderJoinStyle: 'miter',
+				pointBorderColor: "rgba(115,135,156,1)",
+				pointBackgroundColor: "#fff",
+				pointBorderWidth: 1,
+				pointHoverRadius: 5,
+				pointHoverBackgroundColor: "rgba(75,192,192,1)",
+				pointHoverBorderColor: "rgba(220,220,220,1)",
+				pointHoverBorderWidth: 2,
+				pointRadius: 2,
+				pointHitRadius: 10,
+				data: values,
+			}
+		]
 	}
-    });
+
+	var ctx = $("#observationChart");
+	ctx.innerHTML = "";
+	myChart = new Chart(ctx, {
+		type: 'line',
+		data: chartData,
+		options: {
+			scales: {
+				yAxes: [{
+					ticks: {
+						beginAtZero:false
+					}
+				}],
+				xAxes: [{
+					type: 'time',
+					time: {
+						displayFormats: {
+							minute: 'kk:mm'
+						}
+					}
+				}]
+			}
+		}
+	});
 }
 
 function observationChartAddData(l, d){
