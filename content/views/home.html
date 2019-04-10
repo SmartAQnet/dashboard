@@ -1,16 +1,16 @@
 <div class="col-md-12 main">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="panel panel-primary" >
-                <div class="panel-heading">About</div>
-                <div class="panel-body">
+    <div class="row py-2">
+        <div class="col-md-12">
+            <div class="card" >
+                <div class="card-header">About</div>
+                <div class="card-body">
                     This is the live view of the Data from the smartAQnet project..
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-3">
+    <div class="row py-2">
+        <div class="col-md-6">
             <div class="small-box bg-red">
                 <div class="inner">
                     <div id="n_observations" class="small-box-heading">{{n_observations}}</div>
@@ -20,7 +20,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
             <div class="small-box bg-green">
                 <div class="inner">
 			<div id="active-devices" class="small-box-heading"><a href="#/things?$filter=not Datastreams%2FphenomenonTime lt now() sub duration'P1d'">{{active_devices}}</a></div>
