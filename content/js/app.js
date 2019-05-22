@@ -62,7 +62,7 @@ var defaultMarkerStyle = new ol.style.Style({
 		anchor: [0.5, 1],
 		anchorXUnits: 'fraction',
 		anchorYUnits: 'fraction',
-		src: 'assets/img/map_marker.svg'
+		src: '/dashboard/content/assets/img/map_marker.svg'
 	}))
 })
 
