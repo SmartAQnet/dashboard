@@ -64,6 +64,7 @@
 .embedded-dashboard .st-table{
     background: #eaebea;
     margin-top: 10px;
+    font-size: 1rem;
 }
 
 .embedded-dashboard .st-table .st-main{
