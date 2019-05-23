@@ -10,21 +10,21 @@ gostApp.factory('Page', function () {
 
 // Set routes
 gostApp.config(function ($routeProvider) {
-    $routeProvider.
-        when("/home", { templateUrl: "views/home.html", controller: "HomeCtrl" }).
-        when('/thing/:id', { templateUrl: 'views/thing.html', controller: "ThingCtrl" }).
-        when("/things", { templateUrl: "views/things.html", controller: "ThingsCtrl" }).
-        when('/locations', { templateUrl: 'views/locations.html', controller: "LocationsCtrl" }).
-        when('/historicallocations', { templateUrl: 'views/historicallocations.html', controller: "HistoricalLocationsCtrl" }).
-        when('/sensors', { templateUrl: 'views/sensors.html', controller: "SensorsCtrl" }).
-        when('/observedproperties', { templateUrl: 'views/observedproperties.html', controller: "ObservedPropertiesCtrl" }).
-        when('/datastream/:id', { templateUrl: 'views/datastream.html', controller: "DatastreamCtrl" }).
-        when('/datastreams', { templateUrl: 'views/datastreams.html', controller: "DatastreamsCtrl" }).
-        when('/observations', { templateUrl: 'views/observations.html', controller: "ObservationsCtrl" }).
-        when('/featuresofinterest', { templateUrl: 'views/featuresofinterest.html', controller: "FeaturesOfInterestCtrl" }).
-        when('/mqtt', { templateUrl: 'views/mqtt.html', controller: "MqttCtrl" }).
-        otherwise({redirectTo: '/home' });;
-})
+	$routeProvider.
+		when("/home", { templateUrl: '/dashboard/content/views/home.html', controller: "HomeCtrl" }).
+		when('/thing/:id', { templateUrl: '/dashboard/content/views/thing.html', controller: "ThingCtrl" }).
+		when("/things", { templateUrl: '/dashboard/content/views/things.html', controller: "ThingsCtrl" }).
+		when('/locations', { templateUrl: '/dashboard/content/views/locations.html', controller: "LocationsCtrl" }).
+		when('/historicallocations', { templateUrl: '/dashboard/content/views/historicallocations.html', controller: "HistoricalLocationsCtrl" }).
+		when('/sensors', { templateUrl: '/dashboard/content/views/sensors.html', controller: "SensorsCtrl" }).
+		when('/observedproperties', { templateUrl: '/dashboard/content/views/observedproperties.html', controller: "ObservedPropertiesCtrl" }).
+		when('/datastream/:id', { templateUrl: '/dashboard/content/views/datastream.html', controller: "DatastreamCtrl" }).
+		when('/datastreams', { templateUrl: '/dashboard/content/views/datastreams.html', controller: "DatastreamsCtrl" }).
+		when('/observations', { templateUrl: '/dashboard/content/views/observations.html', controller: "ObservationsCtrl" }).
+		when('/featuresofinterest', { templateUrl: '/dashboard/content/views/featuresofinterest.html', controller: "FeaturesOfInterestCtrl" }).
+		when('/mqtt', { templateUrl: '/dashboard/content/views/mqtt.html', controller: "MqttCtrl" }).
+		otherwise({redirectTo: '/home' });
+});
 
 var iconThing = "fa-cube";
 var iconDatastream = "fa-line-chart";
