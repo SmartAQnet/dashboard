@@ -11,16 +11,16 @@ gostApp.factory('Page', function () {
 // Set routes
 gostApp.config(function ($routeProvider) {
 	$routeProvider.
-		when("/home", { templateUrl: '/dashboard/content/views/home.html', controller: "HomeCtrl" }).
-		when('/thing/:id', { templateUrl: '/dashboard/content/views/thing.html', controller: "ThingCtrl" }).
-		when("/things", { templateUrl: '/dashboard/content/views/things.html', controller: "ThingsCtrl" }).
-		when('/locations', { templateUrl: '/dashboard/content/views/locations.html', controller: "LocationsCtrl" }).
-		when('/historicallocations', { templateUrl: '/dashboard/content/views/historicallocations.html', controller: "HistoricalLocationsCtrl" }).
-		when('/sensors', { templateUrl: '/dashboard/content/views/sensors.html', controller: "SensorsCtrl" }).
-		when('/observedproperties', { templateUrl: '/dashboard/content/views/observedproperties.html', controller: "ObservedPropertiesCtrl" }).
-		when('/datastream/:id', { templateUrl: '/dashboard/content/views/datastream.html', controller: "DatastreamCtrl" }).
-		when('/datastreams', { templateUrl: '/dashboard/content/views/datastreams.html', controller: "DatastreamsCtrl" }).
-		when('/observations', { templateUrl: '/dashboard/content/views/observations.html', controller: "ObservationsCtrl" }).
+		when("/home", { templateUrl: '/dashboard/content/views/home.html', controller: "HomeCtrl", activetab: 'home' }).
+		when('/thing/:id', { templateUrl: '/dashboard/content/views/thing.html', controller: "ThingCtrl", activetab: 'things' }).
+		when("/things", { templateUrl: '/dashboard/content/views/things.html', controller: "ThingsCtrl", activetab: 'things' }).
+		when('/locations', { templateUrl: '/dashboard/content/views/locations.html', controller: "LocationsCtrl", activetab: 'things' }).
+		when('/historicallocations', { templateUrl: '/dashboard/content/views/historicallocations.html', controller: "HistoricalLocationsCtrl", activetab: 'things' }).
+		when('/sensors', { templateUrl: '/dashboard/content/views/sensors.html', controller: "SensorsCtrl", activetab: 'sensors' }).
+		when('/observedproperties', { templateUrl: '/dashboard/content/views/observedproperties.html', controller: "ObservedPropertiesCtrl", activetab: 'properties' }).
+		when('/datastream/:id', { templateUrl: '/dashboard/content/views/datastream.html', controller: "DatastreamCtrl", activetab: 'things' }).
+		when('/datastreams', { templateUrl: '/dashboard/content/views/datastreams.html', controller: "DatastreamsCtrl", activetab: 'sensors' }).
+		when('/observations', { templateUrl: '/dashboard/content/views/observations.html', controller: "ObservationsCtrl", activetab: 'sensors' }).
 		when('/featuresofinterest', { templateUrl: '/dashboard/content/views/featuresofinterest.html', controller: "FeaturesOfInterestCtrl" }).
 		when('/mqtt', { templateUrl: '/dashboard/content/views/mqtt.html', controller: "MqttCtrl" }).
 		otherwise({redirectTo: '/home' });

@@ -17,27 +17,18 @@ permalink: /en/dashboard
             <!-- top navigation -->
             <ul class="dashboard-menu nav nav-pills nav-fill">
               <li class="nav-item">
-                  <a class="nav-link" href="#/home"><i class="fa fa-home"></i> Home <span class="fa"></span></a>
+                  <a class="nav-link" ng-class="{active: $route.current.activetab == 'home'}" href="#/home"><i class="fa fa-home"></i> Home <span class="fa"></span></a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="#/things"><i class="fa fa-cube"></i> Things <span class="fa"></span></a>
+                  <a class="nav-link" ng-class="{active: $route.current.activetab == 'things'}" href="#/things"><i class="fa fa-cube"></i> Things <span class="fa"></span></a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="#/sensors"><i class="fa fa-dashboard"></i> Sensors <span class="fa"></span></a>
+                  <a class="nav-link" ng-class="{active: $route.current.activetab == 'sensors'}" href="#/sensors"><i class="fa fa-dashboard"></i> Sensors <span class="fa"></span></a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="#/observedproperties"><i class="fa fa-list"></i> Observed Properties <span class="fa"></span></a>
+                  <a class="nav-link" ng-class="{active: $route.current.activetab == 'properties'}" href="#/observedproperties"><i class="fa fa-list"></i> Observed Properties <span class="fa"></span></a>
               </li>
             </ul>
-            <script>
-                $(document).ready(function(){
-                    $('.dashboard-menu li').click(function() {
-                        $(this).siblings('li').children("a").removeClass('active');
-                        $(this).children("a").addClass('active');
-                    });
-                    $('.nav-link[href="'+window.location.hash+'"]').addClass('active');
-                });
-              </script>
             <div class="right_col" style="margin-left: 0 !important;" role="main">
               <div ng-view></div>
             </div>
