@@ -9,6 +9,10 @@
 	float: left;
 }
 
+.embedded-dashboard .tab-pane{
+  overflow-x: auto;
+}
+
 @media (min-width: 768px) {
 .embedded-dashboard   .bs-glyphicons {
     margin-right: 0;
@@ -2521,9 +2525,6 @@ table.dataTable th.focus,
 /* ***** buttons ********/
 .embedded-dashboard .btn {
   border-radius: 3px;
-}
-.embedded-dashboard a.btn-success, .embedded-dashboard  a.btn-primary, .embedded-dashboard  a.btn-warning, .embedded-dashboard  a.btn-danger {
-  color: #fff;
 }
 .embedded-dashboard .btn-success {
   background: #26B99A;

@@ -56,6 +56,12 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         }
     }
 
+    //Initialize Thing ID and Description for Back Button
+    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing").then(function (response) {
+        $scope.thingId = response.data["@iot.id"];
+        $scope.thingDescription = response.data["description"];
+    });
+
     $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")").then(function (response) {
         $scope.name = response.data["name"];
         $scope.description = response.data["description"];

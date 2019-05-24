@@ -1,83 +1,88 @@
 <div>
-    <ul class="nav nav-tabs">
-        <li class="nav-item" ng-click="tabPropertiesClicked()"><a class="nav-link active show" data-target="#properties" data-toggle="tab">Properties</a></li>
-        <li class="nav-item" ng-click="tabLocationsClicked()"><a class="nav-link" data-target="#locations" data-toggle="tab">Locations</a></li>
-        <li class="nav-item" ng-click="tabHistoricalLocationsClicked()"><a class="nav-link" data-target="#historicallocations" data-toggle="tab">Historical Locations</a></li>
-        <li class="nav-item" ng-click="tabDatastreamsClicked()"><a class="nav-link" data-target="#datastreams" data-toggle="tab">Datastreams</a></li>
-    </ul>
-    <div class="tab-content">
-        <div class="tab-pane active" id="properties">
-            <div class="entityInfo">
-                <span class="entityInfoHeader">Name</span> <br />
-                <pre class="entityInfoInfo">{{name}}</pre>
-                <span class="entityInfoHeader">Description</span><br />
-                <pre class="entityInfoInfo">{{description}}</pre>
-                <span class="entityInfoHeader">Properties</span> <br />
-                <pre class="entityInfoInfo">{{properties | json:4}}</pre>
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs">
+                <li class="nav-item" ng-click="tabPropertiesClicked()"><a class="nav-link active show" data-target="#properties" data-toggle="tab">Properties</a></li>
+                <li class="nav-item" ng-click="tabLocationsClicked()"><a class="nav-link" data-target="#locations" data-toggle="tab">Locations</a></li>
+                <li class="nav-item" ng-click="tabHistoricalLocationsClicked()"><a class="nav-link" data-target="#historicallocations" data-toggle="tab">Historical Locations</a></li>
+                <li class="nav-item" ng-click="tabDatastreamsClicked()"><a class="nav-link" data-target="#datastreams" data-toggle="tab">Datastreams</a></li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
+                <div class="tab-pane active" id="properties">
+                    <div class="entityInfo">
+                        <span class="entityInfoHeader">Name</span> <br />
+                        <pre class="entityInfoInfo">{{name}}</pre>
+                        <span class="entityInfoHeader">Description</span><br />
+                        <pre class="entityInfoInfo">{{description}}</pre>
+                        <span class="entityInfoHeader">Properties</span> <br />
+                        <pre class="entityInfoInfo">{{properties | json:4}}</pre>
+                    </div>
+                </div>
+                <div class="tab-pane" id="locations">
+                    <table class="table table-bordered table-hover st-table table-striped table-sm">
+                        <thead class="st-thead">
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Encoding</th>
+                                <th>Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in locationsList">
+                                <td>{{x["name"]}}</td>
+                                <td>{{x["description"]}}</td>
+                                <td>{{x["encodingtype"]}}</td>
+                                <td>{{x["location"]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+        
+                </div>
+                <div class="tab-pane" id="historicallocationsList">
+                    <table class="table table-bordered table-hover st-table table-striped table-sm">
+                        <thead class="st-thead">
+                        <tr>
+                            <th>Name</th>
+                            <th>Time</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="x in historicalLocationsList">
+                            <td>{{x["name"]}}</td>
+                            <td>{{x["time"]}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="datastreams">
+                    <table class="table table-bordered table-hover st-table table-striped table-sm">
+                        <thead class="st-thead">
+                        <tr>
+                    <th ng-click="sortBy('name')"> Name </th>
+                            <th>Description</th>
+                            <th>Observed Property</th>
+                            <!--th>Unit of Measurement</th-->
+                            <th>Time</th>
+                            <th>Area</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="x in datastreamsList| orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
+                            <td>{{x["name"]}}</td>
+                            <td>{{x["description"]}}</td>
+                            <td>{{x["ObservedProperty"]["name"]}}</td>
+                            <!--td>{{x["unitOfMeasurement"]}}</td-->
+                            <td>{{x["phenomenonTime"]}}</td>
+                            <td>{{x["observedArea"]}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div class="tab-pane" id="locations">
-            <table class="table table-bordered table-hover st-table table-striped table-sm">
-                <thead class="st-thead">
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Encoding</th>
-                        <th>Location</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="x in locationsList">
-                        <td>{{x["name"]}}</td>
-                        <td>{{x["description"]}}</td>
-                        <td>{{x["encodingtype"]}}</td>
-                        <td>{{x["location"]}}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-        </div>
-        <div class="tab-pane" id="historicallocationsList">
-            <table class="table table-bordered table-hover st-table table-striped table-sm">
-                <thead class="st-thead">
-                <tr>
-                    <th>Name</th>
-                    <th>Time</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="x in historicalLocationsList">
-                    <td>{{x["name"]}}</td>
-                    <td>{{x["time"]}}</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="tab-pane" id="datastreams">
-            <table class="table table-bordered table-hover st-table table-striped table-sm">
-                <thead class="st-thead">
-                <tr>
-		    <th ng-click="sortBy('name')"> Name </th>
-                    <th>Description</th>
-                    <th>Observed Property</th>
-                    <!--th>Unit of Measurement</th-->
-                    <th>Time</th>
-                    <th>Area</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="x in datastreamsList| orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
-                    <td>{{x["name"]}}</td>
-                    <td>{{x["description"]}}</td>
-                    <td>{{x["ObservedProperty"]["name"]}}</td>
-                    <!--td>{{x["unitOfMeasurement"]}}</td-->
-                    <td>{{x["phenomenonTime"]}}</td>
-                    <td>{{x["observedArea"]}}</td>
-                </tr>
-                </tbody>
-            </table>
+            <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px"></div>
         </div>
     </div>
-
-    <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px"></div>
 </div>

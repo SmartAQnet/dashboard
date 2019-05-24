@@ -3,7 +3,8 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $route)
     $http.defaults.headers.post["Accept"] = "application/json";
 
     $scope.Page = Page;
-    $scope.$route = $route; 
+    $scope.$route = $route;
+    $scope.$location = $location;
 
     $scope.Page.setHeaderIcon = function (icon) {
         $scope.headerIcon = 'fa ' + icon;
