@@ -94,7 +94,6 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     $scope.tabObservationsClicked = function () {
 	    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$orderby=phenomenonTime desc&$top=1").then(function (r) {
 		    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$filter=phenomenonTime gt "+r.data.value[0]['phenomenonTime'] +" sub duration'P1d'&$orderby=phenomenonTime desc&$top=10000").then(function (response) {
-			    response.data.value.reverse();
 			    $scope.observationsList = response.data.value;
 
 			    labels = []
