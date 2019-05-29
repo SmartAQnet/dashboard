@@ -128,4 +128,26 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
             $scope.observedPropertyDefinition = response.data["definition"];
         });
     };
+
+    $scope.showThingSelection = function() {
+        $scope.modalState = "thingSelection";
+        var query=getUrl() + "/v1.0/Things";
+    
+        $http.get(query).then(function (response) {
+            $scope.thingsList = response.data.value;
+        });
+    }
+
+    $scope.showDatastreamsForThing = function(thingId) {
+        $scope.secondThingId = thingId;
+        $scope.modalState = "datastreamSelection";
+        $http.get(getUrl() + "/v1.0/Things(" + getId(thingId) + ")/Datastreams?$expand=ObservedProperty").then(function (response) {
+            $scope.datastreamsList = response.data.value;
+        });
+    }
+
+    $scope.datastreamClicked = function(datastreamId) {
+        /*TODO: Prepare datastream for diagram*/
+        $('#thingSelection').trigger('click');
+    }
 });

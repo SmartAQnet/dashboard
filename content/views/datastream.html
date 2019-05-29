@@ -51,7 +51,10 @@
 
                 <div class="tab-pane" id="observations">
                     <div id="observationChartWrapper" class="card" >
-                        <div class="card-header">RESULTS</div>
+                        <div class="card-header">
+                            <span>RESULTS</span>
+                            <button type="button" ng-click="showThingSelection()" class="compare-to-btn btn btn-primary" data-toggle="modal" data-target="#thingSelection">Compare to ...</a>
+                        </div>
                         <div class="card-body">
                             <canvas id="observationChart" ></canvas>
                         </div>
@@ -85,6 +88,62 @@
                         <span class="entityInfoHeader">Definition</span> <br />
                         <pre class="entityInfoInfo">{{observedPropertyDefinition}}</pre>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Thing selection for comparison -->
+    <div class="modal fade" id="thingSelection" tabindex="-1" role="dialog" aria-labelledby="thingSelectionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="thingSelectionLabel">Select a second datastream</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <!-- Thing selection -->
+                <div ng-if="modalState == 'thingSelection'" class="modal-body">
+                    <table class="table table-bordered table-hover st-table table-striped table-sm">
+                        <thead class="st-thead">
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="x in thingsList" >
+                            <td ng-click="showDatastreamsForThing(x['@iot.id'], x['name'])">{{x["name"]}}</td>
+                            <td ng-click="showDatastreamsForThing(x['@iot.id'], x['name'])">{{x["description"]}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Datastream selection -->
+                <div ng-if="modalState == 'datastreamSelection'" class="modal-body">
+                    <a href="javascript:void(0);" ng-click="showThingSelection()"><i class="fas fa-arrow-left mr-3"></i>Back to Things</a>
+                    <table class="table table-bordered table-hover st-table table-striped table-sm">
+                        <thead class="st-thead">
+                        <tr>
+                    <th ng-click="sortBy('name')"> Name </th>
+                            <th>Description</th>
+                            <th>Observed Property</th>
+                            <!--th>Unit of Measurement</th-->
+                            <th>Time</th>
+                            <th>Area</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="x in datastreamsList| orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
+                            <td>{{x["name"]}}</td>
+                            <td>{{x["description"]}}</td>
+                            <td>{{x["ObservedProperty"]["name"]}}</td>
+                            <!--td>{{x["unitOfMeasurement"]}}</td-->
+                            <td>{{x["phenomenonTime"]}}</td>
+                            <td>{{x["observedArea"]}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

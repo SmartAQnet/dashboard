@@ -124,6 +124,17 @@
     margin-top: 10px;
 }
 
+.embedded-dashboard #observations .card-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5rem;
+}
+
+.embedded-dashboard .compare-to-btn{
+  margin: 0;
+}
+
 .embedded-dashboard html, .embedded-dashboard  body, .embedded-dashboard  #map {
   padding: 0;
   margin: 0;
