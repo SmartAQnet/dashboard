@@ -168,9 +168,12 @@ Datastreams.prototype.toChart = function(htmlSelector){
 
 	Chart.defaults.global.responsive = true;
 	Chart.defaults.global.maintainAspectRatio = false;
-	Chart.defaults.global.legend.display = false;
+    Chart.defaults.global.legend.display = false;
+    var axesNames = ["main", "secondary"];
+    var indexOfDataset = 0;
 	var chartData = {
 		datasets: Object.keys(this.streams).map(function(id){
+            var axisName = axesNames[indexOfDataset++]
             return {
 				fill: true,
 				lineTension: 0.1,
@@ -188,7 +191,8 @@ Datastreams.prototype.toChart = function(htmlSelector){
 				pointHoverBorderColor: "rgba(220,220,220,1)",
 				pointHoverBorderWidth: 2,
 				pointRadius: 2,
-				pointHitRadius: 10,
+                pointHitRadius: 10,
+                yAxisID: axisName,
                 data: this.streams[id].dataset,
                 showLine: true
 			};
@@ -196,17 +200,37 @@ Datastreams.prototype.toChart = function(htmlSelector){
     }
 
 	var ctx = $(htmlSelector);
-	ctx.innerHTML = "";
+    ctx.innerHTML = "";
+    
+    var yAxes = (Object.keys(this.streams).length > 1) ? [{ //Show both axes if more than one datastream
+        id: 'main',
+        type: 'linear',
+        position: 'left',
+        ticks: {
+            beginAtZero:false
+        }
+    },{
+        id: 'secondary',
+        type: 'linear',
+        position: 'right',
+        ticks: {
+            beginAtZero:false
+        }
+    }] : [{ //Show one axis otherwise
+        id: 'main',
+        type: 'linear',
+        position: 'left',
+        ticks: {
+            beginAtZero:false
+        }
+    }];
+
 	this.chart = new Chart(ctx, {
 		type: 'scatter',
 		data: chartData,
 		options: {
 			scales: {
-				yAxes: [{
-					ticks: {
-						beginAtZero:false
-					}
-				}],
+				yAxes: yAxes,
 				xAxes: [{
 					type: 'time',
 					time: {
