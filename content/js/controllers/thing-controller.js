@@ -20,9 +20,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
 
         $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/Locations").then(function (response) {
             $scope.locationsList = response.data.value;
-            angular.forEach($scope.locationsList, function (value, key) {
-                addGeoJSONFeature(value["location"]);
-            });
+            addGeoJSONFeature($scope.locationsList[0]["location"]);
 
             zoomToGeoJSONLayerExtent();
         });
@@ -31,7 +29,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
     $scope.tabHistoricalLocationsClicked = function () {
         $scope.mapVisible = false;
 
-        $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/HistoricalLocations").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/HistoricalLocations?$expand=Locations").then(function (response) {
             $scope.historicalLocationsList = response.data.value;
         });
     };

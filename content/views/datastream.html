@@ -1,7 +1,9 @@
 <div>
     <div class="card">
         <div class="card-header">
-            <a ng-href="#/thing/{{thingId}}"><i class="fas fa-arrow-left mr-3"></i>Back to Thing: {{thingName}}</a>
+            <button class="backbutton">
+                <a ng-href="#/thing/{{thingId}}"><span class="entityInfoHeader"><i class="fas fa-arrow-left mr-3"></i>Back to Thing: {{thingName}}</span></a>
+            </button>
             <ul class="nav nav-tabs mt-4">
                 <li class="nav-item" ng-click="tabPropertiesClicked()"><a class="nav-link active" data-target="#properties" data-toggle="tab">Properties</a></li>
                 <li class="nav-item" ng-click="tabThingClicked()"><a class="nav-link" data-target="#thing" data-toggle="tab">Thing</a></li>
@@ -18,34 +20,52 @@
                         <pre class="entityInfoInfo">{{name}}</pre>
                         <span class="entityInfoHeader">Description</span><br />
                         <pre class="entityInfoInfo">{{description}}</pre>
-                        <span class="entityInfoHeader">Unit Of Measurement</span> <br />
-                        <pre class="entityInfoInfo">{{unitOfMeasurement | json:4}}</pre>
-                        <span class="entityInfoHeader">Observed Area</span> <br />
-                        <pre class="entityInfoInfo">{{observedArea | json:4}}</pre>
+                        <button class="collapsible">
+                            <span class="entityInfoHeader">Unit Of Measurement</span> <br />
+                        </button>
+                        <div class="collapsible-content">
+                            <pre class="entityInfoInfo">{{unitOfMeasurement | json:4}}</pre>
+                        </div>
+                        <button class="collapsible">
+                            <span class="entityInfoHeader">Observed Area</span> <br />
+                        </button>
+                        <div class="collapsible-content">
+                            <pre class="entityInfoInfo">{{observedArea | json:4}}</pre>
+                        </div>
+                        <span class="entityInfoHeader">Id</span> <br />
+                        <pre class="entityInfoInfo">{{id}}</pre>
                     </div>
                 </div>
 
                 <div class="tab-pane" id="thing">
                     <div class="entityInfo">
-                        <span class="entityInfoHeader">Id</span> <br />
-                        <pre class="entityInfoInfo">{{thingId}}</pre>
+                        <span class="entityInfoHeader">Name</span> <br />
+                        <pre class="entityInfoInfo">{{thingName}}</pre>
                         <span class="entityInfoHeader">Description</span><br />
                         <pre class="entityInfoInfo">{{thingDescription}}</pre>
-                        <span class="entityInfoHeader">Properties</span> <br />
-                        <pre class="entityInfoInfo">{{thingProperties | json:4}}</pre>
+                        <button class="collapsible">
+                            <span class="entityInfoHeader">Properties</span> <br />
+                        </button>
+                        <div class="collapsible-content">
+                            <pre class="entityInfoInfo">{{thingProperties | json:4}}</pre>
+                        </div>
+                        <span class="entityInfoHeader">Id</span> <br />
+                        <pre class="entityInfoInfo">{{thingId}}</pre>
                     </div>
                 </div>
 
                 <div class="tab-pane" id="sensor">
                     <div class="entityInfo">
-                        <span class="entityInfoHeader">Id</span> <br />
-                        <pre class="entityInfoInfo">{{sensorId}}</pre>
+                        <span class="entityInfoHeader">Name</span> <br />
+                        <pre class="entityInfoInfo">{{sensorName}}</pre>
                         <span class="entityInfoHeader">Description</span><br />
                         <pre class="entityInfoInfo">{{sensorDescription}}</pre>
-                        <span class="entityInfoHeader">Encoding</span> <br />
-                        <pre class="entityInfoInfo">{{sensorEncoding}}</pre>
+                        <!--span class="entityInfoHeader">Encoding</span> <br /-->
+                        <!--pre class="entityInfoInfo">{{sensorEncoding}}</pre-->
                         <span class="entityInfoHeader">Metadata</span> <br />
                         <pre class="entityInfoInfo">{{sensorMetadata}}</pre>
+                        <span class="entityInfoHeader">Id</span> <br />
+                        <pre class="entityInfoInfo">{{sensorId}}</pre>
                     </div>
                 </div>
 
@@ -59,16 +79,18 @@
                     <table class="table table-bordered table-hover st-table table-striped table-sm">
                         <thead class="st-thead">
                         <tr>
-                            <th>Phenomenon Time</th>
-                            <th>Result</th>
                             <th>Result Time</th>
+                            <th>Result</th>
+                            <!--th>From</th-->
+                            <!--th>To</th-->
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="x in observationsList">
-                            <td>{{x["phenomenonTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-                            <td>{{x["result"]}}</td>
+                        <tr ng-repeat="x in observationsList | orderBy:'-resultTime'">
                             <td>{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                            <td>{{x["result"]}}</td>
+                            <!--td>{{x["resultTime"] | limitTo : 24 | date:'yyyy-MM-dd HH:mm:ss'}}</td-->
+                            <!--td>{{x["phenomenonTime"] | limitTo : -24 | date:'yyyy-MM-dd HH:mm:ss'}}</td-->
                         </tr>
                         </tbody>
                     </table>
@@ -76,17 +98,18 @@
 
                 <div class="tab-pane" id="observedproperty">
                     <div class="entityInfo">
-                        <span class="entityInfoHeader">Id</span> <br />
-                        <pre class="entityInfoInfo">{{observedPropertyId}}</pre>
                         <span class="entityInfoHeader">Name</span><br />
                         <pre class="entityInfoInfo">{{observedPropertyName}}</pre>
                         <span class="entityInfoHeader">Description</span><br />
                         <pre class="entityInfoInfo">{{observedPropertyDescription}}</pre>
                         <span class="entityInfoHeader">Definition</span> <br />
                         <pre class="entityInfoInfo">{{observedPropertyDefinition}}</pre>
+                        <span class="entityInfoHeader">Id</span> <br />
+                        <pre class="entityInfoInfo">{{observedPropertyId}}</pre>
                     </div>
                 </div>
             </div>
+            <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px"></div>
         </div>
     </div>
 </div>

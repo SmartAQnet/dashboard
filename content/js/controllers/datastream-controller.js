@@ -56,6 +56,32 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         }
     }
 
+    //Collapsibles 
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+            if (content.style.maxHeight){
+            content.style.maxHeight = null;
+            } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+            } 
+    });
+    }/*
+        if (content.style.display === "block") {
+        content.style.display = "none";
+        } else {
+        content.style.display = "block";
+        }
+    });
+    }*/
+
+
+  
+
     //Initialize Thing ID and Description for Back Button
     $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing").then(function (response) {
         $scope.thingId = response.data["@iot.id"];
@@ -69,6 +95,32 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         $scope.observedArea = response.data["observedArea"];
         $scope.Page.selectedDatastream = response.data;
     });
+
+
+    $scope.mapVisible = true;
+    createMap();
+
+    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$orderby=resultTime%20desc&$expand=FeatureOfInterest&$top=1").then(function (response) {
+        $scope.latestResultValue = response.data.value[0]["result"];
+        $scope.latestFoI = response.data.value[0]["FeatureOfInterest"]["feature"]
+        addGeoJSONcolorFeature($scope.latestFoI,$scope.latestResultValue);
+        
+        zoomToGeoJSONLayerExtent();
+    });
+
+    /*
+    // Example of setting a fixed marker 
+    var karlsruhe = {
+       "type": "Point",
+        "coordinates": [8.4,49]
+    };
+
+    //addGeoJSONcolorFeature(karlsruhe,Math.random()*100)
+    addGeoJSONFeature(karlsruhe)
+    */
+    
+
+
 
     $scope.tabPropertiesClicked = function () {
 
@@ -84,6 +136,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
 
     $scope.tabSensorClicked = function () {
         $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Sensor").then(function (response) {
+            $scope.sensorName = response.data["name"];
             $scope.sensorId = response.data["@iot.id"];
             $scope.sensorDescription = response.data["description"];
             $scope.sensorEncoding = response.data["encodingType"];

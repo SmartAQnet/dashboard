@@ -5062,3 +5062,61 @@ table.dataTable th.focus,
   border: 1px solid #e5e5e5;
 }
 /** /Dropzone.js **/
+
+
+
+
+/* *********  Collapsibles  **************************** */
+
+/* Style the button that is used to open and close the collapsible content */
+.embedded-dashboard .collapsible {
+  background-color: #f5f5f5; 
+  color: #000000; 
+  cursor: pointer;
+  padding: 18px;
+  width: 99%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 12px;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.embedded-dashboard .collapsible-active, .embedded-dashboard .collapsible:hover {
+  background-color: #ccc;
+}
+
+/* Style the collapsible content. Note: hidden by default */
+.embedded-dashboard .collapsible-content {
+  padding: 0px 18px;
+  margin-bottom: 6px;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  max-height: 0;
+  transition: max-height 0.2s ease-out;
+}
+
+
+
+/* *********  End Collapsibles  **************************** */
+
+
+
+/* Back button in same style as collapsible*/
+.embedded-dashboard .backbutton {
+  background-color: #f5f5f5; 
+  color: #000000; 
+  cursor: pointer;
+  padding: 6px 18px;
+  width: 99%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 12px;
+  margin: 0px;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.embedded-dashboard .backbutton-active, .embedded-dashboard .backbutton:hover {
+  background-color: #ccc;
+}
