@@ -3,58 +3,31 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     $scope.Page.setTitle('DATASTREAM(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconDatastream);
 
+    $scope.safeApply = function(fn) {
+        var phase = this.$root.$$phase;
+        if(phase == '$apply' || phase == '$digest') {
+          if(fn && (typeof(fn) === 'function')) {
+            fn();
+          }
+        } else {
+          this.$apply(fn);
+        }
+      };
+
+    var datastreams = new Datastreams($http);
+    $scope.datastreams = datastreams;
+    $scope.Datastreams = Datastreams;
+    var onDataChangeUpdater = function(){
+        $scope.safeApply();
+        //Todo: Change something if new data is available
+    }
+    datastreams.addDataChangeListener(onDataChangeUpdater);
+
     $scope.$on("$destroy", function () {
-        client.unsubscribe("v1.0/Datastreams(" + getId($scope.id) + ")/Observations");
+        datastreams.removeAllStreams();
+        datastreams.disconnectMQTTClient();
+        datastreams.removeDataChangeListener(onDataChangeUpdater);
     });
-
-    labels = [];
-    values = [];
-
-	client = new Paho.MQTT.Client(getWebsocketUrl(), guid());
-    client.onConnectionLost = onConnectionLost;
-    client.onMessageArrived = onMessageArrived;
-    client.connect({ onSuccess: onConnect, useSSL: getSSLEnabled() });
-
-      function onConnect() {
-        client.subscribe("v1.0/Datastreams(" + getId($scope.id) + ")/Observations");
-        console.log("v1.0/Datastreams(" + getId($scope.id) + ")/Observations subscribed");
-    }
-
-    function onConnectionLost(responseObject) {
-        if (responseObject.errorCode !== 0) {
-            console.log("onConnectionLost:" + responseObject.errorMessage);
-        }
-    }
-
-    function onMessageArrived(message) {
-        switch (message.destinationName) {
-            case 'v1.0/Datastreams(' + getId($scope.id) + ')/Observations':
-				try {
-					  //$scope.brokerVersion = message.payloadString;
-					var r = JSON.parse(message.payloadString);
-					//$scope.observationsList.push(r)
-
-					values.push(r['result'])
-					labels.push(r['phenomenonTime'])
-					
-					if(values.length > 50){
-						values.splice(0, 1);
-					}
-					
-					if(labels.length > 50){
-						labels.splice(0, 1);
-					}
-					
-					observationChartAddData(labels, values);
-					//$scope.$apply();
-					break;
-				}
-				catch(err) {
-					
-				}
-              
-        }
-    }
 
     //Collapsibles 
     var coll = document.getElementsByClassName("collapsible");
@@ -145,33 +118,10 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     };
 
     $scope.tabObservationsClicked = function () {
-	    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$orderby=phenomenonTime desc&$top=1").then(function (r) {
-		    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$filter=phenomenonTime gt "+r.data.value[0]['phenomenonTime'] +" sub duration'P1d'&$orderby=phenomenonTime desc&$top=10000").then(function (response) {
-			    response.data.value.reverse();
-			    $scope.observationsList = response.data.value;
-
-			    labels = []
-			    values = []
-			    angular.forEach($scope.observationsList, function (value, key) {
-				    if(moment(value['phenomenonTime']).isValid())
-				    {
-					    labels.push(value['phenomenonTime']);
-					    values.push(value['result']);
-				    }
-				    else
-				    {
-					    interval = moment.interval(value['phenomenonTime'])
-					    labels.push(interval.start());
-					    values.push(value['result']);
-					    labels.push(interval.end());
-					    values.push(value['result']);
-				    }
-
-			    });
-
-			    createObservationChart(labels, values);
-		    });
-	    });
+        setTimeout(function(){
+            $scope.observationsList = datastreams.addStream($scope.id).dataset;
+            datastreams.toChart("#observationChart");
+        }, 10);
     };
 
 	$scope.tabObservedPropertyClicked = function () {
@@ -182,4 +132,57 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
             $scope.observedPropertyDefinition = response.data["definition"];
         });
     };
+
+    $scope.showAllThingsSelection = function() {
+        $scope.thingsList = [];
+        $scope.modalState = "thingSelection";
+        var query=getUrl() + "/v1.0/Things";
+    
+        $http.get(query).then(function (response) {
+            $scope.thingsList = response.data.value;
+        });
+    }
+
+    $scope.showActiveThingsSelection = function() {
+        $scope.thingsList = [];
+        $scope.modalState = "thingSelection";
+        var query=getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27";
+    
+        $http.get(query).then(function (response) {
+            $scope.thingsList = response.data.value;
+        });
+    }
+
+    $scope.showThisThingSelection = function() {
+        thingId = $scope.thingId;
+        $scope.secondThingId = thingId;
+        $scope.modalState = "datastreamSelection";
+        $http.get(getUrl() + "/v1.0/Things(" + getId(thingId) + ")/Datastreams?$expand=ObservedProperty").then(function (response) {
+            $scope.datastreamsList = response.data.value;
+        });
+    }
+
+    $scope.showDatastreamsForThing = function(thingId) {
+        $scope.secondThingId = thingId;
+        $scope.modalState = "datastreamSelection";
+        $http.get(getUrl() + "/v1.0/Things(" + getId(thingId) + ")/Datastreams?$expand=ObservedProperty").then(function (response) {
+            $scope.datastreamsList = response.data.value;
+        });
+    }
+
+    $scope.datastreamClicked = function(datastreamId, datastreamName) {
+        /*TODO: Prepare datastream for diagram*/
+        console.log("Add " + datastreamId + "to diagram");
+        $scope.secondObservationsList = datastreams.addStream(datastreamId).dataset;
+        $scope.nameSecondary = datastreamName;
+        datastreams.toChart("#observationChart");
+        $('#thingSelection').trigger('click');
+    }
+
+    $scope.removeComparison = function() {
+        var secondaryStream = Object.keys(datastreams.streams)[1];
+        if(secondaryStream){
+            datastreams.removeStream(secondaryStream);
+        }
+    }
 });

@@ -436,7 +436,7 @@ function delayedUpdateMap() {
 
 var myChart;
 
-function createObservationChart(labels, values){
+function createObservationChart(datasets){
 	if(myChart != null){
 		myChart.destroy();	
 	}
@@ -466,7 +466,7 @@ function createObservationChart(labels, values){
 				pointHoverBorderWidth: 2,
 				pointRadius: 2,
 				pointHitRadius: 10,
-				data: values,
+				data: datasets[0],
 			}
 		]
 	}
@@ -474,7 +474,7 @@ function createObservationChart(labels, values){
 	var ctx = $("#observationChart");
 	ctx.innerHTML = "";
 	myChart = new Chart(ctx, {
-		type: 'line',
+		type: 'scatter',
 		data: chartData,
 		options: {
 			scales: {

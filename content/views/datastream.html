@@ -69,14 +69,24 @@
                     </div>
                 </div>
 
-                <div class="tab-pane" id="observations">
+                <div class="tab-pane" id="observations" ng-class="datastreams.state">
+                    <div id="loading-screen-wrapper" >
+                        <div id="loading-screen" >
+                                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                            LOADING...
+                        </div>
+                    </div>
                     <div id="observationChartWrapper" class="card" >
-                        <div class="card-header">RESULTS</div>
+                        <div class="card-header">
+                            <span>RESULTS</span>
+                            <button type="button" ng-if="datastreams.state == Datastreams.states['main_loaded']" ng-click="showActiveThingsSelection()" class="compare-to-btn btn btn-primary" data-toggle="modal" data-target="#thingSelection">Compare to ...</a>
+                            <button type="button" ng-if="datastreams.state == Datastreams.states['secondary_loaded']" ng-click="removeComparison()" class="compare-to-btn btn btn-error">Remove comparison</a>
+                        </div>
                         <div class="card-body">
                             <canvas id="observationChart" ></canvas>
                         </div>
                     </div>
-                    <table class="table table-bordered table-hover st-table table-striped table-sm">
+                    <table id="observations-table" class="table table-bordered table-hover st-table table-striped table-sm" ng-if="datastreams.state != Datastreams.states['secondary_loaded']">
                         <thead class="st-thead">
                         <tr>
                             <th>Result Time</th>
@@ -94,6 +104,38 @@
                         </tr>
                         </tbody>
                     </table>
+                    <div id="sideBySideComparison" ng-if="datastreams.state == Datastreams.states['secondary_loaded']">
+                            <div class="streamTitle main">{{name}}</div>
+                            <table id="observations-table-main" class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                <tr>
+                                    <th>Phenomenon Time</th>
+                                    <th>Result</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="x in observationsList">
+                                    <td>{{x["phenomenonTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td>{{x["result"]}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="streamTitle secondary">{{nameSecondary}}</div>
+                            <table id="observations-table-secondary" class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                <tr>
+                                    <th>Phenomenon Time</th>
+                                    <th>Result</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="x in secondObservationsList">
+                                    <td>{{x["phenomenonTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td>{{x["result"]}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                    </div>
                 </div>
 
                 <div class="tab-pane" id="observedproperty">
@@ -110,6 +152,147 @@
                 </div>
             </div>
             <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px"></div>
+        </div>
+    </div>
+    <!-- Thing selection for comparison -->
+    <div class="modal fade" id="thingSelection" tabindex="-1" role="dialog" aria-labelledby="thingSelectionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="thingSelectionLabel">Select a second thing/datastream</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <nav>
+                        <ul class="nav nav-tabs mt-4">
+                            <li class="nav-item" ng-click="showActiveThingsSelection()"><a class="nav-link active" data-target="#active-things" data-toggle="tab">Active Things</a></li>
+                            <li class="nav-item" ng-click="showAllThingsSelection()"><a class="nav-link" data-target="#all-things" data-toggle="tab">All Things</a></li>
+                            <li class="nav-item" ng-click="showThisThingSelection()"><a class="nav-link" data-target="#this-thing" data-toggle="tab">Datastreams of this Thing [{{thingName}}]</a></li>
+                        </ul>
+                    </nav>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="active-things">
+                            <!-- Thing selection -->
+                            <div ng-if="modalState == 'thingSelection'">
+                                <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                    <thead class="st-thead">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="x in thingsList" >
+                                        <td ng-click="showDatastreamsForThing(x['@iot.id'], x['name'])">{{x["name"]}}</td>
+                                        <td ng-click="showDatastreamsForThing(x['@iot.id'], x['name'])">{{x["description"]}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Datastream selection -->
+                            <div ng-if="modalState == 'datastreamSelection'">
+                                <a href="javascript:void(0);" ng-click="showActiveThingsSelection()"><i class="fas fa-arrow-left mr-3"></i>Back to active Things</a>
+                                <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                    <thead class="st-thead">
+                                        <tr>
+                                            <th ng-click="sortBy('name')"> Name </th>
+                                            <th>Description</th>
+                                            <th>Observed Property</th>
+                                            <!--th>Unit of Measurement</th-->
+                                            <th>Time</th>
+                                            <th>Area</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="x in datastreamsList| orderBy:propertyName:reverse"
+                                            ng-click="datastreamClicked(x['@iot.id'], x['name'])">
+                                            <td>{{x["name"]}}</td>
+                                            <td>{{x["description"]}}</td>
+                                            <td>{{x["ObservedProperty"]["name"]}}</td>
+                                            <!--td>{{x["unitOfMeasurement"]}}</td-->
+                                            <td>{{x["phenomenonTime"]}}</td>
+                                            <td>{{x["observedArea"]}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="this-thing">
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                    <tr>
+                                        <th ng-click="sortBy('name')"> Name </th>
+                                        <th>Description</th>
+                                        <th>Observed Property</th>
+                                        <!--th>Unit of Measurement</th-->
+                                        <th>Time</th>
+                                        <th>Area</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="x in datastreamsList| orderBy:propertyName:reverse"
+                                        ng-click="datastreamClicked(x['@iot.id'], x['name'])">
+                                        <td>{{x["name"]}}</td>
+                                        <td>{{x["description"]}}</td>
+                                        <td>{{x["ObservedProperty"]["name"]}}</td>
+                                        <!--td>{{x["unitOfMeasurement"]}}</td-->
+                                        <td>{{x["phenomenonTime"]}}</td>
+                                        <td>{{x["observedArea"]}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="all-things">
+                            <!-- Thing selection -->
+                            <div ng-if="modalState == 'thingSelection'">
+                                <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                    <thead class="st-thead">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="x in thingsList" >
+                                        <td ng-click="showDatastreamsForThing(x['@iot.id'], x['name'])">{{x["name"]}}</td>
+                                        <td ng-click="showDatastreamsForThing(x['@iot.id'], x['name'])">{{x["description"]}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Datastream selection -->
+                            <div ng-if="modalState == 'datastreamSelection'">
+                                <a href="javascript:void(0);" ng-click="showAllThingsSelection()"><i class="fas fa-arrow-left mr-3"></i>Back to all Things</a>
+                                <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                    <thead class="st-thead">
+                                        <tr>
+                                            <th ng-click="sortBy('name')"> Name </th>
+                                            <th>Description</th>
+                                            <th>Observed Property</th>
+                                            <!--th>Unit of Measurement</th-->
+                                            <th>Time</th>
+                                            <th>Area</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="x in datastreamsList| orderBy:propertyName:reverse"
+                                            ng-click="datastreamClicked(x['@iot.id'], x['name'])">
+                                            <td>{{x["name"]}}</td>
+                                            <td>{{x["description"]}}</td>
+                                            <td>{{x["ObservedProperty"]["name"]}}</td>
+                                            <!--td>{{x["unitOfMeasurement"]}}</td-->
+                                            <td>{{x["phenomenonTime"]}}</td>
+                                            <td>{{x["observedArea"]}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
