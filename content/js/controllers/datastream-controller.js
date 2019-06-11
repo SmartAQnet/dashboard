@@ -3,9 +3,22 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     $scope.Page.setTitle('DATASTREAM(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconDatastream);
 
+    $scope.safeApply = function(fn) {
+        var phase = this.$root.$$phase;
+        if(phase == '$apply' || phase == '$digest') {
+          if(fn && (typeof(fn) === 'function')) {
+            fn();
+          }
+        } else {
+          this.$apply(fn);
+        }
+      };
+
     var datastreams = new Datastreams($http);
+    $scope.datastreams = datastreams;
+    $scope.Datastreams = Datastreams;
     var onDataChangeUpdater = function(){
-        //$scope.$apply();
+        $scope.safeApply();
         //Todo: Change something if new data is available
     }
     datastreams.addDataChangeListener(onDataChangeUpdater);
@@ -52,8 +65,10 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     };
 
     $scope.tabObservationsClicked = function () {
-        $scope.observationsList = datastreams.addStream($scope.id).dataset;
-        datastreams.toChart("#observationChart");
+        setTimeout(function(){
+            $scope.observationsList = datastreams.addStream($scope.id).dataset;
+            datastreams.toChart("#observationChart");
+        }, 10);
     };
 
 	$scope.tabObservedPropertyClicked = function () {
@@ -65,12 +80,32 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         });
     };
 
-    $scope.showThingSelection = function() {
+    $scope.showAllThingsSelection = function() {
+        $scope.thingsList = [];
         $scope.modalState = "thingSelection";
         var query=getUrl() + "/v1.0/Things";
     
         $http.get(query).then(function (response) {
             $scope.thingsList = response.data.value;
+        });
+    }
+
+    $scope.showActiveThingsSelection = function() {
+        $scope.thingsList = [];
+        $scope.modalState = "thingSelection";
+        var query=getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27";
+    
+        $http.get(query).then(function (response) {
+            $scope.thingsList = response.data.value;
+        });
+    }
+
+    $scope.showThisThingSelection = function() {
+        thingId = $scope.thingId;
+        $scope.secondThingId = thingId;
+        $scope.modalState = "datastreamSelection";
+        $http.get(getUrl() + "/v1.0/Things(" + getId(thingId) + ")/Datastreams?$expand=ObservedProperty").then(function (response) {
+            $scope.datastreamsList = response.data.value;
         });
     }
 
@@ -82,11 +117,19 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         });
     }
 
-    $scope.datastreamClicked = function(datastreamId) {
+    $scope.datastreamClicked = function(datastreamId, datastreamName) {
         /*TODO: Prepare datastream for diagram*/
         console.log("Add " + datastreamId + "to diagram");
-        datastreams.addStream(datastreamId);
+        $scope.secondObservationsList = datastreams.addStream(datastreamId).dataset;
+        $scope.nameSecondary = datastreamName;
         datastreams.toChart("#observationChart");
         $('#thingSelection').trigger('click');
+    }
+
+    $scope.removeComparison = function() {
+        var secondaryStream = Object.keys(datastreams.streams)[1];
+        if(secondaryStream){
+            datastreams.removeStream(secondaryStream);
+        }
     }
 });
