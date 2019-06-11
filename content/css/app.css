@@ -1,3 +1,8 @@
+.embedded-dashboard h1, .embedded-dashboard h2, .embedded-dashboard h3, .embedded-dashboard h4, .embedded-dashboard h5, .embedded-dashboard h6 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+}
+
 .embedded-dashboard .header{
     color: #000000;
 	font-size: 20px;
@@ -115,6 +120,7 @@
     color: #990000;
 }
 
+/*Observations tab pane*/
 .embedded-dashboard #observationChart{
     width: 100% !important;
     height: 220px !important;
@@ -123,6 +129,105 @@
 .embedded-dashboard #observationChartWrapper{
     margin-top: 10px;
 }
+
+.embedded-dashboard #observations.none_loaded #observations-table, .embedded-dashboard #observations.main_loading #observations-table{
+  display: none;
+}
+.embedded-dashboard #observations.none_loaded #observationChartWrapper, .embedded-dashboard #observations.main_loading #observationChartWrapper{
+  display: none;
+}
+.embedded-dashboard #observations #loading-screen-wrapper{
+  position: relative;
+  max-height: 100px;
+  transition: max-height 0.5s;
+}
+.embedded-dashboard #observations.main_loading #loading-screen-wrapper, .embedded-dashboard #observations.secondary_loading #loading-screen-wrapper{
+  max-height: 100px;
+}
+.embedded-dashboard #observations.main_loaded #loading-screen-wrapper, .embedded-dashboard #observations.secondary_loaded #loading-screen-wrapper{
+  max-height: 0;
+  transition-delay: 0.5s;
+}
+.embedded-dashboard #loading-screen{
+  display: flex;
+  height: 100px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.embedded-dashboard #sideBySideComparison{
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: auto auto;
+  grid-auto-flow: column;
+}
+.embedded-dashboard #sideBySideComparison div{
+  flex-basis: 50%;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.embedded-dashboard #sideBySideComparison .streamTitle{
+  padding: 10px;
+}
+.embedded-dashboard #sideBySideComparison .streamTitle.main{
+  color: rgba(115,135,156,1);
+}
+.embedded-dashboard #sideBySideComparison .streamTitle.secondary{
+  color: rgba(172, 110, 98, 1);
+}
+.embedded-dashboard #sideBySideComparison #observations-table-main{
+  background-color: rgba(115,135,156,0.15);
+}
+.embedded-dashboard #sideBySideComparison #observations-table-secondary{
+  background-color: rgba(172, 110, 98, 0.15);
+}
+/*.embedded-dashboard .cellWrapper{
+  display: inline-block;
+}
+
+@keyframes slideinTR {
+  from {
+    line-height: 0
+  }
+
+  to {
+    line-height: 1.5
+  }
+}
+@keyframes slideinTD {
+  from {
+    padding:0
+  }
+
+  to {
+    padding: .3rem;
+  }
+}
+@keyframes slideinTDDIV {
+  from {
+    max-height: 0;
+  }
+
+  to {
+    max-height: 50px;
+  }
+}
+
+#observations table tr {
+  animation-duration: 1s;
+  animation-name: slideinTR;
+}
+#observations table td {
+  animation-duration: 1s;
+  animation-name: slideinTD;
+}
+#observations table td>div {
+  animation-duration: 1s;
+  animation-name: slideinTDDIV;
+}*/
+
+/*Observations tab pane end*/
 
 .embedded-dashboard #observations .card-header{
   display: flex;
@@ -5073,3 +5178,63 @@ table.dataTable th.focus,
   border: 1px solid #e5e5e5;
 }
 /** /Dropzone.js **/
+
+/** Loading Spinner **/
+/* from https://loading.io/css/ under CC0 */
+.lds-ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 27px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #5A738E;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 6px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 6px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 26px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 45px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(19px, 0);
+  }
+}
+
+/** /Loading Spinner **/
