@@ -49,7 +49,7 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 	$scope.mapVisible = true;
 	createMap();
 
-
+	
 	//show location of all active things
 	$http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27&$expand=Locations&$top=9999999").then(function (response) {
 		$scope.alllocationsList = response.data.value;
@@ -61,38 +61,96 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 		//zoomToGeoJSONLayerExtent(); leave default here because otherwise it would just show the entire world
 	});
 	
-
-	/*
+	var kriginglocations = [];
+	var krigingvalues = [];
+	
 	//get pm10 datastreams, recent observation value for color and feature of interest for location
 	$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:mcpm10%27&$expand=Observations($top=1;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
 		$scope.alldatastreams = response.data.value;
 		angular.forEach($scope.alldatastreams, function (value, key) {
+			if (value["Observations"].length > 0){
 			$scope.obsresult = value["Observations"][0]["result"];
 			$scope.obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
+			krigingvalues.push($scope.obsresult);
+			kriginglocations.push([$scope.obsFOI["coordinates"][0],$scope.obsFOI["coordinates"][1]]);
 			addGeoJSONcolorFeature($scope.obsFOI,$scope.obsresult);
+			}
+		
 		});
-
+		krigstuff(kriginglocations,krigingvalues);
 		//zoomToGeoJSONLayerExtent(); leave default here because otherwise it would just show the entire world
 	});
-	*/
+	
 
+	//Default Layers at page loading
+	togglelayers(PinLayer,true);
+	togglelayers(ColoredMarkerLayer,false);
+	togglelayers(WFSVectorLayer,false);
+	togglelayers(SimulationLayer,false);
+	
+
+	
 
 	var pincheckbox = document.getElementById("Layer-Pins");
 	pincheckbox.addEventListener("click", function(){
 		togglelayers(PinLayer,pincheckbox.checked)
 	});
 	
-	/*
-	document.getElementById("Layer-ColoredMarkers").addEventListener("click", function(){
-		if (document.getElementById("Layer-ColoredMarkers").checked && (olMap.ol.Map.getLayers().includes(ColoredMarkerLayer) == false) ) {olMap.addLayer(ColoredMarkerLayer)};
-		if (document.getElementById("Layer-ColoredMarkers").checked == false && olMap.ol.Map.getLayers().includes(ColoredMarkerLayer) ) {olMap.removeLayer(ColoredMarkerLayer)}
+	var coloredmarkercheckbox = document.getElementById("Layer-ColoredMarkers");
+	coloredmarkercheckbox.addEventListener("click", function(){
+		togglelayers(ColoredMarkerLayer,coloredmarkercheckbox.checked)
 	});
-	*/
-	
+
 	var krigingcheckbox = document.getElementById("Layer-Kriging");
 	krigingcheckbox.addEventListener("click", function(){
-		togglelayers("WFSVectorLayer",krigingcheckbox.checked)
+		togglelayers(canvasLayer,krigingcheckbox.checked)
+	});
+
+	
+	//run simulation per default on invisible layer
+	var amountofsimulations = setupsimulations(5);
+	
+
+	var redraw_sim = function(){
+		for (let i=0; i <= amountofsimulations-1; i++) {
+		simulate(i,totalspeed[i]);
+		};
+		//krigstuff(randomlocation,randomvalue);
+		//canvasLayer.getSource().changed();
+		window.setTimeout(redraw_sim, 1000);
+	};
+
+	
+	
+
+
+	window.setTimeout(redraw_sim, 0);
+
+	//var intervaltimer =  window.setTimeout(, 1000);
+	
+
+	var simulationcheckbox = document.getElementById("Layer-Simulation");
+	simulationcheckbox.addEventListener("click", function(){
+		togglelayers(SimulationLayer,simulationcheckbox.checked)
 	});
 	
+
+
+	
+    
+	var autorefreshcheckbox = document.getElementById("auto-refresh");
+	var autorefreshtimer;
+	autorefreshcheckbox.addEventListener("change", function(){
+		if (autorefreshcheckbox.checked){
+			autorefreshtimer = window.setInterval(function(){MapRefresh();
+			SimulationLayer.getSource().changed();}, 1000) 
+		}
+		else
+		{
+			window.clearInterval(autorefreshtimer)
+		}
+	});
+
+
 	
 });
