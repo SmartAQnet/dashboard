@@ -130,7 +130,7 @@ var params={
 	krigingModel:'exponential',//model还可选'gaussian','spherical','exponential'
 	krigingSigma2:0,
 	krigingAlpha:100,
-	canvasAlpha:0.50,//canvas图层透明度
+	canvasAlpha:0.35,//canvas图层透明度
 	colors:["#006837", "#1a9850", "#66bd63", "#a6d96a", "#d9ef8b", "#ffffbf","#fee08b", "#fdae61", "#f46d43", "#d73027", "#a50026"],
 };
 
@@ -165,6 +165,13 @@ function createMap(target) {
 	});
 
 
+
+	SimulationSource = new ol.source.Vector({
+		format: new ol.format.GeoJSON(),
+		features: SimulationCollection = new ol.Collection()
+	})
+
+	/*
 	//simulation layer map ------------------------------------------------------------------------------
 	SimulationLayer = new ol.layer.Vector({
 		source: SimulationSource = new ol.source.Vector({
@@ -172,7 +179,7 @@ function createMap(target) {
 			features: SimulationCollection = new ol.Collection()
 		})
 	});
-
+*/
 
 	//simulation invisible layer map ------------------------------------------------------------------------------
 	SimulationInvisibleLayer = new ol.layer.Vector({
@@ -195,8 +202,8 @@ function createMap(target) {
 	
 				//使用分层设色渲染
 				kriging.plot(canvas,grid,
-					[extent[0],extent[2]],[extent[1],extent[3]],params.colors);
-	
+					[extent[0],extent[2]],[extent[1],extent[3]],params.colors);	
+
 				return canvas;
 			},
 			projection: 'EPSG:4326'
@@ -259,7 +266,6 @@ function createMap(target) {
 			tileLayer, 
 			//PinLayer,
 			//ColoredMarkerLayer
-			//HeatmapLayer
 		],
 
 		//Set Target, View and Interactions
@@ -271,8 +277,8 @@ function createMap(target) {
 
 	
 
-
-	//add features
+/*
+	//add random features
 	for (let i = 0; i < 100; i++) {
 		let feature = new ol.Feature({
 			geometry: new ol.geom.Point(
@@ -287,7 +293,7 @@ function createMap(target) {
 		}));
 		WFSVectorSource.addFeature(feature);
 	}
-
+*/
 
 	/*
 	olMap.addLayer(WFSVectorLayer);
@@ -392,7 +398,7 @@ function createMap(target) {
 
 
 
-//function that can be used to add features to the map with gps coordinates
+//function that can be used to add gps pins to the map
 function addGeoJSONFeature(geojson) {
 	var defaultGeoJSONProjection = 'EPSG:4326';
 	var mapProjection = olMap.getView().getProjection();
@@ -409,7 +415,7 @@ function addGeoJSONFeature(geojson) {
 }
 
 //function that can be used to add features to the map with gps coordinates and a value for value height which is used for color coding
-function addGeoJSONcolorFeature(geojson, result) {
+function addGeoJSONcolorFeature(geojson, result, resulttime) {
 	var defaultGeoJSONProjection = 'EPSG:4326';
 	var mapProjection = olMap.getView().getProjection();
 
@@ -421,13 +427,12 @@ function addGeoJSONcolorFeature(geojson, result) {
 		var geom = (new ol.format.GeoJSON()).readGeometry(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
 		var colormarkerfeature = new ol.Feature(geom);
 		colormarkerfeature.setStyle(stylefunction(result));
+		colormarkerfeature.setId(resulttime);
 		ColoredMarkerCollection.push(colormarkerfeature);
 		//var heatmapfeature = heatmapfeature(geom,result);
 		//HeatmapCollection.push(heatmapfeature);
 	}
-
-
-}
+};
 
 //function that can be used to add features to the heatmap 
 /*
@@ -455,60 +460,6 @@ function togglelayers(layer,toggle) {
 
 
 
-/*
-function MapRefreshFunction() {
-	//add single point
-
-	//SimulationSource.clear() //clears the whole source
-
-	if (idcounter > 10) {
-		for (let i=1; i<=10; i++) {
-			SimulationSource.removeFeature(SimulationSource.getFeatureById(i)); //clear only selected features by id, code time in id
-		}
-	idcounter = 0;
-	}
-	randomvalue = randomvalue*(Math.random()+Math.random());
-	randomlocation = [randomlocation[0]+(Math.random()-0.5)*0.001,randomlocation[1]+(Math.random()-0.5)*0.001]
-
-	let SimulatedFeature = new ol.Feature({
-		geometry: new ol.geom.Point(ol.proj.fromLonLat(randomlocation)),
-		value: randomvalue
-	});
-	idcounter = idcounter +1
-	SimulatedFeature.setId(idcounter);
-
-	SimulatedFeature.setStyle(stylefunction(randomvalue))
-
-	SimulationSource.addFeature(SimulatedFeature);
-};
-*/
-/*
-//add single point
-var SimulatedFeature = new ol.Feature({
-	geometry: new ol.geom.Point(ol.proj.fromLonLat(randomlocation)),
-	value: 10
-});
-SimulatedFeature.setId(Date.now());
-
-SimulatedFeature.setStyle(new ol.style.Style({
-	image: new ol.style.Circle({
-		radius: 6,
-		fill: new ol.style.Fill({
-			color: "#FF000F"
-		}),
-		stroke: new ol.style.Stroke({
-			color: '#00000F',
-			width: 3
-		})
-	})
-}));
-
-SimulationSource.addFeature(SimulatedFeature);
-*/
-
-//generated features add and remove to invisible layer and the refresh function should add and remove them from the visible layer
-//var grace = 10000;
-
 
 var idcounter = 1;
 var randomlocation = [];
@@ -528,14 +479,16 @@ function setupsimulations(number){
 }
 
 var grid;
+var caz = [[10.924750,48.386800],[10.870650,48.386800],[10.870650,48.332600],[10.924750,48.332600]]
+var riesenpolygon = [[12,49],[9,49],[9,46],[12,46]] 
+
 
 function krigstuff(locations,values){
 	var lats=locations.map(function(x){return x[1]})
 	var lngs=locations.map(function(x){return x[0]})
 	var variogram=kriging.train(values,lngs,lats,
 		params.krigingModel,params.krigingSigma2,params.krigingAlpha);
-	var polygons=[[[10.924750,48.386800],[10.870650,48.386800],[10.870650,48.332600],[10.924750,48.332600]]];
-	//var polygons=[[[10.890,48.360],[10.898,48.360],[10.898,48.369],[10.890,48.369]]];
+	var polygons=[caz];
 	grid=kriging.grid(polygons,variogram,(polygons[0][0][1]-polygons[0][3][1])/200);
 };
 
@@ -545,7 +498,6 @@ function krigstuff(locations,values){
 
 
 function simulate(id){
-
 
 	xspeed[id] = totalspeed[id]*Math.random();
 	yspeed[id] = Math.sqrt(totalspeed[id]*totalspeed[id] - xspeed[id]*xspeed[id]);
@@ -557,19 +509,16 @@ function simulate(id){
 		geometry: new ol.geom.Point(ol.proj.fromLonLat(randomlocation[id])),
 		value: randomvalue[id]
 	});
+
 	SimulatedFeature.setId(Date.now());
-
 	SimulatedFeature.setStyle(stylefunction(randomvalue[id]))
-
 	SimulationInvisibleSource.addFeature(SimulatedFeature);
 
-
 	removeoldfeatures(10000); //store time in milliseconds
-
-
 };
 
-function removeoldfeatures(grace){	
+
+function removeoldfeatures(grace){	//same function for real observations
 	let threshold = Date.now() - grace;
 	SimulationInvisibleSource.forEachFeature(function(thisfeature){
 	if (thisfeature.getId() < threshold ) {
@@ -578,10 +527,24 @@ function removeoldfeatures(grace){
 })};
 
 
-function MapRefresh(){
+
+
+
+/*
+function SimulationSourceUpdate(){
 	SimulationSource.clear();
-	SimulationSource.addFeatures(SimulationInvisibleSource.getFeatures())
+	SimulationSource.addFeatures(SimulationInvisibleSource.getFeatures());
 };
+*/
+
+/*
+function UpdateMapLayers(){
+	ColoredMarkerLayer.getSource().changed();
+	canvasLayer.getSource().changed();
+};
+*/
+
+
 
 
 //function that sets the initial zoom and center of a map so that all features are visible. If the resulting area would result in a very high zoom (e.g. only one feature), sets it to 17 instead

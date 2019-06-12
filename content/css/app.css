@@ -2526,12 +2526,12 @@ table.dataTable th.focus,
 /* ***** /autocomplete *****/
 
 /* ***** buttons ********/
-.embedded-dashboard .testbutton {
+.embedded-dashboard .refreshbutton {
   padding: 10px;
   border-radius: 4px;
 }
 
-.embedded-dashboard .testbutton:hover {
+.embedded-dashboard .refreshbutton:hover {
   cursor: pointer; 
 }
 
@@ -5132,12 +5132,4 @@ table.dataTable th.focus,
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
 .embedded-dashboard .backbutton-active, .embedded-dashboard .backbutton:hover {
   background-color: #ccc;
-}
-
-
-.vcenterbox {
-  margin: auto;
-  width: 60%;
-  /*border: 3px solid #73AD21; */
-  padding: 10px;
 }
