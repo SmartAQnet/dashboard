@@ -1,7 +1,9 @@
-function Stream(id) {
+function Stream(id, isLive) {
     this.baseURL = getUrl() + "/v1.0/Datastreams(" + getId(id) + ")";
     this.dataset = [];
-    this.datasetChart = [];
+    this.datasetDownsampled = [];
+    this.isLive = typeof isLive === "undefined" ? true : isLive;
+    this.cacheLive = [];
     this.streamData = { //is loaded in prototype.loadPropertyDescription
         "unitOfMeasurement" : {
             "name" : null,
@@ -25,14 +27,34 @@ Stream.prototype.getFromServer = function($http, callback){
             callback();
             return;
         }
-        $http.get(this.baseURL + "/Observations?$filter=phenomenonTime gt "+r.data.value[0]['phenomenonTime'] +" sub duration'P1d'&$orderby=phenomenonTime desc&$top=10000").then(function (response) {
-            this.dataset.length = 0;
-            response.data.value.forEach(function (value, key) {
-                this.addDataPoint(value);
-            }.bind(this));
-            callback();
-        }.bind(this));
+        var endDate = moment(r.data.value[0]['phenomenonTime']);
+        var startDate = moment(endDate).subtract(1, 'days');
+        this.getFromServerDateTime($http, startDate, endDate, callback);
     }.bind(this));
+}
+
+//https://api.smartaq.net/v1.0/Datastreams('saqn%3Ads%3Ad4196c3')/Observations?$filter=phenomenonTime%20gt%202019-06-14T03:59:52.000Z%20sub%20duration%27P1d%27&$orderby=phenomenonTime%20desc&$top=10000
+
+Stream.prototype.getFromServerDateTime = function($http, start, end, callback){
+    $http.get(this.baseURL + "/Observations?$filter=phenomenonTime gt " + start.toISOString() + " and phenomenonTime lt "+ end.toISOString() +"&$orderby=phenomenonTime desc&$top=10000").then(function (response) {
+        this.dataset.length = 0;
+        response.data.value.forEach(function (value, key) {
+            this.addDataPoint(value, false);
+        }.bind(this));
+        this.datasetDownsampled.length = 0;
+        var downsampled = downsampleToResolution(this.dataset, 600);
+        downsampled.forEach(function(point){
+            this.datasetDownsampled.push(point);
+        }.bind(this));
+        callback();
+    }.bind(this));
+}
+
+Stream.prototype.setLive = function(isLive){
+    this.isLive = isLive;
+    if(isLive){
+        this.commitLiveData();
+    }
 }
 
 Stream.prototype.loadPropertyDescription = function($http, callback){
@@ -43,32 +65,57 @@ Stream.prototype.loadPropertyDescription = function($http, callback){
     }.bind(this));
 }
 
-Stream.prototype.addDataPoint = function(value, method){
+Stream.prototype.commitLiveData = function(){
+    this.cacheLive.reverse().forEach(function(point){
+        this.addDataPoint(point, "unshift", true);
+    }.bind(this));
+    this.cacheLive.length = 0;
+    this._dataChanged();
+}
+
+Stream.prototype.addDataPoint = function(value, method, isLive){
     method = method || "push";
     if (moment(value['phenomenonTime']).isValid()) {
-        this.dataset[method]({
+        var point = {
             phenomenonTime: value['phenomenonTime'],
             result: value['result'],
             resultTime: value['resultTime'],
             x: value['phenomenonTime'],
             y: value['result']
-        });
+        };
+        if(isLive && !this.isLive){
+            this.cacheLive[method](point);
+        }
+        else{
+            this.dataset[method](point);
+            this.datasetDownsampled[method](point);
+        }
     } else {
         var interval = moment.interval(value['phenomenonTime']);
-        this.dataset[method]({
+        var pointStart = {
             phenomenonTime: value['phenomenonTime'],
             result: value['result'],
             resultTime: value['resultTime'],
             x: interval.start(),
             y: value['result']
-        });
-        this.dataset[method]({
+        };
+        var pointEnd = {
             phenomenonTime: value['phenomenonTime'],
             result: value['result'],
             resultTime: value['resultTime'],
             x: interval.end(),
             y: value['result']
-        });
+        };
+        if(isLive && !this.isLive){
+            this.cacheLive[method](pointStart);
+            this.cacheLive[method](pointEnd);
+        }
+        else{
+            this.dataset[method](pointStart);
+            this.dataset[method](pointEnd);
+            this.datasetDownsampled[method](pointStart);
+            this.datasetDownsampled[method](pointEnd);
+        }
     }
 }
 
@@ -90,6 +137,13 @@ function Datastreams($http, ...ids){
     this.$http = $http;
     this.state = Datastreams.states["none_loaded"];
     this.stateAdditionalInformation = "";
+    this.isLive = true;
+}
+
+Datastreams.prototype.setLive = function(isLive){
+    Object.keys(this.streams).forEach(function(key){
+        this.streams[key].setLive(isLive);
+    }.bind(this));
 }
 
 Datastreams.prototype.setState = function(state){
@@ -129,7 +183,7 @@ Datastreams.prototype._onMessageArrived = function (message) {
     try {
         var r = JSON.parse(message.payloadString);
         var stream = this.streams[id];
-        stream.addDataPoint(r, "unshift");
+        stream.addDataPoint(r, "unshift", true);
         this._dataChanged();
     }
     catch(err) {
@@ -148,8 +202,16 @@ Datastreams.prototype._subscribeToStreams = function () {
     }.bind(this));
 }
 
+Datastreams.prototype.adjustDatetimeRange = function($http, start, end){
+    Object.keys(this.streams).forEach(function(key){
+        this.streams[key].getFromServerDateTime($http, start, end, function(){
+            
+        });
+    }.bind(this));
+}
+
 Datastreams.prototype.addStream = function (id) {
-    this.streams[id] = new Stream(id);
+    this.streams[id] = new Stream(id, this.isLive);
     if (Object.keys(this.streams).length == 1){
         this.setState(Datastreams.states["main_loading"]);
     }
@@ -158,6 +220,7 @@ Datastreams.prototype.addStream = function (id) {
     }
     this.streams[id].loadPropertyDescription(this.$http, function(){
         this.streams[id].getFromServer(this.$http, function(){
+
             console.log("initial data load finished");
             if (Object.keys(this.streams).length == 1){
                 this.setState(Datastreams.states["main_loaded"]);
@@ -354,7 +417,7 @@ Datastreams.prototype.toChart = function(htmlSelector){
 				borderJoinStyle: 'miter',
 
                 yAxisID: axisName,
-                data: this.streams[id].dataset,
+                data: this.streams[id].datasetDownsampled,
                 showLine: true
 			};
         }.bind(this))
@@ -362,7 +425,6 @@ Datastreams.prototype.toChart = function(htmlSelector){
 
 	var ctx = $(htmlSelector);
     ctx.innerHTML = "";
-
 	this.chart = new Chart(ctx, {
 		type: 'scatter',
 		data: chartData,
@@ -379,5 +441,73 @@ Datastreams.prototype.toChart = function(htmlSelector){
 				}]
 			}
 		}
-	});
+    });
+    window.chart = this.chart;
 }
+
+function downsampleToResolution(data, targetLength) {
+    var dataLength = data.length;
+    if (targetLength >= dataLength || targetLength === 0) {
+        return data; // data has target size
+    }
+    var output = [];
+    // bucket size, leave room for start and end data points
+    var bucksetSize = (dataLength - 2) / (targetLength - 2);
+    var a = 0; // initially a is the first point in the triangle
+    var maxAreaPoint;
+    var maxArea;
+    var area;
+    var nextA;
+    // always add the first point
+    output.push(data[a]);
+    for (var i = 0; i < targetLength - 2; ++i) {
+        // Calculate point average for next bucket (containing c)
+        var avgX = 0;
+        var avgY = 0;
+        var avgRangeStart = Math.floor((i + 1) * bucksetSize) + 1;
+        var avgRangeEnd = Math.floor((i + 2) * bucksetSize) + 1;
+        avgRangeEnd = avgRangeEnd < dataLength ? avgRangeEnd : dataLength;
+        var avgRangeLength = avgRangeEnd - avgRangeStart;
+        for (; avgRangeStart < avgRangeEnd; avgRangeStart++) {
+            avgX += getSimpleTime(data[avgRangeStart]);
+            avgY += data[avgRangeStart].y * 1;
+        }
+        avgX /= avgRangeLength;
+        avgY /= avgRangeLength;
+        // Get the range for this bucket
+        var rangeOffs = Math.floor((i + 0) * bucksetSize) + 1;
+        var rangeTo = Math.floor((i + 1) * bucksetSize) + 1;
+        // Point a
+        var pointA = data[a];
+        var pointAX = getSimpleTime(pointA);
+        var pointAY = pointA.y * 1;
+        maxArea = area = -1;
+        for (; rangeOffs < rangeTo; rangeOffs++) {
+            // Calculate triangle area over three buckets
+            area = Math.abs((pointAX - avgX) * (data[rangeOffs].y - pointAY) -
+                (pointAX - getSimpleTime(data[rangeOffs])) * (avgY - pointAY)) * 0.5;
+            if (area > maxArea) {
+                maxArea = area;
+                maxAreaPoint = data[rangeOffs];
+                nextA = rangeOffs; // Next a is this b
+            }
+        }
+        output.push(maxAreaPoint); // Pick this point from the bucket
+        a = nextA; // This a is the next a (chosen b)
+    }
+    output.push(data[dataLength - 1]); // Always add last
+    return output;
+};
+
+function getSimpleTime (point) {
+    var x = point.x || point.t;
+    if (typeof x === "number") {
+        return x;
+    }
+    else if (typeof x === "string") {
+        return new Date(x).getTime();
+    }
+    else {
+        return x.getTime();
+    }
+};

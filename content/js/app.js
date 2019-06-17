@@ -1,4 +1,4 @@
-var gostApp = angular.module('gostApp', ['ngRoute']);
+var gostApp = angular.module('gostApp', ['ngRoute', 'vs-repeat']);
 
 gostApp.factory('Page', function () {
     var title = 'SmartAQnet';

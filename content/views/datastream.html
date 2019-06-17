@@ -70,6 +70,18 @@
                 </div>
 
                 <div class="tab-pane" id="observations" ng-class="datastreams.state">
+                    <form>
+                        <button id="datetimes" class="btn btn-secondary dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+                            <span ng-if="!startDate">Select Date</span>
+                            <span ng-if="startDate">{{startDate}} - {{endDate}}</span>
+                        </button>
+                        <div class="switch pull-right">
+                            <label>
+                                <input type="checkbox" ng-model="isLive" ng-change="changedLive()">
+                                Show Live Data
+                            </label>
+                        </div>
+                    </form>
                     <div id="loading-screen-wrapper" >
                         <div id="loading-screen" >
                                 <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
@@ -86,55 +98,48 @@
                             <canvas id="observationChart" ></canvas>
                         </div>
                     </div>
-                    <table id="observations-table" class="table table-bordered table-hover st-table table-striped table-sm" ng-if="datastreams.state != Datastreams.states['secondary_loaded']">
-                        <thead class="st-thead">
-                        <tr>
-                            <th>Result Time</th>
-                            <th>Result</th>
-                            <!--th>From</th-->
-                            <!--th>To</th-->
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="x in observationsList | orderBy:'-resultTime'">
-                            <td>{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-                            <td>{{x["result"]}}</td>
-                            <!--td>{{x["resultTime"] | limitTo : 24 | date:'yyyy-MM-dd HH:mm:ss'}}</td-->
-                            <!--td>{{x["phenomenonTime"] | limitTo : -24 | date:'yyyy-MM-dd HH:mm:ss'}}</td-->
-                        </tr>
-                        </tbody>
-                    </table>
+                    <div id="legacy-tables">
+                        
+                    </div>
+                    <div id="observations-grid" ng-if="datastreams.state != Datastreams.states['secondary_loaded']">
+                        <div class="grid-row grid-header">
+                            <div class="grid-cell">Result Time</div>
+                            <div ng-repeat-end class="grid-cell">Result</div>
+                        </div>
+                        <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0}">
+                            <div class="grid-row" ng-class="{top: x == observationsList[0]}" ng-repeat="x in observationsList">
+                                <div class="grid-cell">{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
+                                <div class="grid-cell">{{x["result"]}}</div>
+                            </div>
+                        </div>
+                    </div>
                     <div id="sideBySideComparison" ng-if="datastreams.state == Datastreams.states['secondary_loaded']">
                             <div class="streamTitle main">{{name}}</div>
-                            <table id="observations-table-main" class="table table-bordered table-hover st-table table-striped table-sm">
-                                <thead class="st-thead">
-                                <tr>
-                                    <th>Phenomenon Time</th>
-                                    <th>Result</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr ng-repeat="x in observationsList">
-                                    <td>{{x["phenomenonTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-                                    <td>{{x["result"]}}</td>
-                                </tr>
-                                </tbody>
-                            </table>
+                            <div id="observations-table-main" class="table table-bordered table-hover st-table table-striped table-sm">
+                                <div class="grid-row grid-header">
+                                    <div class="grid-cell">Result Time</div>
+                                    <div ng-repeat-end class="grid-cell">Result</div>
+                                </div>
+                                <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0}">
+                                    <div class="grid-row" ng-class="{top: x == observationsList[0]}" ng-repeat="x in observationsList">
+                                        <div class="grid-cell">{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
+                                        <div class="grid-cell">{{x["result"]}}</div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="streamTitle secondary">{{nameSecondary}}</div>
-                            <table id="observations-table-secondary" class="table table-bordered table-hover st-table table-striped table-sm">
-                                <thead class="st-thead">
-                                <tr>
-                                    <th>Phenomenon Time</th>
-                                    <th>Result</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr ng-repeat="x in secondObservationsList">
-                                    <td>{{x["phenomenonTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-                                    <td>{{x["result"]}}</td>
-                                </tr>
-                                </tbody>
-                            </table>
+                            <div id="observations-table-secondary" class="table table-bordered table-hover st-table table-striped table-sm">
+                                <div class="grid-row grid-header">
+                                    <div class="grid-cell">Result Time</div>
+                                    <div ng-repeat-end class="grid-cell">Result</div>
+                                </div>
+                                <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0}">
+                                    <div class="grid-row" ng-class="{top: x == observationsList[0]}" ng-repeat="x in observationsList">
+                                        <div class="grid-cell">{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
+                                        <div class="grid-cell">{{x["result"]}}</div>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
                 </div>
 
@@ -169,7 +174,7 @@
                         <ul class="nav nav-tabs mt-4">
                             <li class="nav-item" ng-click="showActiveThingsSelection()"><a class="nav-link active" data-target="#active-things" data-toggle="tab">Active Things</a></li>
                             <li class="nav-item" ng-click="showAllThingsSelection()"><a class="nav-link" data-target="#all-things" data-toggle="tab">All Things</a></li>
-                            <li class="nav-item" ng-click="showThisThingSelection()"><a class="nav-link" data-target="#this-thing" data-toggle="tab">Datastreams of this Thing [{{thingName}}]</a></li>
+                            <li class="nav-item" ng-click="showThisThingSelection()"><a class="nav-link" data-target="#this-thing" data-toggle="tab">Datastreams of this Thing</a></li>
                         </ul>
                     </nav>
                     <div class="tab-content">
@@ -193,7 +198,11 @@
                             </div>
                             <!-- Datastream selection -->
                             <div ng-if="modalState == 'datastreamSelection'">
-                                <a href="javascript:void(0);" ng-click="showActiveThingsSelection()"><i class="fas fa-arrow-left mr-3"></i>Back to active Things</a>
+                                <button class="backbutton">
+                                    <a href="javascript:void(0);" ng-click="showActiveThingsSelection()"><span
+                                            class="entityInfoHeader"><i class="fas fa-arrow-left mr-3"></i>Back to
+                                            active Things</span></a>
+                                </button>
                                 <table class="table table-bordered table-hover st-table table-striped table-sm">
                                     <thead class="st-thead">
                                         <tr>
@@ -264,8 +273,11 @@
                             </div>
                             <!-- Datastream selection -->
                             <div ng-if="modalState == 'datastreamSelection'">
-                                <a href="javascript:void(0);" ng-click="showAllThingsSelection()"><i class="fas fa-arrow-left mr-3"></i>Back to all Things</a>
-                                <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                    <button class="backbutton">
+                                        <a href="javascript:void(0);" ng-click="showAllThingsSelection()"><span
+                                                class="entityInfoHeader"><i class="fas fa-arrow-left mr-3"></i>Back to
+                                                active Things</span></a>
+                                    </button>
                                     <thead class="st-thead">
                                         <tr>
                                             <th ng-click="sortBy('name')"> Name </th>

@@ -17,11 +17,54 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     var datastreams = new Datastreams($http);
     $scope.datastreams = datastreams;
     $scope.Datastreams = Datastreams;
+    $scope.isLive = true;
+
+    var oldDatastreamsState = Datastreams.states["none_loaded"];
+
     var onDataChangeUpdater = function(){
         $scope.safeApply();
-        //Todo: Change something if new data is available
+        processDatastreamsStateChange(oldDatastreamsState, datastreams.state);
+        oldDatastreamsState = datastreams.state;
+
     }
     datastreams.addDataChangeListener(onDataChangeUpdater);
+
+    function otherDateSelected(start, end){
+        renderDate(start, end);
+        datastreams.adjustDatetimeRange($http, start,end);
+        var diff = moment.duration(moment().diff(end)).asHours();
+        if(diff > 2){
+            $scope.isLive = false;
+            $scope.changedLive();
+            $scope.safeApply();
+        }
+    }
+
+    function renderDate(start, end){
+        $scope.startDate = start.format('YYYY-MM-DD HH:mm:ss');
+        $scope.endDate = end.format('YYYY-MM-DD HH:mm:ss');
+        $scope.safeApply();
+    }
+
+    function processDatastreamsStateChange(oldState, newState){
+        if(oldState == Datastreams.states["main_loading"] && newState == Datastreams.states["main_loaded"]){
+            var startDate = moment().startOf('hour');
+            var endDate = moment().startOf('hour').add(32, 'hour');
+            if($scope.observationsList.length > 0){
+                startDate = moment($scope.observationsList[$scope.observationsList.length - 1]["phenomenonTime"]);
+                endDate = moment($scope.observationsList[0]["phenomenonTime"]);
+                renderDate(startDate, endDate);
+            }
+            $('#datetimes').daterangepicker({
+                timePicker: true,
+                startDate: startDate,
+                endDate: endDate,
+                locale: {
+                  format: 'YYYY-MM-DD HH:mm:ss'
+                }
+              }, otherDateSelected);
+        }
+    }
 
     $scope.$on("$destroy", function () {
         datastreams.removeAllStreams();
@@ -119,6 +162,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
 
     $scope.tabObservationsClicked = function () {
         setTimeout(function(){
+            $('#observations').bootstrapMaterialDesign();
             $scope.observationsList = datastreams.addStream($scope.id).dataset;
             datastreams.toChart("#observationChart");
         }, 10);
@@ -132,6 +176,10 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
             $scope.observedPropertyDefinition = response.data["definition"];
         });
     };
+
+    $scope.changedLive = function(){
+        datastreams.setLive($scope.isLive);
+    }
 
     $scope.showAllThingsSelection = function() {
         $scope.thingsList = [];
