@@ -216,7 +216,7 @@
                                                 </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
+                                        <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'], x['name'])">
                                             <td>
                                                 <span title="{{x['name']}}">{{x["name"] | limitTo : 26}}...</span>
                                             </td>
@@ -245,7 +245,7 @@
                                             </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
+                                    <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'], x['name'])">
                                         <td>
                                             <span title="{{x['name']}}">{{x["name"] | limitTo : 26}}...</span>
                                         </td>
@@ -297,7 +297,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
+                                        <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'], x['name'])">
                                             <td>
                                                 <span title="{{x['name']}}">{{x["name"] | limitTo : 26}}...</span>
                                             </td>
