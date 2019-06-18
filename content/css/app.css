@@ -167,6 +167,28 @@
   padding: .3rem;
   height: 35px;
 }
+@media (max-width: 1200px) {
+  .embedded-dashboard #sideBySideComparison .grid-cell{
+    height: 70px;
+  }
+  .embedded-dashboard .grid-row.top{
+    animation: appear2 1s;
+  }
+}
+@keyframes appear2{
+  0%{
+    color: #2d497f;
+    max-height: 0;
+  }
+  70%{
+    transform: scale(1.05);
+    color: #2d497f;
+  }
+  100%{
+    color: black;
+    max-height: 70px;
+  }
+}
 @keyframes appear{
   0%{
     color: #2d497f;
@@ -183,12 +205,20 @@
 }
 .embedded-dashboard .grid-cell:last-child{
   flex-grow: 1;
+  flex-basis: 100px;
+  text-align: right;
 }
 .embedded-dashboard .grid-cell:first-child{
   flex-basis: 180px;
 }
-.embedded-dashboard #observations.none_loaded #observations-table, .embedded-dashboard #observations.main_loading #observations-table, .embedded-dashboard #observations.main_loading form{
+.embedded-dashboard #observations.none_loaded #observations-table, .embedded-dashboard #observations.none_loaded #observations-grid, .embedded-dashboard #observations.main_loading #observations-grid, .embedded-dashboard #observations.main_loading #observations-table, .embedded-dashboard #observations.main_loading form, .embedded-dashboard #observations.adjusting_timeframe #observations-table, .embedded-dashboard #observations.adjusting_timeframe #observations-grid{
   display: none;
+}
+.embedded-dashboard #observations form, .embedded-dashboard #observations form, .embedded-dashboard #observations .observationChartWrapper, .embedded-dashboard #observations .observationChartWrapper{
+  pointer-events: none;
+}
+.embedded-dashboard #observations.main_loaded form, .embedded-dashboard #observations.secondary_loaded form, .embedded-dashboard #observations.main_loaded .observationChartWrapper, .embedded-dashboard #observations.secondary_loaded .observationChartWrapper{
+  pointer-events: auto;
 }
 .embedded-dashboard #observations.none_loaded #observationChartWrapper, .embedded-dashboard #observations.main_loading #observationChartWrapper, .embedded-dashboard #observations.none_loaded form{
   display: none;
@@ -198,10 +228,10 @@
   max-height: 100px;
   transition: max-height 0.5s;
 }
-.embedded-dashboard #observations.main_loading #loading-screen-wrapper, .embedded-dashboard #observations.secondary_loading #loading-screen-wrapper{
+.embedded-dashboard #observations.main_loading #loading-screen-wrapper, .embedded-dashboard #observations.secondary_loading #loading-screen-wrapper, .embedded-dashboard #observations.adjusting_timeframe #loading-screen-wrapper{
   max-height: 100px;
 }
-.embedded-dashboard #observations.main_loaded #loading-screen-wrapper, .embedded-dashboard #observations.secondary_loaded #loading-screen-wrapper{
+.embedded-dashboard #observations.none_loaded #loading-screen-wrapper, .embedded-dashboard #observations.main_loaded #loading-screen-wrapper, .embedded-dashboard #observations.secondary_loaded #loading-screen-wrapper{
   max-height: 0;
   transition-delay: 0.5s;
 }
@@ -218,7 +248,7 @@
   grid-template-rows: auto auto;
   grid-auto-flow: column;
 }
-.embedded-dashboard #sideBySideComparison div{
+.embedded-dashboard #sideBySideComparison>div{
   flex-basis: 50%;
   flex-grow: 0;
   flex-shrink: 0;

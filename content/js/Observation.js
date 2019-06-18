@@ -4,6 +4,7 @@ function Stream(id, isLive) {
     this.datasetDownsampled = [];
     this.isLive = typeof isLive === "undefined" ? true : isLive;
     this.cacheLive = [];
+    this.id = id;
     this.streamData = { //is loaded in prototype.loadPropertyDescription
         "unitOfMeasurement" : {
             "name" : null,
@@ -20,7 +21,7 @@ function Stream(id, isLive) {
     }
 }
 
-Stream.prototype.getFromServer = function($http, callback){
+Stream.prototype.getFromServer = function($http, handleHttpError, callback){
     $http.get(this.baseURL + "/Observations?$orderby=phenomenonTime desc&$top=1").then(function (r) {
         if(!r.data.value[0]){
             //no data
@@ -29,13 +30,13 @@ Stream.prototype.getFromServer = function($http, callback){
         }
         var endDate = moment(r.data.value[0]['phenomenonTime']);
         var startDate = moment(endDate).subtract(1, 'days');
-        this.getFromServerDateTime($http, startDate, endDate, callback);
-    }.bind(this));
+        this.getFromServerDateTime($http, handleHttpError, startDate, endDate, callback);
+    }.bind(this)).catch((function(error){
+        handleHttpError(error, this.id);
+    }).bind(this));
 }
 
-//https://api.smartaq.net/v1.0/Datastreams('saqn%3Ads%3Ad4196c3')/Observations?$filter=phenomenonTime%20gt%202019-06-14T03:59:52.000Z%20sub%20duration%27P1d%27&$orderby=phenomenonTime%20desc&$top=10000
-
-Stream.prototype.getFromServerDateTime = function($http, start, end, callback){
+Stream.prototype.getFromServerDateTime = function($http, handleHttpError, start, end, callback){
     $http.get(this.baseURL + "/Observations?$filter=phenomenonTime gt " + start.toISOString() + " and phenomenonTime lt "+ end.toISOString() +"&$orderby=phenomenonTime desc&$top=10000").then(function (response) {
         this.dataset.length = 0;
         response.data.value.forEach(function (value, key) {
@@ -47,7 +48,9 @@ Stream.prototype.getFromServerDateTime = function($http, start, end, callback){
             this.datasetDownsampled.push(point);
         }.bind(this));
         callback();
-    }.bind(this));
+    }.bind(this)).catch((function(error){
+        handleHttpError(error, this.id);
+    }).bind(this));
 }
 
 Stream.prototype.setLive = function(isLive){
@@ -57,12 +60,14 @@ Stream.prototype.setLive = function(isLive){
     }
 }
 
-Stream.prototype.loadPropertyDescription = function($http, callback){
+Stream.prototype.loadPropertyDescription = function($http, handleHttpError, callback){
     $http.get(this.baseURL + "?$expand=ObservedProperty").then(function (r) {
         this.streamData["unitOfMeasurement"] = r.data["unitOfMeasurement"];
         this.streamData["ObservedProperty"] = r.data["ObservedProperty"];
         callback();
-    }.bind(this));
+    }.bind(this)).catch((function(error){
+        handleHttpError(error, this.id);
+    }).bind(this));
 }
 
 Stream.prototype.commitLiveData = function(){
@@ -70,7 +75,6 @@ Stream.prototype.commitLiveData = function(){
         this.addDataPoint(point, "unshift", true);
     }.bind(this));
     this.cacheLive.length = 0;
-    this._dataChanged();
 }
 
 Stream.prototype.addDataPoint = function(value, method, isLive){
@@ -124,7 +128,8 @@ Datastreams.states = {
     "main_loading": "main_loading",
     "main_loaded": "main_loaded",
     "secondary_loading": "secondary_loading",
-    "secondary_loaded": "secondary_loaded"
+    "secondary_loaded": "secondary_loaded",
+    "adjusting_timeframe": "adjusting_timeframe"
 }
 
 function Datastreams($http, ...ids){
@@ -144,6 +149,7 @@ Datastreams.prototype.setLive = function(isLive){
     Object.keys(this.streams).forEach(function(key){
         this.streams[key].setLive(isLive);
     }.bind(this));
+    this._dataChanged();
 }
 
 Datastreams.prototype.setState = function(state){
@@ -203,14 +209,50 @@ Datastreams.prototype._subscribeToStreams = function () {
 }
 
 Datastreams.prototype.adjustDatetimeRange = function($http, start, end){
+    this.setState(Datastreams.states["adjusting_timeframe"]);
+    var streamLength = Object.keys(this.streams).length;
+    var currentStream = 0;
     Object.keys(this.streams).forEach(function(key){
-        this.streams[key].getFromServerDateTime($http, start, end, function(){
-            
-        });
+        this.streams[key].getFromServerDateTime($http, this.handleHttpError.bind(this), start, end, function(){
+            currentStream++;
+            if(currentStream >= streamLength){
+                //all streams reloaded
+                if(streamLength == 1){
+                    this.setState(Datastreams.states["main_loaded"]);
+                }
+                else{
+                    this.setState(Datastreams.states["secondary_loaded"]);
+                }
+                this._dataChanged();
+            }
+        }.bind(this));
     }.bind(this));
 }
 
-Datastreams.prototype.addStream = function (id) {
+Datastreams.prototype.handleHttpError = function(error, streamId){
+    $.snackbar({content: "The request was not successfull " + error.status});
+    switch(this.state){
+        case Datastreams.states["main_loading"]:
+        case Datastreams.states["secondary_loading"]:
+            if(streamId){
+                this.removeStream(streamId);
+            }
+            break;
+        case Datastreams.states["adjusting_timeframe"]:
+            if (Object.keys(this.streams).length == 0){
+                this.setState(Datastreams.states["none_loaded"]);
+            }
+            else if (Object.keys(this.streams).length == 1){
+                this.setState(Datastreams.states["main_loaded"]);
+            }
+            else{
+                this.setState(Datastreams.states["secondary_loaded"]);
+            }
+        break;
+    }
+}
+
+Datastreams.prototype.addStream = function (id, startMoment, endMoment) {
     this.streams[id] = new Stream(id, this.isLive);
     if (Object.keys(this.streams).length == 1){
         this.setState(Datastreams.states["main_loading"]);
@@ -218,9 +260,8 @@ Datastreams.prototype.addStream = function (id) {
     else{
         this.setState(Datastreams.states["secondary_loading"]);
     }
-    this.streams[id].loadPropertyDescription(this.$http, function(){
-        this.streams[id].getFromServer(this.$http, function(){
-
+    this.streams[id].loadPropertyDescription(this.$http, this.handleHttpError.bind(this), function(){
+        function afterGetCallback(){
             console.log("initial data load finished");
             if (Object.keys(this.streams).length == 1){
                 this.setState(Datastreams.states["main_loaded"]);
@@ -229,7 +270,13 @@ Datastreams.prototype.addStream = function (id) {
                 this.setState(Datastreams.states["secondary_loaded"]);
             }
             this._dataChanged();
-        }.bind(this));
+        }
+        if(startMoment && endMoment){
+            this.streams[id].getFromServerDateTime(this.$http, this.handleHttpError.bind(this), startMoment, endMoment, afterGetCallback.bind(this));
+        }
+        else{
+            this.streams[id].getFromServer(this.$http, this.handleHttpError.bind(this), afterGetCallback.bind(this));
+        }
     }.bind(this));
 
     if(this.isClientConnected){
@@ -251,14 +298,14 @@ Datastreams.prototype._subscribe = function(id){
 }
 
 Datastreams.prototype.removeStream = function (id) {
+    this.client.unsubscribe("v1.0/Datastreams(" + getId(id) + ")/Observations");
+    delete this.streams[id];
     if (Object.keys(this.streams).length == 0){
         this.setState(Datastreams.states["none_loaded"]);
     }
     else{
         this.setState(Datastreams.states["main_loaded"]);
     }
-    this.client.unsubscribe("v1.0/Datastreams(" + getId(id) + ")/Observations");
-    delete this.streams[id];
     this.toChart();
 }
 

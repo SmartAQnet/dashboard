@@ -70,7 +70,7 @@
                 </div>
 
                 <div class="tab-pane" id="observations" ng-class="datastreams.state">
-                    <form>
+                    <form ng-class="{disabled: datastreams.state != Datastreams.states['main_loaded'] && datastreams.state != Datastreams.states['secondary_loaded']}">
                         <button id="datetimes" class="btn btn-secondary dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
                             <span ng-if="!startDate">Select Date</span>
                             <span ng-if="startDate">{{startDate}} - {{endDate}}</span>
@@ -106,7 +106,7 @@
                             <div class="grid-cell">Result Time</div>
                             <div ng-repeat-end class="grid-cell">Result</div>
                         </div>
-                        <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0}">
+                        <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0, autoresize: true}">
                             <div class="grid-row" ng-class="{top: x == observationsList[0]}" ng-repeat="x in observationsList">
                                 <div class="grid-cell">{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
                                 <div class="grid-cell">{{x["result"]}}</div>
@@ -120,7 +120,7 @@
                                     <div class="grid-cell">Result Time</div>
                                     <div ng-repeat-end class="grid-cell">Result</div>
                                 </div>
-                                <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0}">
+                                <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0, autoresize: true}">
                                     <div class="grid-row" ng-class="{top: x == observationsList[0]}" ng-repeat="x in observationsList">
                                         <div class="grid-cell">{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
                                         <div class="grid-cell">{{x["result"]}}</div>
@@ -134,7 +134,7 @@
                                     <div ng-repeat-end class="grid-cell">Result</div>
                                 </div>
                                 <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0}">
-                                    <div class="grid-row" ng-class="{top: x == observationsList[0]}" ng-repeat="x in observationsList">
+                                    <div class="grid-row" ng-class="{top: x == secondObservationsList[0]}" ng-repeat="x in secondObservationsList">
                                         <div class="grid-cell">{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
                                         <div class="grid-cell">{{x["result"]}}</div>
                                     </div>

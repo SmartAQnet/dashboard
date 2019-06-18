@@ -30,7 +30,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     datastreams.addDataChangeListener(onDataChangeUpdater);
 
     function otherDateSelected(start, end){
-        renderDate(start, end);
+        setDate(start, end);
         datastreams.adjustDatetimeRange($http, start,end);
         var diff = moment.duration(moment().diff(end)).asHours();
         if(diff > 2){
@@ -40,7 +40,9 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         }
     }
 
-    function renderDate(start, end){
+    function setDate(start, end){
+        $scope.startDateMoment = start;
+        $scope.endDateMoment = end;
         $scope.startDate = start.format('YYYY-MM-DD HH:mm:ss');
         $scope.endDate = end.format('YYYY-MM-DD HH:mm:ss');
         $scope.safeApply();
@@ -53,7 +55,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
             if($scope.observationsList.length > 0){
                 startDate = moment($scope.observationsList[$scope.observationsList.length - 1]["phenomenonTime"]);
                 endDate = moment($scope.observationsList[0]["phenomenonTime"]);
-                renderDate(startDate, endDate);
+                setDate(startDate, endDate);
             }
             $('#datetimes').daterangepicker({
                 timePicker: true,
@@ -221,7 +223,12 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     $scope.datastreamClicked = function(datastreamId, datastreamName) {
         /*TODO: Prepare datastream for diagram*/
         console.log("Add " + datastreamId + "to diagram");
-        $scope.secondObservationsList = datastreams.addStream(datastreamId).dataset;
+        if($scope.startDateMoment && $scope.endDateMoment){
+            $scope.secondObservationsList = datastreams.addStream(datastreamId, $scope.startDateMoment, $scope.endDateMoment).dataset;
+        }
+        else{
+            $scope.secondObservationsList = datastreams.addStream(datastreamId).dataset;
+        }
         $scope.nameSecondary = datastreamName;
         datastreams.toChart("#observationChart");
         $('#thingSelection').trigger('click');
