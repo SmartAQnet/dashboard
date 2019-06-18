@@ -207,22 +207,25 @@
                                     <thead class="st-thead">
                                         <tr>
                                             <th ng-click="sortBy('name')"> Name </th>
-                                            <th>Description</th>
-                                            <th>Observed Property</th>
-                                            <!--th>Unit of Measurement</th-->
-                                            <th>Time</th>
-                                            <th>Area</th>
-                                        </tr>
+                                                    <!--th>Description</th-->
+                                                    <th>Observed Property</th>
+                                                    <!--th>Unit of Measurement</th-->
+                                                    <th>From</th>
+                                                    <th>Until</th>
+                                                    <!--th>Area</th-->
+                                                </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="x in datastreamsList| orderBy:propertyName:reverse"
-                                            ng-click="datastreamClicked(x['@iot.id'], x['name'])">
-                                            <td>{{x["name"]}}</td>
-                                            <td>{{x["description"]}}</td>
-                                            <td>{{x["ObservedProperty"]["name"]}}</td>
+                                        <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
+                                            <td>
+                                                <span title="{{x['name']}}">{{x["name"] | limitTo : 26}}...</span>
+                                            </td>
+                                            <!--td>{{x["description"]}}</td-->
+                                            <td>{{x['ObservedProperty']['name']}}</td>
                                             <!--td>{{x["unitOfMeasurement"]}}</td-->
-                                            <td>{{x["phenomenonTime"]}}</td>
-                                            <td>{{x["observedArea"]}}</td>
+                                            <td>{{x["phenomenonTime"] | limitTo : 24 | date:'yyyy-MM-dd HH:mm:ss'}} </td>
+                                            <td>{{x["phenomenonTime"] | limitTo : -24 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                            <!--td>{{x["observedArea"]}}</td-->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -233,22 +236,25 @@
                                 <thead class="st-thead">
                                     <tr>
                                         <th ng-click="sortBy('name')"> Name </th>
-                                        <th>Description</th>
-                                        <th>Observed Property</th>
-                                        <!--th>Unit of Measurement</th-->
-                                        <th>Time</th>
-                                        <th>Area</th>
-                                    </tr>
+                                                <!--th>Description</th-->
+                                                <th>Observed Property</th>
+                                                <!--th>Unit of Measurement</th-->
+                                                <th>From</th>
+                                                <th>Until</th>
+                                                <!--th>Area</th-->
+                                            </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="x in datastreamsList| orderBy:propertyName:reverse"
-                                        ng-click="datastreamClicked(x['@iot.id'], x['name'])">
-                                        <td>{{x["name"]}}</td>
-                                        <td>{{x["description"]}}</td>
-                                        <td>{{x["ObservedProperty"]["name"]}}</td>
+                                    <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
+                                        <td>
+                                            <span title="{{x['name']}}">{{x["name"] | limitTo : 26}}...</span>
+                                        </td>
+                                        <!--td>{{x["description"]}}</td-->
+                                        <td>{{x['ObservedProperty']['name']}}</td>
                                         <!--td>{{x["unitOfMeasurement"]}}</td-->
-                                        <td>{{x["phenomenonTime"]}}</td>
-                                        <td>{{x["observedArea"]}}</td>
+                                        <td>{{x["phenomenonTime"] | limitTo : 24 | date:'yyyy-MM-dd HH:mm:ss'}} </td>
+                                        <td>{{x["phenomenonTime"] | limitTo : -24 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                        <!--td>{{x["observedArea"]}}</td-->
                                     </tr>
                                 </tbody>
                             </table>
@@ -273,30 +279,34 @@
                             </div>
                             <!-- Datastream selection -->
                             <div ng-if="modalState == 'datastreamSelection'">
-                                    <button class="backbutton">
-                                        <a href="javascript:void(0);" ng-click="showAllThingsSelection()"><span
-                                                class="entityInfoHeader"><i class="fas fa-arrow-left mr-3"></i>Back to
-                                                active Things</span></a>
-                                    </button>
+                                <button class="backbutton">
+                                    <a href="javascript:void(0);" ng-click="showAllThingsSelection()"><span
+                                            class="entityInfoHeader"><i class="fas fa-arrow-left mr-3"></i>Back to
+                                            active Things</span></a>
+                                </button>
+                                <table class="table table-bordered table-hover st-table table-striped table-sm">
                                     <thead class="st-thead">
                                         <tr>
                                             <th ng-click="sortBy('name')"> Name </th>
-                                            <th>Description</th>
+                                            <!--th>Description</th-->
                                             <th>Observed Property</th>
                                             <!--th>Unit of Measurement</th-->
-                                            <th>Time</th>
-                                            <th>Area</th>
+                                            <th>From</th>
+                                            <th>Until</th>
+                                            <!--th>Area</th-->
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="x in datastreamsList| orderBy:propertyName:reverse"
-                                            ng-click="datastreamClicked(x['@iot.id'], x['name'])">
-                                            <td>{{x["name"]}}</td>
-                                            <td>{{x["description"]}}</td>
-                                            <td>{{x["ObservedProperty"]["name"]}}</td>
+                                        <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
+                                            <td>
+                                                <span title="{{x['name']}}">{{x["name"] | limitTo : 26}}...</span>
+                                            </td>
+                                            <!--td>{{x["description"]}}</td-->
+                                            <td>{{x['ObservedProperty']['name']}}</td>
                                             <!--td>{{x["unitOfMeasurement"]}}</td-->
-                                            <td>{{x["phenomenonTime"]}}</td>
-                                            <td>{{x["observedArea"]}}</td>
+                                            <td>{{x["phenomenonTime"] | limitTo : 24 | date:'yyyy-MM-dd HH:mm:ss'}} </td>
+                                            <td>{{x["phenomenonTime"] | limitTo : -24 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                            <!--td>{{x["observedArea"]}}</td-->
                                         </tr>
                                     </tbody>
                                 </table>

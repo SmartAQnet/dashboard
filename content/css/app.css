@@ -227,6 +227,7 @@
   position: relative;
   max-height: 100px;
   transition: max-height 0.5s;
+  overflow: hidden;
 }
 .embedded-dashboard #observations.main_loading #loading-screen-wrapper, .embedded-dashboard #observations.secondary_loading #loading-screen-wrapper, .embedded-dashboard #observations.adjusting_timeframe #loading-screen-wrapper{
   max-height: 100px;
