@@ -5133,3 +5133,27 @@ table.dataTable th.focus,
 .embedded-dashboard .backbutton-active, .embedded-dashboard .backbutton:hover {
   background-color: #ccc;
 }
+
+
+
+/* *********  Map Legend  **************************** */
+
+
+
+
+/* *********  Full Screen  **************************** */
+.embedded-dashboard .map:-moz-full-screen {
+  height: 100%;
+}
+.embedded-dashboard .map:-webkit-full-screen {
+  height: 100%;
+}
+.embedded-dashboard .map:-ms-fullscreen {
+  height: 100%;
+}
+.embedded-dashboard .map:fullscreen {
+  height: 100%;
+}
+.embedded-dashboard .ol-rotate {
+  top: 3em;
+}

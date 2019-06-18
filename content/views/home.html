@@ -36,7 +36,13 @@
                 <div class="card" >
                     <div class="card-header">Map showing active Sensors</div>
                     <div class="card-body">
-                        <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px"></div>
+                        <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px">
+                            <div id="legend">
+                                <h2>Legend:</h2>
+                                <div class="legendbox" id="legendbox">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-footer">
                         <div class="row py-2">

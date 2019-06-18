@@ -142,6 +142,7 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 		};*/
 		ColoredMarkerLayer.getSource().changed();
 		canvasLayer.getSource().changed();
+		
 		 
 	};
 
@@ -163,7 +164,7 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 	};
 
 	
-	var amountofsimulations = setupsimulations(10);
+	var amountofsimulations = setupsimulations(20);
 	window.setTimeout(backroundsimulation, 0);
 	
     
