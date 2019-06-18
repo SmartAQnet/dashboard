@@ -39,21 +39,48 @@
                         <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px"></div>
                     </div>
                     <div class="card-footer">
-                            <p>Choose the Layers of the Map:</p>
-                            <div>
-                            <input type="checkbox" id="Layer-Pins" name="Layer-Pins" checked>
-                            <label for="Layer-Pins">Pins</label>
+                        <div class="row py-2">
+                            <div class="col-md-6">
+                                <p>Choose the Layers of the Map:</p>
+                                <div>
+                                    <input type="checkbox" id="Layer-Pins" name="Layer" checked>
+                                    <label for="Layer-Pins">Pins</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="Layer-ColoredMarkers" name="Layer">
+                                    <label for="Layer-ColoredMarkers">Colored Markers</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="Layer-Kriging" name="Layer">
+                                    <label for="Layer-Kriging">Kriging</label>
+                                </div> 
                             </div>
-                            <div>
-                            <input type="checkbox" id="Layer-ColoredMarkers" name="Layer-ColoredMarkers">
-                            <label for="Layer-ColoredMarkers">Colored Markers</label>
+                            <div class="col-md-6">
+                                <p>Choose Data Source:</p>
+                                <div>
+                                    <input type="radio" id="Source-Real" name="Source" value="realsource" checked>
+                                    <label for="Source-Real">Real Data</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="Source-Simulation" name="Source" value="simulationsource">
+                                    <label for="Source-Simulaion">Simulation Data</label>
+                                </div>
                             </div>
-                            <div>
-                            <input type="checkbox" id="Layer-Kriging" name="Layer-Kriging">
-                            <label for="Layer-Kriging">Kriging</label>
+                        </div>
+                    </div>                    
+                    <div class="card-footer">
+                        <div class="row py-2">
+                            <div class="col-md-6">
+                                <button class="refreshbutton" id="refreshbutton">Refresh Map</button> <!-- disable for few sec or until loaded-->
                             </div>
+                            <div class="col-md-6">
+                                <input type="checkbox" id="auto-refresh" name="auto-refresh">
+                                <label for="auto-refresh">Auto-Refresh</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </div>

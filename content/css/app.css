@@ -439,16 +439,19 @@
 }
 
 .embedded-dashboard .bg-yellow, .embedded-dashboard  .callout.callout-warning, .embedded-dashboard  .alert-warning, .label-warning, .embedded-dashboard  .modal-warning .modal-body {
-    background-color: #f39c12 !important;
+    background-color: #f39c12 !important;    
+    border-radius: 4px;
 }
 
 .embedded-dashboard .bg-red, .embedded-dashboard  .callout.callout-warning, .embedded-dashboard  .alert-warning, .label-warning, .embedded-dashboard  .modal-warning .modal-body {
     background-color: #D9534F !important;
+    border-radius: 4px;
 }
 
 
 .embedded-dashboard .bg-green, .embedded-dashboard  .callout.callout-warning, .embedded-dashboard  .alert-warning, .label-warning, .embedded-dashboard  .modal-warning .modal-body {
     background-color: #00A65A !important;
+    border-radius: 4px;
 }
 
 
@@ -2376,7 +2379,7 @@ table.dataTable th.focus,
 
 .embedded-dashboard .buttons, .embedded-dashboard  button, .embedded-dashboard  .btn {
   margin-bottom: 5px;
-  margin-right: 5px;
+  /* margin-right: 5px; */
 }
 
 .embedded-dashboard .btn-group-vertical .btn, .embedded-dashboard  .btn-group .btn {
@@ -2732,6 +2735,15 @@ table.dataTable th.focus,
 /* ***** /autocomplete *****/
 
 /* ***** buttons ********/
+.embedded-dashboard .refreshbutton {
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.embedded-dashboard .refreshbutton:hover {
+  cursor: pointer; 
+}
+
 .embedded-dashboard .btn {
   border-radius: 3px;
 }
@@ -5443,6 +5455,7 @@ table.dataTable th.focus,
 
 /* Back button in same style as collapsible*/
 .embedded-dashboard .backbutton {
+  display: block;
   background-color: #f5f5f5; 
   color: #000000; 
   cursor: pointer;

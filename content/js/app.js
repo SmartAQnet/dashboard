@@ -44,7 +44,7 @@ function getUrl() {
 	if (typeof stURL !== 'undefined') {
 		return stURL   
 	} else if (window.location.protocol.localeCompare("file:"  !== '0')) {
-		return "https://smartaqnet.teco.edu"
+		return "https://api.smartaq.net"
 		//return "https://smartaqnet-dev.dmz.teco.edu"
 	}
 	return "";
@@ -56,6 +56,12 @@ function getId(id) {
 
 
 var olMap;
+var PinLayer;
+var ColoredMarkerLayer;
+var HeatmapLayer;
+var WFSVectorLayer;
+var tileLayer;
+
 var defaultMarkerStyle = new ol.style.Style({
 	image: new ol.style.Icon(({
 		anchor: [0.5, 1],
@@ -68,24 +74,27 @@ var defaultMarkerStyle = new ol.style.Style({
 
 
 
-var stylefunction = function(pmvalue){
 
+var colorfunction = function(result){
+	
 	var brownanchor = 100
 	var redanchor = 50
 	var yellowanchor = 30
 	var greenanchor = 10
 
-	var colorfunction = function(result){
+	if (result > brownanchor) {redrgb = 96, greenrgb = 64, bluergb = 0} //brown area
+	if (result > redanchor && result < brownanchor) {redrgb = (192-96)*(1-((result-redanchor)/(brownanchor-redanchor))) + 96 , greenrgb=64*((result-redanchor)/(brownanchor-redanchor)), bluergb=0} //slide red to brown: (192,0,0) - (96,64,0)
+	if (result < redanchor && result > yellowanchor) {redrgb = 192, greenrgb=(1-((result-yellowanchor)/(redanchor-yellowanchor)))*192, bluergb=0} // slide yellow to red: (192,192,0) - (192,0,0)
+	if (result < yellowanchor && result > greenanchor) {redrgb = ((result-greenanchor)/(yellowanchor-greenanchor))*192, greenrgb = 192, bluergb = 0} //slide green to yellow (0,192,0) - (192,192,0)
+	if (result < greenanchor) {redrgb = 0, greenrgb = 192, bluergb = 0} //green area
+
+	return(redrgb.toString() + ',' + greenrgb.toString() + ',' + bluergb.toString())
+}
 
 
-		if (result > brownanchor) {redrgb = 96, greenrgb = 64, bluergb = 0} //brown area
-		if (result > redanchor && result < brownanchor) {redrgb = (192-96)*(1-((result-redanchor)/(brownanchor-redanchor))) + 96 , greenrgb=64*((result-redanchor)/(brownanchor-redanchor)), bluergb=0} //slide red to brown: (192,0,0) - (96,64,0)
-		if (result < redanchor && result > yellowanchor) {redrgb = 192, greenrgb=(1-((result-yellowanchor)/(redanchor-yellowanchor)))*192, bluergb=0} // slide yellow to red: (192,192,0) - (192,0,0)
-		if (result < yellowanchor && result > greenanchor) {redrgb = ((result-greenanchor)/(yellowanchor-greenanchor))*192, greenrgb = 192, bluergb = 0} //slide green to yellow (0,192,0) - (192,192,0)
-		if (result < greenanchor) {redrgb = 0, greenrgb = 192, bluergb = 0} //green area
+var stylefunction = function(pmvalue){
 
-		return(redrgb.toString() + ',' + greenrgb.toString() + ',' + bluergb.toString())
-	}
+
 
 
 	var colormarker = new ol.style.Style({
@@ -114,6 +123,18 @@ var heatmapfeature = function(lonLat, pmvalue){
 }
 
 
+//kriging parameters, see https://codepen.io/jianxunrao/pen/oadBPq
+var params={
+	mapCenter:[10.8986971, 48.3668041],
+	maxValue:100,
+	krigingModel:'exponential',//model还可选'gaussian','spherical','exponential'
+	krigingSigma2:0,
+	krigingAlpha:100,
+	canvasAlpha:0.35,//canvas图层透明度
+	colors:["#006837", "#1a9850", "#66bd63", "#a6d96a", "#d9ef8b", "#ffffbf","#fee08b", "#fdae61", "#f46d43", "#d73027", "#a50026"],
+};
+
+
 
 
 //creates the entire map
@@ -124,6 +145,7 @@ function createMap(target) {
 
 	//create layers with collections and sources
 
+	//pin layer for locations of things
 	PinSource = new ol.source.Vector({
 		format: new ol.format.GeoJSON(),
 		features: PinCollection = new ol.Collection()
@@ -133,6 +155,7 @@ function createMap(target) {
 	});
 
 
+	//colored markers for latest observations per datastream with feature of interest
 	ColoredMarkerSource = new ol.source.Vector({
 		format: new ol.format.GeoJSON(),
 		features: ColoredMarkerCollection = new ol.Collection()
@@ -141,7 +164,61 @@ function createMap(target) {
 		source: ColoredMarkerSource
 	});
 
+
+
+	SimulationSource = new ol.source.Vector({
+		format: new ol.format.GeoJSON(),
+		features: SimulationCollection = new ol.Collection()
+	})
+
+	/*
+	//simulation layer map ------------------------------------------------------------------------------
+	SimulationLayer = new ol.layer.Vector({
+		source: SimulationSource = new ol.source.Vector({
+			format: new ol.format.GeoJSON(),
+			features: SimulationCollection = new ol.Collection()
+		})
+	});
+*/
+
+	//simulation invisible layer map ------------------------------------------------------------------------------
+	SimulationInvisibleLayer = new ol.layer.Vector({
+		source: SimulationInvisibleSource = new ol.source.Vector({
+			format: new ol.format.GeoJSON(),
+			features: SimulationInvisibleCollection = new ol.Collection()
+		})
+	});
+
+
+	canvasLayer=new ol.layer.Image({
+		source: new ol.source.ImageCanvas({
+			canvasFunction:(extent, resolution, pixelRatio, size, projection) =>{
+				let canvas = document.createElement('canvas');
+				canvas.width = size[0];
+				canvas.height = size[1];
+				canvas.style.display='block';
+				//设置canvas透明度
+				canvas.getContext('2d').globalAlpha=params.canvasAlpha;                          
 	
+				//使用分层设色渲染
+				kriging.plot(canvas,grid,
+					[extent[0],extent[2]],[extent[1],extent[3]],params.colors);	
+
+				return canvas;
+			},
+			projection: 'EPSG:4326'
+		})
+	})
+
+
+	//kriging layer map --------------------------------------------------------------------------------
+	WFSVectorSource = new ol.source.Vector();
+	WFSVectorLayer = new ol.layer.Vector({
+			source: WFSVectorSource,
+	});
+
+
+	//Heatmap layer
 	HeatmapSource = new ol.source.Vector({
 		format: new ol.format.GeoJSON(),
 		features: HeatmapCollection  = new ol.Collection()
@@ -187,9 +264,8 @@ function createMap(target) {
 		//Set layers
 		layers: [
 			tileLayer, 
-			PinLayer
-			//geoJSONLayer,
-			//HeatmapLayer
+			//PinLayer,
+			//ColoredMarkerLayer
 		],
 
 		//Set Target, View and Interactions
@@ -198,64 +274,13 @@ function createMap(target) {
 		interactions: ol.interaction.defaults({ altShiftDragRotate: false, pinchRotate: false })
 	});
 
-	//kriging parameters, see https://codepen.io/jianxunrao/pen/oadBPq
-	var params={
-		mapCenter:[10.8986971, 48.3668041],
-		maxValue:100,
-		krigingModel:'exponential',//model还可选'gaussian','spherical','exponential'
-		krigingSigma2:0,
-		krigingAlpha:100,
-		canvasAlpha:0.75,//canvas图层透明度
-		colors:["#006837", "#1a9850", "#66bd63", "#a6d96a", "#d9ef8b", "#ffffbf","#fee08b", "#fdae61", "#f46d43", "#d73027", "#a50026"],
-	};
 
-	//kriging layers map --------------------------------------------------------------------------------
+	
 
-	WFSVectorSource=new ol.source.Vector();
-	WFSVectorLayer=new ol.layer.Vector(
-		{
-			source: WFSVectorSource,
-		});
-	olMap.addLayer(WFSVectorLayer);
-
-	//add interaction
-	var select = new ol.interaction.Select();
-	olMap.addInteraction(select);
-	var dragBox = new ol.interaction.DragBox({
-		condition: ol.events.condition.platformModifierKeyOnly
-	});
-	olMap.addInteraction(dragBox);
-
-
-
-	//add single point
-	var feature = new ol.Feature({
-		geometry: new ol.geom.Point(ol.proj.fromLonLat([8.4,49])),
-		value: 10
-
-	});
-
-	feature.setStyle(new ol.style.Style({
-		image: new ol.style.Circle({
-			radius: 6,
-			fill: new ol.style.Fill({
-				color: "#FF000F"
-			}),
-			stroke: new ol.style.Stroke({
-				color: '#00000F',
-				width: 3
-			})
-		})
-	}));
-
-	WFSVectorSource.addFeature(feature);
-
-
-
-
-	//add features
-	for (let i = 0; i < 10; i++) {
-		var feature = new ol.Feature({
+/*
+	//add random features
+	for (let i = 0; i < 100; i++) {
+		let feature = new ol.Feature({
 			geometry: new ol.geom.Point(
 				ol.proj.fromLonLat([params.mapCenter[0]+Math.random()*0.01-.005,params.mapCenter[1]+Math.random()*0.01-.005])), 
 				value: Math.round(Math.random()*params.maxValue)
@@ -263,23 +288,38 @@ function createMap(target) {
 		feature.setStyle(new ol.style.Style({
 			image: new ol.style.Circle({
 				radius: 6,
-				fill: new ol.style.Fill({color: "#00000F"})
+				fill: new ol.style.Fill({color: 'rgba(' + colorfunction(Math.random()*50) + ',' + Math.random() + ')'})
 			})
 		}));
 		WFSVectorSource.addFeature(feature);
 	}
+*/
 
+	/*
+	olMap.addLayer(WFSVectorLayer);
 
-
-
-
-	setTimeout(delayedUpdateMap, 300);
-
-
-
-
-
-/*
+	//添加选择和框选控件，按住Ctrl/⌘键，使用鼠标框选采样点
+	let select = new ol.interaction.Select();
+	olMap.addInteraction(select);
+	let dragBox = new ol.interaction.DragBox({
+		condition: ol.events.condition.platformModifierKeyOnly
+	});
+	olMap.addInteraction(dragBox);
+	
+	//创建10个位置随机、属性值随机的特征点
+	for (let i = 0; i < 10; i++) {
+		let feature = new ol.Feature({
+			geometry: new ol.geom.Point([params.mapCenter[0]+Math.random()*0.01-.005,params.mapCenter[1]+Math.random()*0.01-.005]), value: Math.round(Math.random()*params.maxValue)
+		});
+		feature.setStyle(new ol.style.Style({
+			image: new ol.style.Circle({
+				radius: 6,
+				fill: new ol.style.Fill({color: "#00F"})
+			})
+		}));
+		WFSVectorSource.addFeature(feature);
+	}
+	
 	//设置框选事件
 	let selectedFeatures = select.getFeatures();
 	dragBox.on('boxend', ()=>{
@@ -292,11 +332,8 @@ function createMap(target) {
 	dragBox.on('boxstart', ()=>{
 		selectedFeatures.clear();
 	});
-
-
-
-
-		//绘制kriging插值图
+	
+	//绘制kriging插值图
 	let canvasLayer=null;
 	const drawKriging=(extent)=>{
 		let values=[],lngs=[],lats=[];
@@ -305,15 +342,15 @@ function createMap(target) {
 			lngs.push(feature.values_.geometry.flatCoordinates[0]);
 			lats.push(feature.values_.geometry.flatCoordinates[1]);
 		});
-		if (values.length>-1){
+		if (values.length>3){
 			let variogram=kriging.train(values,lngs,lats,
 				params.krigingModel,params.krigingSigma2,params.krigingAlpha);
-
+	
 			let polygons=[];
 			polygons.push([[extent[0],extent[1]],[extent[0],extent[3]],
 				[extent[2],extent[3]],[extent[2],extent[1]]]);
 			let grid=kriging.grid(polygons,variogram,(extent[2]-extent[0])/200);
-
+	
 			let dragboxExtent=extent;
 			//移除已有图层
 			if (canvasLayer !== null){
@@ -329,20 +366,20 @@ function createMap(target) {
 						canvas.style.display='block';
 						//设置canvas透明度
 						canvas.getContext('2d').globalAlpha=params.canvasAlpha;                          
-
+	
 						//使用分层设色渲染
 						kriging.plot(canvas,grid,
 							[extent[0],extent[2]],[extent[1],extent[3]],params.colors);
-
+	
 						return canvas;
 					},
 					projection: 'EPSG:4326'
 				})
 			})
 			//向map添加图层
-			map.addLayer(canvasLayer);
+			olMap.addLayer(canvasLayer);
 		}else {
-			alert("Fehlermeldung auf chinesisch: 有效样点个数不足，无法插值");
+			alert("有效样点个数不足，无法插值");
 		}
 	}
 	//首次加载，自动渲染一次差值图
@@ -351,12 +388,17 @@ function createMap(target) {
 			selectedFeatures.push(feature);
 		});
 	drawKriging(extent);
+	*/
+	setTimeout(delayedUpdateMap, 300);
 
-*/
 }
 
 
-//function that can be used to add features to the map with gps coordinates
+
+
+
+
+//function that can be used to add gps pins to the map
 function addGeoJSONFeature(geojson) {
 	var defaultGeoJSONProjection = 'EPSG:4326';
 	var mapProjection = olMap.getView().getProjection();
@@ -373,7 +415,7 @@ function addGeoJSONFeature(geojson) {
 }
 
 //function that can be used to add features to the map with gps coordinates and a value for value height which is used for color coding
-function addGeoJSONcolorFeature(geojson, result) {
+function addGeoJSONcolorFeature(geojson, result, resulttime) {
 	var defaultGeoJSONProjection = 'EPSG:4326';
 	var mapProjection = olMap.getView().getProjection();
 
@@ -385,13 +427,15 @@ function addGeoJSONcolorFeature(geojson, result) {
 		var geom = (new ol.format.GeoJSON()).readGeometry(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
 		var colormarkerfeature = new ol.Feature(geom);
 		colormarkerfeature.setStyle(stylefunction(result));
+		colormarkerfeature.setId(resulttime);
 		ColoredMarkerCollection.push(colormarkerfeature);
-		var heatmapfeature = heatmapfeature(geom,result);
-		HeatmapCollection.push(heatmapfeature);
+		//var heatmapfeature = heatmapfeature(geom,result);
+		//HeatmapCollection.push(heatmapfeature);
 	}
-}
+};
 
-//function that can be used to add features to the heatmap
+//function that can be used to add features to the heatmap 
+/*
 function addHeatmapFeature(geojson, result) {
 	var defaultGeoJSONProjection = 'EPSG:4326';
 	var mapProjection = olMap.getView().getProjection();
@@ -405,12 +449,47 @@ function addHeatmapFeature(geojson, result) {
 		olCollectionGeoJSON.push(feature);
 	}
 }
+*/
+
+
+function togglelayers(layer,toggle) {
+	if (toggle == true) {olMap.addLayer(layer)}
+	if (toggle == false)  {olMap.removeLayer(layer)}
+};
 
 
 
-function togglelayers(layerstring,toggle) {
-	if (toggle == true) {olMap.addLayer(eval(layerstring))}
-	if (toggle == false)  {olMap.removeLayer(eval(layerstring))}
+
+
+var idcounter = 1;
+var randomlocation = [];
+var randomvalue = [];
+var xspeed = [];
+var yspeed = [];
+var totalspeed = [];
+
+
+function setupsimulations(number){
+	for (let i = 0; i <= number-1; i++){
+		randomlocation[i] = [10.8986971+0.03*(Math.random()-0.5),48.3668041+0.03*(Math.random()-0.5)];
+		randomvalue[i] = 50*Math.random();
+		totalspeed[i] = Math.random()+Math.random()+Math.random();
+	};
+	return(number);
+}
+
+var grid;
+var caz = [[10.924750,48.386800],[10.870650,48.386800],[10.870650,48.332600],[10.924750,48.332600]]
+var riesenpolygon = [[12,49],[9,49],[9,46],[12,46]] 
+
+
+function krigstuff(locations,values){
+	var lats=locations.map(function(x){return x[1]})
+	var lngs=locations.map(function(x){return x[0]})
+	var variogram=kriging.train(values,lngs,lats,
+		params.krigingModel,params.krigingSigma2,params.krigingAlpha);
+	var polygons=[caz];
+	grid=kriging.grid(polygons,variogram,(polygons[0][0][1]-polygons[0][3][1])/200);
 };
 
 
@@ -418,6 +497,52 @@ function togglelayers(layerstring,toggle) {
 
 
 
+function simulate(id){
+
+	xspeed[id] = totalspeed[id]*Math.random();
+	yspeed[id] = Math.sqrt(totalspeed[id]*totalspeed[id] - xspeed[id]*xspeed[id]);
+
+	randomvalue[id] = randomvalue[id]*(Math.random()+Math.random()+0.05-randomvalue[id]/1000);
+	randomlocation[id] = [randomlocation[id][0]+(Math.random()-0.5)*0.001*xspeed[id],randomlocation[id][1]+(Math.random()-0.5)*0.001*yspeed[id]]
+
+	let SimulatedFeature = new ol.Feature({
+		geometry: new ol.geom.Point(ol.proj.fromLonLat(randomlocation[id])),
+		value: randomvalue[id]
+	});
+
+	SimulatedFeature.setId(Date.now());
+	SimulatedFeature.setStyle(stylefunction(randomvalue[id]))
+	SimulationInvisibleSource.addFeature(SimulatedFeature);
+
+	removeoldfeatures(10000); //store time in milliseconds
+};
+
+
+function removeoldfeatures(grace){	//same function for real observations
+	let threshold = Date.now() - grace;
+	SimulationInvisibleSource.forEachFeature(function(thisfeature){
+	if (thisfeature.getId() < threshold ) {
+		SimulationInvisibleSource.removeFeature(thisfeature)
+	}
+})};
+
+
+
+
+
+/*
+function SimulationSourceUpdate(){
+	SimulationSource.clear();
+	SimulationSource.addFeatures(SimulationInvisibleSource.getFeatures());
+};
+*/
+
+/*
+function UpdateMapLayers(){
+	ColoredMarkerLayer.getSource().changed();
+	canvasLayer.getSource().changed();
+};
+*/
 
 
 
