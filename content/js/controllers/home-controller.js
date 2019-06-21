@@ -53,13 +53,10 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 	
 	//show location of all active things
 	$http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27&$expand=Locations&$top=9999999").then(function (response) {
-		$scope.alllocationsList = response.data.value;
-		angular.forEach($scope.alllocationsList, function (value, key) {
+		$scope.allThings = response.data.value;
+		angular.forEach($scope.allThings, function (value, key) {
 			addGeoJSONFeature(value["Locations"][0]["location"]);
-			//addHeatmapFeature(value["Locations"][0]["location"],Math.random()*1000);
 		});
-
-		//zoomToGeoJSONLayerExtent(); leave default here because otherwise it would just show the entire world
 	});
 	
 	var kriginglocations = [];
@@ -81,8 +78,6 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 				}
 			
 			});
-			//if (realradio.checked) {
-			//	krigstuff(kriginglocations,krigingvalues);};
 		});
 	};
 
@@ -115,9 +110,10 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 	var realradio = document.getElementById("Source-Real");
 	realradio.addEventListener("click", function(){
 		if (realradio.checked) {
+			clearTimeout(runningsimulation);
 			PinLayer.setSource(PinSource);
 			ColoredMarkerLayer.setSource(ColoredMarkerSource);
-			refreshrate = 10000};
+			refreshrate = 10000}; 
 	});
 	
 	var simulationradio = document.getElementById("Source-Simulation");
@@ -152,18 +148,18 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 
 	
 
-
+	var runningsimulation;
 
 	//run simulation in background on invisible layer
 	var backroundsimulation = function(){
 		for (let i=0; i <= amountofsimulations-1; i++) {
 			simulate(i,totalspeed[i]);
 		};
-		window.setTimeout(backroundsimulation, refreshrate);
+		runningsimulation = window.setTimeout(backroundsimulation, refreshrate);
 	};
 
 	
-	var amountofsimulations = setupsimulations(10);
+	var amountofsimulations = setupsimulations(50);
 	window.setTimeout(backroundsimulation, 0);
 	
     

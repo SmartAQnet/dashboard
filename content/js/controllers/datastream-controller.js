@@ -115,16 +115,23 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     });
 
 
+
+
+
     $scope.mapVisible = true;
     createMap();
 
+
     $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$orderby=resultTime%20desc&$expand=FeatureOfInterest&$top=1").then(function (response) {
         $scope.latestResultValue = response.data.value[0]["result"];
-        $scope.latestFoI = response.data.value[0]["FeatureOfInterest"]["feature"]
+        $scope.latestFoI = response.data.value[0]["FeatureOfInterest"]["feature"];
+        togglelayers(ColoredMarkerLayer,true);
         addGeoJSONcolorFeature($scope.latestFoI,$scope.latestResultValue);
-        
-        zoomToGeoJSONLayerExtent();
+        setview($scope.latestFoI["coordinates"]);
     });
+
+
+
 
     /*
     // Example of setting a fixed marker 

@@ -104,7 +104,7 @@
                     <div id="observations-grid" ng-if="datastreams.state != Datastreams.states['secondary_loaded']">
                         <div class="grid-row grid-header">
                             <div class="grid-cell">Result Time</div>
-                            <div ng-repeat-end class="grid-cell">Result</div>
+                            <div ng-repeat-end class="grid-cell">Result [<span id="unitOfMeasurementone"></span>]</div>
                         </div>
                         <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0, autoresize: true}">
                             <div class="grid-row" ng-class="{top: x == observationsList[0]}" ng-repeat="x in observationsList">
@@ -118,7 +118,7 @@
                             <div id="observations-table-main" class="table table-bordered table-hover st-table table-striped table-sm">
                                 <div class="grid-row grid-header">
                                     <div class="grid-cell">Result Time</div>
-                                    <div ng-repeat-end class="grid-cell">Result</div>
+                                    <div ng-repeat-end class="grid-cell">Result [<span id="unitOfMeasurementone"></span>]</div>
                                 </div>
                                 <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0, autoresize: true}">
                                     <div class="grid-row" ng-class="{top: x == observationsList[0]}" ng-repeat="x in observationsList">
@@ -131,7 +131,7 @@
                             <div id="observations-table-secondary" class="table table-bordered table-hover st-table table-striped table-sm">
                                 <div class="grid-row grid-header">
                                     <div class="grid-cell">Result Time</div>
-                                    <div ng-repeat-end class="grid-cell">Result</div>
+                                    <div ng-repeat-end class="grid-cell">Result [<span id="unitOfMeasurementtwo"></span>]</div>
                                 </div>
                                 <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0}">
                                     <div class="grid-row" ng-class="{top: x == secondObservationsList[0]}" ng-repeat="x in secondObservationsList">

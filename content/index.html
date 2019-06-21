@@ -8,6 +8,7 @@ permalink: /en/dashboard/
 
 <link href='{{ "/dashboard/content/js/vendor/font-awesome/css/font-awesome.min.css" | relative_url }}' rel="stylesheet">
 <link href='{{ "/dashboard/content/js/vendor/openlayers/ol-3.15.1.css" | relative_url }}' rel="stylesheet">
+<link href='{{ "/dashboard/content/js/vendor/openlayers-ext/dist/ol-ext.css" | relative_url }}' rel="stylesheet">
 <link href='{{ "/dashboard/content/css/app.css" | relative_url }}' rel="stylesheet">
 
 
@@ -21,7 +22,7 @@ permalink: /en/dashboard/
                   <a class="nav-link" ng-class="{active: $route.current.activetab == 'home'}" href="#/home"><i class="fa fa-home"></i> Home <span class="fa"></span></a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" ng-class="{active: $route.current.activetab == 'things'}" href="#/things"><i class="fa fa-cube"></i> Things <span class="fa"></span></a>
+                  <a class="nav-link" ng-class="{active: $route.current.activetab == 'things'}" href="#/things?$expand=Locations"><i class="fa fa-cube"></i> Things <span class="fa"></span></a>
               </li>
               <li class="nav-item">
                   <a class="nav-link" ng-class="{active: $route.current.activetab == 'sensors'}" href="#/sensors"><i class="fa fa-dashboard"></i> Sensors <span class="fa"></span></a>
@@ -51,6 +52,8 @@ permalink: /en/dashboard/
 <script src='{{ "/dashboard/content/js/vendor/eclipse/mqttws31.js" | relative_url }}'></script>
 <script src='{{ "/dashboard/content/js/vendor/daterangepicker/daterangepicker.min.js" | relative_url }}'></script>
 <script src='{{ "/dashboard/content/js/vendor/krigingjs/kriging.js" | relative_url }}'></script>
+<script src='{{ "/dashboard/content/js/vendor/openlayers-ext/dist/ol-ext.js" | relative_url }}'></script>
+<script src='{{ "/dashboard/content/js/vendor/openlayers-ext/dist/extra/FontAwesomeDef.js" | relative_url }}'></script>
 
 <script src='{{ "/dashboard/content/js/app.js" | relative_url }}'></script>
 <script src='{{ "/dashboard/content/js/Observation.js" | relative_url }}'></script>

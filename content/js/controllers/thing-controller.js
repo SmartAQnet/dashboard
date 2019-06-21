@@ -20,9 +20,10 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
 
         $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/Locations").then(function (response) {
             $scope.locationsList = response.data.value;
+            togglelayers(PinLayer,true);
+            PinLayer.getSource().clear();
             addGeoJSONFeature($scope.locationsList[0]["location"]);
-
-            zoomToGeoJSONLayerExtent();
+            setview($scope.locationsList[0]["location"]["coordinates"]);
         });
     };
 

@@ -409,6 +409,16 @@ Datastreams.prototype.getUpdatedChartAxes = function(){
             beginAtZero:false
         }
     }];
+
+    document.getElementById("unitOfMeasurementone").innerHTML = axisLabels[0]["symbolName"];
+    if (Object.keys(this.streams).length > 1) {
+        try{
+            setTimeout(function(){document.getElementById("unitOfMeasurementtwo").innerHTML = axisLabels[1]["symbolName"];
+                document.getElementById("unitOfMeasurementone").innerHTML = axisLabels[0]["symbolName"]}, 1000)
+        }
+        catch(e){console.log("we get an error like:" + e)} //warum ignoriert er das komplett?
+    };
+
     return yAxes;
 }
 
