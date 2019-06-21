@@ -305,9 +305,25 @@ function calculatelegend(anchorarray){
 
 
 
+customControl = function(opt_options) {
+    var element = document.createElement('div');
+    element.className = 'custom-control ol-unselectable ol-control';
+    ol.control.Control.call(this, {
+      element: element
+    });
+  };
+  ol.inherits(customControl, ol.control.Control);
 
 
+var testcontrol = new customControl({
+	innterHTML: "test"
+})
 
+
+function togglecontrols(control,toggle) {
+	if (toggle == true) {olMap.addControl(control)}
+	if (toggle == false)  {olMap.removeControl(control)}
+};
 
 /************************************ Marker ************************************/
 //                               create Markers

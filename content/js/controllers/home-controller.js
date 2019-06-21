@@ -88,6 +88,9 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 	togglelayers(ColoredMarkerLayer,false);
 	togglelayers(canvasLayer,false);
 
+	//Default Layers at page loading
+	togglecontrols(legend,false);
+	togglecontrols(testcontrol,true);
 	
 
 	var pincheckbox = document.getElementById("Layer-Pins");
