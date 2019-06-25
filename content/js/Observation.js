@@ -253,6 +253,7 @@ Datastreams.prototype.handleHttpError = function(error, streamId){
 }
 
 Datastreams.prototype.addStream = function (id, startMoment, endMoment) {
+    debugger;
     this.streams[id] = new Stream(id, this.isLive);
     if (Object.keys(this.streams).length == 1){
         this.setState(Datastreams.states["main_loading"]);
@@ -324,6 +325,9 @@ Datastreams.prototype._dataChanged = function(){
     if(this.chart != null){
         var yAxes = this.getUpdatedChartAxes();
         this.chart.options.scales.yAxes = yAxes;
+        if(yAxes.length == 1 && this.chart.data.datasets.length > 1){
+            this.chart.data.datasets[1].yAxisID = "main";
+        }
 		this.chart.update();	
     }
     this.notify();
