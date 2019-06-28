@@ -1,3 +1,4 @@
+//First line should be empty or a comment (this comment). Line is overwritten by the docker-entrypoint script
 var gostApp = angular.module('gostApp', ['ngRoute', 'vs-repeat']);
 
 gostApp.factory('Page', function () {
@@ -11,18 +12,18 @@ gostApp.factory('Page', function () {
 // Set routes
 gostApp.config(function ($routeProvider) {
 	$routeProvider.
-		when("/home", { templateUrl: '/dashboard/content/views/home.html', controller: "HomeCtrl", activetab: 'home' }).
-		when('/thing/:id', { templateUrl: '/dashboard/content/views/thing.html', controller: "ThingCtrl", activetab: 'things' }).
-		when("/things", { templateUrl: '/dashboard/content/views/things.html', controller: "ThingsCtrl", activetab: 'things' }).
-		when('/locations', { templateUrl: '/dashboard/content/views/locations.html', controller: "LocationsCtrl", activetab: 'things' }).
-		when('/historicallocations', { templateUrl: '/dashboard/content/views/historicallocations.html', controller: "HistoricalLocationsCtrl", activetab: 'things' }).
-		when('/sensors', { templateUrl: '/dashboard/content/views/sensors.html', controller: "SensorsCtrl", activetab: 'sensors' }).
-		when('/observedproperties', { templateUrl: '/dashboard/content/views/observedproperties.html', controller: "ObservedPropertiesCtrl", activetab: 'properties' }).
-		when('/datastream/:id', { templateUrl: '/dashboard/content/views/datastream.html', controller: "DatastreamCtrl", activetab: 'things' }).
-		when('/datastreams', { templateUrl: '/dashboard/content/views/datastreams.html', controller: "DatastreamsCtrl", activetab: 'sensors' }).
-		when('/observations', { templateUrl: '/dashboard/content/views/observations.html', controller: "ObservationsCtrl", activetab: 'sensors' }).
-		when('/featuresofinterest', { templateUrl: '/dashboard/content/views/featuresofinterest.html', controller: "FeaturesOfInterestCtrl" }).
-		when('/mqtt', { templateUrl: '/dashboard/content/views/mqtt.html', controller: "MqttCtrl" }).
+		when("/home", { templateUrl: window.dashboardSettings.root + 'views/home.html', controller: "HomeCtrl", activetab: 'home' }).
+		when('/thing/:id', { templateUrl: window.dashboardSettings.root + 'views/thing.html', controller: "ThingCtrl", activetab: 'things' }).
+		when("/things", { templateUrl: window.dashboardSettings.root + 'views/things.html', controller: "ThingsCtrl", activetab: 'things' }).
+		when('/locations', { templateUrl: window.dashboardSettings.root + 'views/locations.html', controller: "LocationsCtrl", activetab: 'things' }).
+		when('/historicallocations', { templateUrl: window.dashboardSettings.root + 'views/historicallocations.html', controller: "HistoricalLocationsCtrl", activetab: 'things' }).
+		when('/sensors', { templateUrl: window.dashboardSettings.root + 'views/sensors.html', controller: "SensorsCtrl", activetab: 'sensors' }).
+		when('/observedproperties', { templateUrl: window.dashboardSettings.root + 'views/observedproperties.html', controller: "ObservedPropertiesCtrl", activetab: 'properties' }).
+		when('/datastream/:id', { templateUrl: window.dashboardSettings.root + 'views/datastream.html', controller: "DatastreamCtrl", activetab: 'things' }).
+		when('/datastreams', { templateUrl: window.dashboardSettings.root + 'views/datastreams.html', controller: "DatastreamsCtrl", activetab: 'sensors' }).
+		when('/observations', { templateUrl: window.dashboardSettings.root + 'views/observations.html', controller: "ObservationsCtrl", activetab: 'sensors' }).
+		when('/featuresofinterest', { templateUrl: window.dashboardSettings.root + 'views/featuresofinterest.html', controller: "FeaturesOfInterestCtrl" }).
+		when('/mqtt', { templateUrl: window.dashboardSettings.root + 'views/mqtt.html', controller: "MqttCtrl" }).
 		otherwise({redirectTo: '/home' });
 });
 
@@ -32,7 +33,7 @@ var iconFeatureOfInterest = "fa-map";
 var iconHistoricalLocation = "fa-history";
 var iconLocation = "fa-map-marker";
 var iconObservation = "fa-eye";
-var iconSensor = "fa-dashboard";
+var iconSensor = "fa-tachometer-alt";
 var iconObservedProperty = "fa-list";
 
 function getSSLEnabled() {
@@ -338,7 +339,7 @@ var defaultMarkerStyle = new ol.style.Style({
 		anchorXUnits: 'fraction',
 		anchorYUnits: 'fraction',
 		//color: [127,127,0,0.1],
-		src: '/dashboard/content/assets/img/map_marker.svg'
+		src: window.dashboardSettings.root + 'assets/img/map_marker.svg'
 	}))
 })
 

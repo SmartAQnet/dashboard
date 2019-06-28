@@ -253,7 +253,6 @@ Datastreams.prototype.handleHttpError = function(error, streamId){
 }
 
 Datastreams.prototype.addStream = function (id, startMoment, endMoment) {
-    debugger;
     this.streams[id] = new Stream(id, this.isLive);
     if (Object.keys(this.streams).length == 1){
         this.setState(Datastreams.states["main_loading"]);
