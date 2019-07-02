@@ -69,7 +69,7 @@ var augsburg = [10.8986971, 48.3668041];
 var karlsruhe = [8.4,49];
 
 var params={
-	mapCenter: karlsruhe,
+	mapCenter: augsburg,
 	maxValue: 100,
 	krigingModel: 'exponential',//model还可选'gaussian','spherical','exponential'
 	krigingSigma2: 0,
@@ -88,11 +88,13 @@ function setview(coordinates){
 	olMap.setView(view)
 }
 
+
 var defaultView  = new ol.View({
 	zoom: 13,
 	center: ol.proj.transform(params.mapCenter, 'EPSG:4326', 'EPSG:3857'),
 	maxZoom: 20
 })
+
 
 
 
@@ -117,7 +119,7 @@ function createMap(target) {
 			attributionOptions: ({
 				collapsible: false
 			})
-		}).extend([new ol.control.FullScreen()]),
+		}).extend([new ol.control.FullScreen({source: 'fullscreen'})]),
 
 		//Set layers
 		layers: [],
@@ -129,8 +131,8 @@ function createMap(target) {
 	});
 
 
-	olMap.addControl(legend);
-	calculatelegend(params.colors);
+	olMap.on(olMap.getLayers().addEventListener("change", console.log("true")))
+
 
 	togglelayers(tileLayer,true);
 
@@ -249,7 +251,7 @@ function togglelayers(layer,toggle) {
 
 // Define a new legend
 var legend = new ol.control.Legend({ 
-	title: 'Feinstaub [g/cm^3]',
+	title: 'Legend n/a',
 	margin: 5,
 	collapsed: true
 });
@@ -271,6 +273,34 @@ var legend2 = new ol.control.Legend({
 
 
 
+
+function obspropertydict(obsprop){
+	if (obsprop == "mcpm10"){
+		return("PM 10")
+	}
+	else if (obsprop == "mcpm2p5"){
+		return("PM 2.5")
+	}
+	else if (obsprop == "hur"){
+		return("Relative Humidity")
+	}
+	else if (obsprop == "plev"){
+		return("Air Pressure")
+	}
+	else if (obsprop == "ta"){
+		return("Air Temperature")
+	}
+	else{return(obsprop)};
+};
+
+
+var lengthoflegend=0;
+var obsproperty;
+var obsvaluelist;
+var upperlimit;
+var reducedarraylength;
+
+
 function calculatelegend(anchorarray){
 
 	function gradientfunction(one, two){
@@ -279,14 +309,27 @@ function calculatelegend(anchorarray){
 			grad.addColorStop(1, two);
 			return grad;
 	};
-	
 
-	for (let i=(anchorarray.length-2);i>=0;i--) {
-		
-		if ( i==(anchorarray.length-2)) {var scale=params.maxValue}
+
+	for (let i=(lengthoflegend);i>=0;i--) {legend.removeRow()};
+	lengthoflegend = anchorarray.length-2;
+
+	//legend.removeRow();
+	legend.set("title",obspropertydict(obsproperty));
+	
+	upperlimit = (Math.round(Math.max(obsvaluelist)/10)+1)*10;
+	
+	if (upperlimit < 50) {upperlimit = 50}
+	else if (upperlimit > 100) {upperlimit = 100}
+
+	reducedarraylength = Math.floor(upperlimit+9);
+
+	for (let i=(reducedarraylength-2);i>=0;i--) {
+
+		if ( i==(reducedarraylength-2)) {var scale=upperlimit}
 		else if ( i==0 ) {var scale = 0}
 		else {var scale = " "}
-		
+
 		legend.addRow({
 			title: scale.toString(), 
 			typeGeom: 'Point',
@@ -304,7 +347,7 @@ function calculatelegend(anchorarray){
 };
 
 
-
+/*
 customControl = function(opt_options) {
     var element = document.createElement('div');
     element.className = 'custom-control ol-unselectable ol-control';
@@ -318,12 +361,40 @@ customControl = function(opt_options) {
 var testcontrol = new customControl({
 	innterHTML: "test"
 })
+*/
 
+
+var external_fullscreen = new ol.control.FullScreen({
+	target: document.getElementById('externalfullscreencontrol') });
+
+var mapsidepanelbtton = document.getElementById("mapsidepanelbutton");
+
+if (mapsidepanelbtton){
+	mapsidepanelbtton.addEventListener("click", function(){
+		olMap.addControl(external_fullscreen);
+	});
+
+  	console.log(mapsidepanelbtton)}
+  	else {console.log(mapsidepanelbtton)};
 
 function togglecontrols(control,toggle) {
 	if (toggle == true) {olMap.addControl(control)}
 	if (toggle == false)  {olMap.removeControl(control)}
 };
+
+
+function toggleLegendSidepanel() {
+	if (document.getElementById("LegendSidepanel").style.right == "0px") 
+	{
+		document.getElementById("LegendSidepanel").style.right = "-250px"
+	} else
+	{
+		document.getElementById("LegendSidepanel").style.right = "0px"
+	}
+};
+
+
+
 
 /************************************ Marker ************************************/
 //                               create Markers

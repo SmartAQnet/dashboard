@@ -323,6 +323,15 @@
 
 /*Observations tab pane end*/
 
+
+.embedded-dashboard .card{
+  overflow: hidden;
+}
+
+.embedded-dashboard #card-body-map{
+  position: relative;
+}
+
 .embedded-dashboard #observations .card-header{
   display: flex;
   justify-content: space-between;
@@ -5535,6 +5544,24 @@ table.dataTable th.focus,
 
 
 
+.embedded-dashboard .fullscreen:fullscreen #map {
+  height: 100%;
+}
+
+.embedded-dashboard .fullscreen:-moz-full-screen #map {
+  height: 100%;
+}
+.embedded-dashboard .fullscreen:-webkit-full-screen #map {
+  height: 100%;
+}
+.embedded-dashboard .fullscreen:-ms-fullscreen #map {
+  height: 100%;
+}
+
+.fullscreen:fullscreen {
+  height: 100%;
+}
+
 
 .embedded-dashboard .custom-control {
   top: 20px;
@@ -5543,3 +5570,128 @@ table.dataTable th.focus,
   height: 70px;
   background: no-repeat url('http://openlayers.org/en/latest/examples/resources/logo-70x70.png')
 }
+
+
+
+/* The sidepanel menu */
+.embedded-dashboard .sidepanel {
+  height: calc(100% - 40px); /* Specify a height */
+  width: 250px; /* 0 width - change this with JavaScript */
+  position: absolute; /* Stay in place */
+  z-index: 1; /* Stay on top */
+  top: 0;
+  right: -250px;
+  background-color: rgba(0,60,136,.2);
+  margin: 20px;
+  padding-left: 24px;
+  overflow-x: hidden; /* Disable horizontal scroll */
+  transition: 0.5s; /* 0.5 second transition effect to slide in the sidepanel */
+}
+
+/*button mit negativem left margin --> sitzt auf padding*/
+
+/* .embedded-dashboard #sidepanel-container {
+  position: absolute;
+  margin : 20px;
+  overflow: hidden;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+} */
+
+
+/* The sidepanel links */
+.embedded-dashboard .sidepanel a {
+  padding: 8px 8px 0px 32px; 
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.embedded-dashboard .sidepanel a:hover {
+  color: #f1f1f1;
+}
+
+/* Position and style the close button (top right corner)
+.embedded-dashboard .sidepanel .togglebtn {
+  font-size: 20px;
+  cursor: pointer;
+  background-color: rgba(0,60,136,.5);
+  color: white;
+  position: relative;
+  top: 0;
+  margin-left: -20px;
+  margin-top: 4px;
+  display: block;
+  padding: 0;
+  color: #fff;
+  font-size: 1.14em;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  height: 1.375em;
+  width: 1.375em;
+  line-height: .4em;
+  background-color: rgba(0,60,136,.5);
+  border: none;
+  border-radius: 2px;
+} */
+
+
+/* Position and style the close button (top right corner) */
+.embedded-dashboard .sidepanel .togglebtn-container {
+  position: relative;
+  font-size: 1.14em;
+  height: 1.375em;
+  width: 1.375em;
+} 
+
+
+.embedded-dashboard .sidepanel-header{
+  margin-top: 0px;
+  height: 50px;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+/* Style the button that is used to open the sidepanel */
+.embedded-dashboard .openbtn {
+  font-size: 20px;
+  cursor: pointer;
+  background-color: rgba(0,60,136,.5);
+  color: white;
+  padding: 10px 15px;
+  border: none;
+}
+
+.embedded-dashboard .openbtn:hover {
+  background-color: #444;
+}
+
+
+
+.embedded-dashboard #externalfullscreencontrol {
+  margin-right: 10px;
+  margin-top: -31px;
+  margin-left: 194px;
+  height: 22px;
+  font-size: 20px;
+  cursor: pointer;
+  background-color: rgba(0,60,136,.5);
+  color: white;
+  /* padding: 10px 15px; */
+  border: none;
+}
+
+
+.embedded-dashboard #SidepanelFooter #Source-Panel #Layer-Panel {
+  margin-top: 10px;
+  padding-top: 10px;
+  /* border-width: thin;
+  border-style: solid;
+  border-color: #000; */
+} 
