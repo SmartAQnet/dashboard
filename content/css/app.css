@@ -5,7 +5,7 @@
 
 .embedded-dashboard .header{
     color: #000000;
-	font-size: 20px;
+	font-size: 1.25rem;
 	font-weight:600;
 	letter-spacing: 1px;
 	margin-top: 10px;
@@ -60,7 +60,7 @@
 }
 
 .embedded-dashboard #header-sub-title{
-	font-size: 16px;
+	font-size: 1rem;
 	font-weight: 400;
 	letter-spacing: 5px;
 	color: #ECF0F1;
@@ -101,14 +101,14 @@
 }
 
 .embedded-dashboard .entityInfoHeader{
-    font-size: 14px;
+    font-size: 0.875rem;
     letter-spacing: 1px;
     font-weight: bold;
     color: #000000;
 }
 
 .embedded-dashboard .entityInfoInfo{
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 200;
 }
 
@@ -386,7 +386,7 @@
 
 .embedded-dashboard .btn-box-tool {
     padding: 5px;
-    font-size: 12px;
+    font-size: 0.75rem;
     background: transparent;
     color: #97a0b3;
 }
@@ -406,7 +406,7 @@
 
 .embedded-dashboard .box-header>.fa, .embedded-dashboard  .box-header>.glyphicon, .embedded-dashboard  .box-header>.ion, .embedded-dashboard  .box-header .box-title {
     display: inline-block;
-    font-size: 18px;
+    font-size: 1.125rem;
     margin: 0;
     line-height: 1;
 }
@@ -533,7 +533,7 @@
 .embedded-dashboard .nav-sm .nav.side-menu li a {
   text-align: center !important;
   font-weight: 400;
-  font-size: 10px;
+  font-size: 0.625rem;
   padding: 10px 5px;
 }
 .nav-sm .nav.child_menu li.active,
@@ -618,7 +618,7 @@
   color: #BAB8B8;
 }
 .embedded-dashboard .profile_info h2 {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #ECF0F1;
   margin: 0;
   font-weight: 300;
@@ -643,7 +643,7 @@
   float: right;
   text-align: center;
   margin-top: 5px;
-  font-size: 10px;
+  font-size: 0.625rem;
   min-width: inherit;
   color: #C4CFDA;
 }
@@ -1151,7 +1151,7 @@
 }
 .embedded-dashboard .nav.child_menu > li > a {
   color: rgba(255, 255, 255, 0.75);
-  font-size: 12px;
+  font-size: 0.75rem;
   padding: 9px;
 }
 .embedded-dashboard .panel_toolbox {
@@ -1165,7 +1165,7 @@
 .embedded-dashboard .panel_toolbox>li>a {
   padding: 5px;
   color: #C5C7CB;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .embedded-dashboard .panel_toolbox>li>a:hover {
   background: #F5F7FA;
@@ -1220,7 +1220,7 @@
 }
 .embedded-dashboard .top_tiles .tile span {}
 .embedded-dashboard .top_tiles .tile h2 {
-  font-size: 30px;
+  font-size: 1.875rem;
   line-height: 30px;
   margin: 3px 0 7px;
   font-weight: bold;
@@ -1270,7 +1270,7 @@
   float: left;
 }
 .embedded-dashboard h2 {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 400;
 }
 .embedded-dashboard #left, .embedded-dashboard  #right {
@@ -1302,7 +1302,7 @@
   width: 10px;
   float: right;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .embedded-dashboard .accordion .panel {
   margin-bottom: 5px;
@@ -1368,7 +1368,7 @@
   margin-top: 5px;
 }
 .embedded-dashboard .x_content h4 {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
 }
 .embedded-dashboard legend {
@@ -1429,7 +1429,7 @@
 
 .embedded-dashboard .profile_details .profile_view .ratings {
   text-align: left;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .embedded-dashboard .profile_details .profile_view .brief {
@@ -1547,7 +1547,7 @@
   font-weight: 300;
 }
 .embedded-dashboard .daily-weather .day {
-  font-size: 14px;
+  font-size: 0.875rem;
   border-top: 2px solid rgba(115, 135, 156, 0.36);
   text-align: center;
   border-bottom: 2px solid rgba(115, 135, 156, 0.36);
@@ -1628,7 +1628,7 @@
   border: 1px solid #ddd;
   text-align: center;
   color: #999;
-  font-size: 14px;
+  font-size: 0.875rem;
   background-color: white;
 }
 .embedded-dashboard .dataTables_length {
@@ -1852,7 +1852,7 @@ table.dataTable th.focus,
   box-shadow: none;
   display: none;
   float: left;
-  font-size: 12px;
+  font-size: 0.75rem;
   left: 0;
   list-style: none outside none;
   padding: 0;
@@ -1882,7 +1882,7 @@ table.dataTable th.focus,
   width: 300px;
 }
 .embedded-dashboard .info-number .badge {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: normal;
   line-height: 13px;
   padding: 2px 6px;
@@ -1980,7 +1980,7 @@ table.dataTable th.focus,
   text-align: right;
 }
 .embedded-dashboard .widget_summary .w_right span {
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .embedded-dashboard .w_20 {
   width: 20%
@@ -2062,7 +2062,7 @@ table.dataTable th.focus,
   }
 }
 .embedded-dashboard .tile_count .tile_stats_count .count {
-  font-size: 30px;
+  font-size: 1.875rem;
   line-height: 47px;
   font-weight: 600;
 }
@@ -2073,11 +2073,11 @@ table.dataTable th.focus,
 }
 @media (min-width: 992px) and (max-width: 1100px) {
 .embedded-dashboard   .tile_count .tile_stats_count .count {
-    font-size: 30px;
+    font-size: 1.875rem;
   }
 }
 .embedded-dashboard .tile_count .tile_stats_count span {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 @media (min-width:768px) {
 .embedded-dashboard   .tile_count .tile_stats_count span {
@@ -2125,7 +2125,7 @@ table.dataTable th.focus,
   padding: 9px 12px;
 }
 .embedded-dashboard .media .profile_thumb i {
-  font-size: 30px;
+  font-size: 1.875rem;
 }
 .embedded-dashboard .media .date {
   background: #ccc;
@@ -2181,7 +2181,7 @@ table.dataTable th.focus,
 }
 .embedded-dashboard .fontawesome-icon-list .fa-hover a .fa {
   width: 32px;
-  font-size: 16px;
+  font-size: 1rem;
   display: inline-block;
   text-align: right;
   margin-right: 10px;
@@ -2193,7 +2193,7 @@ table.dataTable th.focus,
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
-  font-size: 18px;
+  font-size: 1.125rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -2279,7 +2279,7 @@ table.dataTable th.focus,
 
 .embedded-dashboard .tile-stats p {
   margin-top: 5px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .embedded-dashboard .tile-stats > .dash-box-footer {
@@ -2367,7 +2367,7 @@ table.dataTable th.focus,
 
 .embedded-dashboard .list-btn-mail > i {
   float: left;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-style: normal;
   width: 33px;
 }
@@ -2450,7 +2450,7 @@ table.dataTable th.focus,
 }
 
 .embedded-dashboard .mail_heading h4 {
-  font-size: 18px;
+  font-size: 1.125rem;
   border-bottom: 1px solid #ddd;
   padding-bottom: 10px;
   margin-top: 20px;
@@ -2582,7 +2582,7 @@ table.dataTable th.focus,
   box-shadow: none !important;
 }
 .embedded-dashboard legend {
-  font-size: 18px;
+  font-size: 1.125rem;
   color: inherit;
 }
 .embedded-dashboard .checkbox {}
@@ -2713,7 +2713,7 @@ table.dataTable th.focus,
   position: absolute;
   top: 15px;
   left: 15px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: bold;
   color: #bbb;
   text-transform: uppercase;
@@ -2745,14 +2745,6 @@ table.dataTable th.focus,
 /* ***** /autocomplete *****/
 
 /* ***** buttons ********/
-.embedded-dashboard .refreshbutton {
-  padding: 10px;
-  border-radius: 4px;
-}
-
-.embedded-dashboard .refreshbutton:hover {
-  cursor: pointer; 
-}
 
 .embedded-dashboard .btn {
   border-radius: 3px;
@@ -2793,10 +2785,10 @@ table.dataTable th.focus,
   color: #666;
   border: 1px solid #ddd;
   background-color: #fafafa;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .embedded-dashboard .btn.btn-app > .fa, .embedded-dashboard  .btn.btn-app > .glyphicon, .embedded-dashboard  .btn.btn-app > .ion {
-  font-size: 20px;
+  font-size: 1.25rem;
   display: block;
 }
 .embedded-dashboard .btn.btn-app:hover {
@@ -2813,7 +2805,7 @@ table.dataTable th.focus,
   position: absolute;
   top: -3px;
   right: -10px;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 400;
 }
 /* ***** /buttons *******/
@@ -2835,7 +2827,7 @@ table.dataTable th.focus,
   display: inline-block;
   padding: 3px 9px;
   margin-bottom: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 20px;
   text-align: center;
   vertical-align: middle;
@@ -2881,7 +2873,7 @@ table.dataTable th.focus,
   width: 25%;
   height: 115px;
   padding: 10px;
-  font-size: 10px;
+  font-size: 0.625rem;
   line-height: 1.4;
   text-align: center;
   background-color: #f9f9f9;
@@ -3085,7 +3077,7 @@ table.dataTable th.focus,
 }
 .embedded-dashboard .timeline h2.title {
   position: relative;
-  font-size: 16px;
+  font-size: 1rem;
   margin: 0;
 }
 .embedded-dashboard .timeline h2.title:before {
@@ -3142,7 +3134,7 @@ table.dataTable th.focus,
 .embedded-dashboard .chat .status {
   float: left;
   margin: 16px 0 0 -16px;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: bold;
   width: 12px;
   height: 12px;
@@ -3194,7 +3186,7 @@ table.dataTable th.focus,
   display: inline-block;
   line-height: 110px;
   z-index: 2;
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .embedded-dashboard .percent:after {
   content: '%';
@@ -3314,12 +3306,12 @@ table.dataTable th.focus,
   text-align: left;
 }
 .embedded-dashboard .widget_tally_box ul.legend li .icon {
-  font-size: 20px;
+  font-size: 1.25rem;
   float: left;
   width: 14px;
 }
 .embedded-dashboard .widget_tally_box ul.legend li .name {
-  font-size: 14px;
+  font-size: 0.875rem;
   margin: 5px 0 0 14px;
   text-overflow: ellipsis;
   float: left;
@@ -3438,17 +3430,17 @@ table.dataTable th.focus,
   text-align: center;
   padding: 0 15px;
   width: 30%;
-  font-size: 14px;
+  font-size: 0.875rem;
   border-right: 1px solid #e8e8e8;
 }
 .embedded-dashboard ul.stats-overview li:last-child {
   border-right: 0;
 }
 .embedded-dashboard ul.stats-overview li .name {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .embedded-dashboard ul.stats-overview li .value {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: bold;
   display: block;
 }
@@ -3487,13 +3479,13 @@ table.dataTable th.focus,
 }
 .embedded-dashboard .pricing .title h2 {
   text-transform: capitalize;
-  font-size: 18px;
+  font-size: 1.125rem;
   border-radius: 5px 5px 0 0;
   margin: 0;
   font-weight: 400;
 }
 .embedded-dashboard .pricing .title h1 {
-  font-size: 30px;
+  font-size: 1.875rem;
   margin: 12px;
 }
 .embedded-dashboard .pricing .title span {
@@ -3629,14 +3621,14 @@ table.dataTable th.focus,
 .embedded-dashboard .view .tools a {
   display: inline-block;
   color: #FFF;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 400;
   padding: 0 4px;
 }
 .embedded-dashboard .view p {
   font-family: Georgia, serif;
   font-style: italic;
-  font-size: 12px;
+  font-size: 0.75rem;
   position: relative;
   color: #fff;
   padding: 10px 20px 20px;
@@ -3895,7 +3887,7 @@ table.dataTable th.focus,
   background: rgba(243, 242, 243, 0.8);
   border: solid 2px rgba(195, 194, 196, 0.8);
   font-family: sans-serif;
-  font-size: 12px;
+  font-size: 0.75rem;
   text-align: center;
 }
 .embedded-dashboard .morris-hover.morris-default-style .morris-hover-row-label {
@@ -3922,7 +3914,7 @@ table.dataTable th.focus,
   border-bottom: 1px solid #DFDFDF;
   padding-bottom: 5px;
   margin: 30px 0;
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 400;
 }
 .embedded-dashboard .product-image img {
@@ -3963,7 +3955,7 @@ table.dataTable th.focus,
   border: 2px dashed #E0E0E0;
 }
 .embedded-dashboard .price-tax {
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .embedded-dashboard .product_social {
   margin: 20px 0;
@@ -4178,7 +4170,7 @@ table.dataTable th.focus,
   background-position: 10px -53px !important
 }
 .embedded-dashboard .login_content form div a {
-  font-size: 12px;
+  font-size: 0.75rem;
   margin: 10px 15px 0 0;
 }
 .embedded-dashboard .reset_pass {
@@ -4638,7 +4630,7 @@ table.dataTable th.focus,
   border-radius: 100px;
   display: block;
   margin: 0 auto 5px;
-  font-size: 16px;
+  font-size: 1rem;
   text-align: center;
   position: relative;
   z-index: 5;
@@ -4750,7 +4742,7 @@ table.dataTable th.focus,
   border-radius: 100px;
   display: block;
   margin: 0 auto 5px;
-  font-size: 16px;
+  font-size: 1rem;
   text-align: center;
   position: relative;
   z-index: 5;
@@ -5144,7 +5136,7 @@ table.dataTable th.focus,
   width: 32px;
   height: 24px;
   line-height: 24px;
-  font-size: 12px;
+  font-size: 0.75rem;
   border-radius: 4px;
   border: 1px solid transparent;
   white-space: nowrap;
@@ -5217,7 +5209,7 @@ table.dataTable th.focus,
 }
 
 .daterangepicker select.monthselect, .daterangepicker select.yearselect {
-  font-size: 12px;
+  font-size: 0.75rem;
   padding: 1px;
   height: auto;
   margin: 0;
@@ -5240,7 +5232,7 @@ table.dataTable th.focus,
   border: 1px solid #eee;
   padding: 2px;
   outline: 0;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .daterangepicker .calendar-time {
@@ -5267,13 +5259,13 @@ table.dataTable th.focus,
 
 .daterangepicker .drp-selected {
   display: inline-block;
-  font-size: 12px;
+  font-size: 0.75rem;
   padding-right: 8px;
 }
 
 .daterangepicker .drp-buttons .btn {
   margin-left: 8px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: bold;
   padding: 4px 8px;
 }
@@ -5312,7 +5304,7 @@ table.dataTable th.focus,
 }
 
 .daterangepicker .ranges li {
-  font-size: 12px;
+  font-size: 0.75rem;
   padding: 8px 12px;
   cursor: pointer;
 }
@@ -5439,7 +5431,7 @@ table.dataTable th.focus,
   border: none;
   text-align: left;
   outline: none;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
@@ -5474,7 +5466,7 @@ table.dataTable th.focus,
   border: none;
   text-align: left;
   outline: none;
-  font-size: 12px;
+  font-size: 0.75rem;
   margin: 0px;
 }
 
@@ -5544,6 +5536,13 @@ table.dataTable th.focus,
 
 
 
+
+
+/* ****************************   Map Sidepanel  **************************** */
+
+
+
+
 .embedded-dashboard .fullscreen:fullscreen #map {
   height: 100%;
 }
@@ -5575,58 +5574,60 @@ table.dataTable th.focus,
 
 /* The sidepanel menu */
 .embedded-dashboard .sidepanel {
-  height: calc(100% - 40px); /* Specify a height */
-  width: 250px; /* 0 width - change this with JavaScript */
-  position: absolute; /* Stay in place */
-  z-index: 1; /* Stay on top */
+  height: calc(100% - 40px); 
+  width: 250px; 
+  position: absolute; 
+  z-index: 1; 
   top: 0;
   right: -250px;
   background-color: rgba(0,60,136,.2);
   margin: 20px;
   padding-left: 24px;
-  overflow-x: hidden; /* Disable horizontal scroll */
-  transition: 0.5s; /* 0.5 second transition effect to slide in the sidepanel */
+  transition: 0.6s; 
+  border-radius: 4px;
+  -webkit-user-select: none; /* Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
 }
 
-/*button mit negativem left margin --> sitzt auf padding*/
-
-/* .embedded-dashboard #sidepanel-container {
-  position: absolute;
-  margin : 20px;
-  overflow: hidden;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 0;
-} */
-
-
 /* The sidepanel links */
-.embedded-dashboard .sidepanel a {
-  padding: 8px 8px 0px 32px; 
+.embedded-dashboard .sidepanel label {
+  /* padding: 8px 8px 0px 32px; 
   text-decoration: none;
-  font-size: 25px;
+  font-size: 25px; 
   color: #818181;
-  display: block;
-  transition: 0.3s;
+  display: block;*/
+  transition: 0.6s;
 }
 
 /* When you mouse over the navigation links, change their color */
-.embedded-dashboard .sidepanel a:hover {
+.embedded-dashboard .sidepanel label:hover {
   color: #f1f1f1;
 }
 
-/* Position and style the close button (top right corner)
-.embedded-dashboard .sidepanel .togglebtn {
-  font-size: 20px;
-  cursor: pointer;
-  background-color: rgba(0,60,136,.5);
-  color: white;
+
+/* Position and style the close button (top right corner) */
+.embedded-dashboard .togglebtn-container {
   position: relative;
-  top: 0;
-  margin-left: -20px;
-  margin-top: 4px;
+  height: 40px;
+  width: 40px;
+  left: -24px;
+  float: left;
+  top: -10px;
+  margin-left: 0px;
+  transition: 0.6s;
+} 
+
+.embedded-dashboard .togglebtn-container.shift {
+  transition: 1.0s;
+  margin-left: -14px;
+} 
+
+
+/* .embedded-dashboard #externalfullscreencontrol {
   display: block;
+  margin: 1px;
   padding: 0;
   color: #fff;
   font-size: 1.14em;
@@ -5638,60 +5639,81 @@ table.dataTable th.focus,
   line-height: .4em;
   background-color: rgba(0,60,136,.5);
   border: none;
-  border-radius: 2px;
+  border-radius: 2px;  
+  float: right;
 } */
 
 
-/* Position and style the close button (top right corner) */
-.embedded-dashboard .sidepanel .togglebtn-container {
-  position: relative;
-  font-size: 1.14em;
-  height: 1.375em;
-  width: 1.375em;
-} 
-
 
 .embedded-dashboard .sidepanel-header{
-  margin-top: 0px;
-  height: 50px;
-  margin-left: 0px;
-  margin-right: 0px;
-}
-
-/* Style the button that is used to open the sidepanel */
-.embedded-dashboard .openbtn {
-  font-size: 20px;
-  cursor: pointer;
-  background-color: rgba(0,60,136,.5);
-  color: white;
-  padding: 10px 15px;
-  border: none;
-}
-
-.embedded-dashboard .openbtn:hover {
-  background-color: #444;
-}
-
-
-
-.embedded-dashboard #externalfullscreencontrol {
-  margin-right: 10px;
-  margin-top: -31px;
-  margin-left: 194px;
-  height: 22px;
-  font-size: 20px;
-  cursor: pointer;
-  background-color: rgba(0,60,136,.5);
-  color: white;
-  /* padding: 10px 15px; */
-  border: none;
-}
-
-
-.embedded-dashboard #SidepanelFooter #Source-Panel #Layer-Panel {
-  margin-top: 10px;
   padding-top: 10px;
-  /* border-width: thin;
-  border-style: solid;
-  border-color: #000; */
+  height: 42px;
+}
+
+.embedded-dashboard .sidepanel-body {
+  /* margin-top: 10px; */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-top-width: thin;
+  border-top-style: solid;
+  border-color: #f1f1f1;
 } 
+
+.embedded-dashboard .sidepanel-footer{
+  /* margin-top: 10px; */
+  padding-top: 10px;
+  border-top-width: thin;
+  border-top-style: solid;
+  border-color: #f1f1f1;
+} 
+
+
+.embedded-dashboard .sidepanel-subpanel {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-right: 10px;
+  border-radius: 4px;
+  transition: 0.3s;
+}
+
+.embedded-dashboard .sidepanel-subpanel:hover {
+  background-color: rgba(0,60,136,.3);
+  padding: 5px;
+  border-color: #000000;
+}
+
+.embedded-dashboard .sidepanel .refreshbutton {
+  background-color: rgba(0,60,136,0);  
+  color: black; 
+  border: 2px solid rgba(0,60,136,.5);
+  border-radius: 4px;
+  padding: 16px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1rem;
+  margin-top: 4px ;
+  margin-right: 2px;
+  margin-left: 24px;
+  margin-bottom: 12px;
+  -webkit-transition-duration: 0.3s; /* Safari */
+  transition-duration: 0.3s;
+  cursor: pointer;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.embedded-dashboard .sidepanel .refreshbutton:hover {
+  background-color: rgba(0,60,136,.5);
+  color: #f1f1f1;
+}
+
+.embedded-dashboard .sidepanel .sidepanel-subtitle{
+  font-size: 1rem;
+  margin-bottom: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-bottom-width: thin;
+  border-bottom-style: solid;
+  border-color: #f1f1f1;
+}
+

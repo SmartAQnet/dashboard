@@ -131,8 +131,6 @@ function createMap(target) {
 	});
 
 
-	olMap.on(olMap.getLayers().addEventListener("change", console.log("true")))
-
 
 	togglelayers(tileLayer,true);
 
@@ -301,6 +299,7 @@ var upperlimit;
 var reducedarraylength;
 
 
+//takes an array of colors to generate a legend based on color transitions from the first to the last color
 function calculatelegend(anchorarray){
 
 	function gradientfunction(one, two){
@@ -317,19 +316,18 @@ function calculatelegend(anchorarray){
 	//legend.removeRow();
 	legend.set("title",obspropertydict(obsproperty));
 	
-	upperlimit = (Math.round(Math.max(obsvaluelist)/10)+1)*10;
-	
+	upperlimit = (Math.round(Math.max.apply(null,obsvaluelist)/10)+1)*10;
 	if (upperlimit < 50) {upperlimit = 50}
 	else if (upperlimit > 100) {upperlimit = 100}
 
-	reducedarraylength = Math.floor(upperlimit+9);
-
+	reducedarraylength = Math.floor((upperlimit+9)/10);
+	console.log(reducedarraylength)
 	for (let i=(reducedarraylength-2);i>=0;i--) {
 
 		if ( i==(reducedarraylength-2)) {var scale=upperlimit}
 		else if ( i==0 ) {var scale = 0}
 		else {var scale = " "}
-
+		
 		legend.addRow({
 			title: scale.toString(), 
 			typeGeom: 'Point',
@@ -369,13 +367,13 @@ var external_fullscreen = new ol.control.FullScreen({
 
 var mapsidepanelbtton = document.getElementById("mapsidepanelbutton");
 
-if (mapsidepanelbtton){
-	mapsidepanelbtton.addEventListener("click", function(){
-		olMap.addControl(external_fullscreen);
-	});
+setTimeout( function(){mapsidepanelbtton.addEventListener("click", function(){
+	olMap.addControl(external_fullscreen);
+})}, 3000);
 
-  	console.log(mapsidepanelbtton)}
-  	else {console.log(mapsidepanelbtton)};
+
+// olMap.on(olMap.getLayers().addEventListener("change", console.log("true")))
+
 
 function togglecontrols(control,toggle) {
 	if (toggle == true) {olMap.addControl(control)}
@@ -387,9 +385,13 @@ function toggleLegendSidepanel() {
 	if (document.getElementById("LegendSidepanel").style.right == "0px") 
 	{
 		document.getElementById("LegendSidepanel").style.right = "-250px"
+		document.getElementById("mapsidepanelbutton").innerHTML = "&#171;"
+		document.getElementById("togglebtn-container-sidepanel").classList.add('shift')
 	} else
 	{
 		document.getElementById("LegendSidepanel").style.right = "0px"
+		document.getElementById("mapsidepanelbutton").innerHTML = "&#187;"
+		document.getElementById("togglebtn-container-sidepanel").classList.remove('shift')
 	}
 };
 
@@ -552,7 +554,7 @@ var scalingfactor = 0.005;
 function setupsimulations(number){
 	for (let i = 0; i <= number-1; i++){
 		randomlocation[i] = [params.mapCenter[0]+scalingfactor*(Math.random()-0.5)*1.6,params.mapCenter[1]+scalingfactor*(Math.random()-0.5)*0.9];
-		randomvalue[i] = 50*Math.random();
+		randomvalue[i] = 200*Math.random();
 		totalspeed[i] = (Math.random()+Math.random()+Math.random())*scalingfactor;
 	};
 	return(number);

@@ -38,62 +38,57 @@
                     <div class="card-body" id="card-body-map">
                         <div id="fullscreen" class="fullscreen">
                         <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px"></div>
-                        <!--<div id="sidepanel-container">-->
                             <div class="sidepanel" id="LegendSidepanel">
                                 <div class="sidepanel-header">
-                                    <div class="togglebtn-container">
+                                    <div class="togglebtn-container shift" id="togglebtn-container-sidepanel">
                                         <div class="ol-full-screen ol-unselectable ol-control">
-                                            <button onclick="toggleLegendSidepanel()" id="mapsidepanelbutton">&harr;</button>
+                                            <span title="Toggle control-panel"><button onclick="toggleLegendSidepanel()" id="mapsidepanelbutton">&#171;</button></span>
                                         </div>
                                     </div>
-                                    <div id="externalfullscreencontrol"></div>
-                                </div>
-                                <div id="Layer-Panel">
-                                    <p>Choose the Layers of the Map:</p>
-                                    <div>
-                                        <input type="checkbox" id="Layer-Pins" name="Layer" checked>
-                                        <label for="Layer-Pins">Pins</label>
-                                    </div>
-                                    <div>
-                                        <input type="checkbox" id="Layer-ColoredMarkers" name="Layer">
-                                        <label for="Layer-ColoredMarkers">Colored Markers</label>
-                                    </div>
-                                    <div>
-                                        <input type="checkbox" id="Layer-Kriging" name="Layer">
-                                        <label for="Layer-Kriging">Kriging</label>
-                                    </div> 
-                                </div>
-                                <div id="Source-Panel">
-                                    <p>Choose Data Source:</p>
-                                    <div>
-                                        <input type="radio" id="Source-Real" name="Source" value="realsource" checked>
-                                        <label for="Source-Real">Real Data</label>
-                                    </div>
-                                    <div>
-                                        <input type="radio" id="Source-Simulation" name="Source" value="simulationsource">
-                                        <label for="Source-Simulaion">Simulation Data</label>
+                                    <div class="ol-full-screen ol-unselectable ol-control">
+                                            <button id="externalfullscreencontrol"></button>
                                     </div>
                                 </div>
-                                <div id="SidepanelFooter">
-                                    <button class="refreshbutton" id="refreshbutton">Refresh Map</button> <!-- disable for few sec or until loaded-->
-                                    <input type="checkbox" id="auto-refresh" name="auto-refresh">
-                                    <label for="auto-refresh">Auto-Refresh</label>
+                                <div class="sidepanel-body">
+                                    <div class="sidepanel-subpanel" id="Layer-Panel">
+                                        <div class="sidepanel-subtitle">Layers:</div>
+                                        <div class="checkbox-container">
+                                            <input type="checkbox" id="Layer-Pins" name="Layer" checked>
+                                            <label for="Layer-Pins">Pins</label>
+                                        </div>
+                                        <div class="checkbox-container">
+                                            <input type="checkbox" id="Layer-ColoredMarkers" name="Layer">
+                                            <label for="Layer-ColoredMarkers">Colored Markers</label>
+                                        </div>
+                                        <div class="checkbox-container">
+                                            <input type="checkbox" id="Layer-Kriging" name="Layer">
+                                            <label for="Layer-Kriging">Kriging</label>
+                                        </div> 
+                                    </div>
+                                    <div class="sidepanel-subpanel" id="Source-Panel">
+                                            <div class="sidepanel-subtitle">Data Source:</div>
+                                        <div>
+                                            <input type="radio" id="Source-Real" name="Source" value="realsource" checked>
+                                            <label for="Source-Real">Real Data</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" id="Source-Simulation" name="Source" value="simulationsource">
+                                            <label for="Source-Simulation">Simulation Data</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="sidepanel-footer">
+                                    <div class="sidepanel-subpanel" id="Refresh-Panel">
+                                        <div>
+                                            <button class="refreshbutton" id="refreshbutton">Refresh Map</button> <!-- disable for few sec or until loaded-->
+                                        </div>
+                                        <input type="checkbox" id="auto-refresh" name="auto-refresh">
+                                        <label for="auto-refresh">Auto-Refresh</label>
+                                    </div>
                                 </div>
                             </div>
-                        <!--</div>-->
                         </div>
                     </div>            
-                    <!-- <div class="card-footer">
-                        <div class="row py-2">
-                            <div class="col-md-6">
-                                <button class="refreshbutton" id="refreshbutton">Refresh Map</button> 
-                            </div>
-                            <div class="col-md-6">
-                                <input type="checkbox" id="auto-refresh" name="auto-refresh">
-                                <label for="auto-refresh">Auto-Refresh</label>
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
             </div>
         </div>
