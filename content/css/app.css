@@ -5547,21 +5547,6 @@ table.dataTable th.focus,
   height: 100%;
 }
 
-.embedded-dashboard .fullscreen:-moz-full-screen #map {
-  height: 100%;
-}
-.embedded-dashboard .fullscreen:-webkit-full-screen #map {
-  height: 100%;
-}
-.embedded-dashboard .fullscreen:-ms-fullscreen #map {
-  height: 100%;
-}
-
-.fullscreen:fullscreen {
-  height: 100%;
-}
-
-
 .embedded-dashboard .custom-control {
   top: 20px;
   right: 20px;
@@ -5589,6 +5574,30 @@ table.dataTable th.focus,
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+/Edge */
   user-select: none; /* Standard */
+}
+
+.embedded-dashboard .fullscreen:fullscreen .sidepanel {
+  height: 100%;
+  margin: 0;
+}
+
+/*The original fullscreen button*/
+.embedded-dashboard .ol-viewport>div>.ol-full-screen {
+  opacity: 1;
+  transition: 0.3s opacity;
+}
+
+/*The original fullscreen button in fullscreen*/
+.embedded-dashboard .fullscreen:fullscreen .ol-viewport>div>.ol-full-screen {
+  right: calc(0.5em + 20px);
+}
+
+.embedded-dashboard .fullscreen:fullscreen .sidepanel {
+  right: -230px;
+}
+
+.embedded-dashboard  .sidepanel #mapsidepanelbutton::after{
+  content: "«"
 }
 
 /* The sidepanel links */
@@ -5619,31 +5628,10 @@ table.dataTable th.focus,
   transition: 0.6s;
 } 
 
-.embedded-dashboard .togglebtn-container.shift {
-  transition: 1.0s;
+.embedded-dashboard .togglebtn-container {
+  transition: 0.6s;
   margin-left: -14px;
 } 
-
-
-/* .embedded-dashboard #externalfullscreencontrol {
-  display: block;
-  margin: 1px;
-  padding: 0;
-  color: #fff;
-  font-size: 1.14em;
-  font-weight: 700;
-  text-decoration: none;
-  text-align: center;
-  height: 1.375em;
-  width: 1.375em;
-  line-height: .4em;
-  background-color: rgba(0,60,136,.5);
-  border: none;
-  border-radius: 2px;  
-  float: right;
-} */
-
-
 
 .embedded-dashboard .sidepanel-header{
   padding-top: 10px;
@@ -5717,3 +5705,18 @@ table.dataTable th.focus,
   border-color: #f1f1f1;
 }
 
+/* opened sidepanel */
+.embedded-dashboard .sidepanel.opened, .embedded-dashboard .fullscreen:fullscreen .sidepanel.opened {
+  right: 0;
+}
+
+.embedded-dashboard  .sidepanel.opened #mapsidepanelbutton::after{
+  content: "»"
+}
+.embedded-dashboard .sidepanel.opened .togglebtn-container {
+  margin-left: 0;
+}
+/*The original fullscreen button*/
+.embedded-dashboard #map.isSidePanelOpen .ol-viewport>div>.ol-full-screen {
+  opacity: 0;
+}

@@ -119,7 +119,6 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
 
 
     $scope.mapVisible = true;
-    createMap();
 
 
     $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$orderby=resultTime%20desc&$expand=FeatureOfInterest&$top=1").then(function (response) {
