@@ -296,9 +296,9 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         if (toggle == false)  {olMap.removeControl(control)}
     };
 
-    $scope.isSidePanelOpen = false;
-    $scope.toggleLegendSidepanel = function(){
-        $scope.isSidePanelOpen = !$scope.isSidePanelOpen;
+    $scope.isControlSidePanelOpen = false;
+    $scope.toggleControlSidepanel = function(){
+        $scope.isControlSidePanelOpen = !$scope.isControlSidePanelOpen;
     };
 
 

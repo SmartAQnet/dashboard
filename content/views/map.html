@@ -1,11 +1,12 @@
 <div ng-controller="MapCtrl" id="fullscreen" class="fullscreen">
-    <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isSidePanelOpen: isSidePanelOpen}"></div>
-    <div class="sidepanel" id="LegendSidepanel" ng-class="{opened: isSidePanelOpen}">
+    <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}"></div>
+    
+    <div class="sidepanel" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
         <div class="sidepanel-header">
-            <div class="togglebtn-container shift" id="togglebtn-container-sidepanel">
+            <div class="togglebtn-container shift" id="togglebtn-container-sidepanel-right">
                 <div class="ol-full-screen ol-unselectable ol-control">
-                    <span title="Toggle control-panel"><button ng-click="toggleLegendSidepanel()"
-                            id="mapsidepanelbutton"></button></span>
+                    <span title="Toggle control-panel"><button ng-click="toggleControlSidepanel()"
+                            id="togglebtn-sidepanel-right"></button></span>
                 </div>
             </div>
         </div>
@@ -48,4 +49,22 @@
             </div>
         </div>
     </div>
+
+    <div class="sidepanel" id="LegendSidepanel" ng-class="{opened: isLegendSidePanelOpen}">
+        <div class="sidepanel-header">
+            <div class="togglebtn-container shift" id="togglebtn-container-sidepanel-left">
+                <div class="ol-full-screen ol-unselectable ol-control">
+                    <span title="Toggle control-panel"><button ng-click="toggleLegendSidepanel()"
+                            id="togglebtn-sidepanel-left"></button></span>
+                </div>
+            </div>
+        </div>
+        <div class="sidepanel-body">
+            <div class="sidepanel-subpanel" id="dummypanel">
+            </div>
+        </div>
+        <div class="sidepanel-footer">
+        </div>
+    </div>
+
 </div>

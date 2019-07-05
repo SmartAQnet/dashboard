@@ -5559,15 +5559,10 @@ table.dataTable th.focus,
 
 /* The sidepanel menu */
 .embedded-dashboard .sidepanel {
-  height: calc(100% - 40px); 
-  width: 250px; 
   position: absolute; 
   z-index: 1; 
-  top: 0;
-  right: -250px;
   background-color: rgba(0,60,136,.2);
   margin: 20px;
-  padding-left: 24px;
   transition: 0.6s; 
   border-radius: 4px;
   -webkit-user-select: none; /* Safari */        
@@ -5575,6 +5570,26 @@ table.dataTable th.focus,
   -ms-user-select: none; /* IE10+/Edge */
   user-select: none; /* Standard */
 }
+
+.embedded-dashboard .sidepanel#ControlSidepanel {
+  height: calc(100% - 40px); 
+  width: 250px; 
+  top: 0;
+  right: -250px;
+  padding-left: 24px;
+}
+
+
+
+.embedded-dashboard .sidepanel#LegendSidepanel {
+  height: calc(60% - 40px); 
+  width: 150px; 
+  bottom: 0;
+  left: -150px;
+  padding-right: 24px;
+}
+
+
 
 .embedded-dashboard .fullscreen:fullscreen .sidepanel {
   height: 100%;
@@ -5592,45 +5607,39 @@ table.dataTable th.focus,
   right: calc(0.5em + 20px);
 }
 
-.embedded-dashboard .fullscreen:fullscreen .sidepanel {
-  right: -230px;
-}
 
-.embedded-dashboard  .sidepanel #mapsidepanelbutton::after{
-  content: "«"
-}
-
-/* The sidepanel links */
+/* The sidepanel checkbox/radio text */
 .embedded-dashboard .sidepanel label {
-  /* padding: 8px 8px 0px 32px; 
-  text-decoration: none;
-  font-size: 25px; 
-  color: #818181;
-  display: block;*/
   transition: 0.6s;
 }
 
-/* When you mouse over the navigation links, change their color */
+/* When you mouse checkboxes/radios, change their color */
 .embedded-dashboard .sidepanel label:hover {
   color: #f1f1f1;
 }
 
 
-/* Position and style the close button (top right corner) */
+/* Position and style the toggle-button (top right corner) */
 .embedded-dashboard .togglebtn-container {
   position: relative;
   height: 40px;
   width: 40px;
-  left: -24px;
-  float: left;
   top: -10px;
-  margin-left: 0px;
   transition: 0.6s;
 } 
 
-.embedded-dashboard .togglebtn-container {
-  transition: 0.6s;
+.embedded-dashboard .togglebtn-container#togglebtn-container-sidepanel-right {
+  left: -24px;
+  float: left;
+  margin-left: 0px;
   margin-left: -14px;
+} 
+
+.embedded-dashboard .togglebtn-container#togglebtn-container-sidepanel-left {
+  right: -24px;
+  float: right;
+  margin-right: 0px;
+  margin-right: -14px;
 } 
 
 .embedded-dashboard .sidepanel-header{
@@ -5705,18 +5714,48 @@ table.dataTable th.focus,
   border-color: #f1f1f1;
 }
 
-/* opened sidepanel */
-.embedded-dashboard .sidepanel.opened, .embedded-dashboard .fullscreen:fullscreen .sidepanel.opened {
+/* closed sidepanel */
+.embedded-dashboard .fullscreen:fullscreen .sidepanel#ControlSidepanel {
+  right: -230px;
+}
+
+.embedded-dashboard  .sidepanel#ControlSidepanel #togglebtn-sidepanel-right::after{
+  content: "«"
+}
+
+
+.embedded-dashboard .fullscreen:fullscreen .sidepanel#LegendSidepanel {
+  left: -130px;
+}
+
+.embedded-dashboard  .sidepanel#LegendSidepanel #togglebtn-sidepanel-left::after{
+  content: "»"
+}
+
+  /* opened sidepanel */
+.embedded-dashboard .sidepanel#ControlSidepanel.opened, .embedded-dashboard .fullscreen:fullscreen .sidepanel#ControlSidepanel.opened {
   right: 0;
 }
 
-.embedded-dashboard  .sidepanel.opened #mapsidepanelbutton::after{
+.embedded-dashboard  .sidepanel#ControlSidepanel.opened #togglebtn-sidepanel-right::after{
   content: "»"
 }
-.embedded-dashboard .sidepanel.opened .togglebtn-container {
+.embedded-dashboard .sidepanel#ControlSidepanel.opened .togglebtn-container {
   margin-left: 0;
 }
+
+.embedded-dashboard .sidepanel#LegendSidepanel.opened, .embedded-dashboard .fullscreen:fullscreen .sidepanel#LegendSidepanel.opened {
+  left: 0;
+}
+
+.embedded-dashboard  .sidepanel#LegendSidepanel.opened #togglebtn-sidepanel-left::after{
+  content: "«"
+}
+.embedded-dashboard .sidepanel#LegendSidepanel.opened .togglebtn-container {
+  margin-left: 0;
+}
+
 /*The original fullscreen button*/
-.embedded-dashboard #map.isSidePanelOpen .ol-viewport>div>.ol-full-screen {
+.embedded-dashboard #map.isControlSidePanelOpen .ol-viewport>div>.ol-full-screen {
   opacity: 0;
 }
