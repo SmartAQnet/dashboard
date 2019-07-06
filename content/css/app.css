@@ -449,7 +449,7 @@
 }
 
 .embedded-dashboard .bg-yellow, .embedded-dashboard  .callout.callout-warning, .embedded-dashboard  .alert-warning, .label-warning, .embedded-dashboard  .modal-warning .modal-body {
-    background-color: #f39c12 !important;    
+    background-color: #f39c12 !important;
     border-radius: 4px;
 }
 
@@ -747,7 +747,7 @@
   color: #9B59B6;
 }
 .embedded-dashboard .green {
-  color: #1ABB9C;
+  color: #1ABB9C;#3498DB;#E74C3C;
 }
 .embedded-dashboard .aero {
   color: #9CC2CB;
@@ -5579,30 +5579,95 @@ table.dataTable th.focus,
   padding-left: 24px;
 }
 
-
-
 .embedded-dashboard .sidepanel#LegendSidepanel {
-  height: calc(60% - 40px); 
-  width: 150px; 
+  /* height: calc(100% - 40px);  */
+  width: 120px; 
   bottom: 0;
-  left: -150px;
+  left: -120px;
   padding-right: 24px;
 }
-
-
 
 .embedded-dashboard .fullscreen:fullscreen .sidepanel {
   height: 100%;
   margin: 0;
 }
 
+/* closed sidepanel */
+.embedded-dashboard .fullscreen:fullscreen .sidepanel#ControlSidepanel {
+  right: -230px;
+}
+
+.embedded-dashboard .fullscreen:fullscreen .sidepanel#LegendSidepanel {
+  left: -100px;
+}
+
+.embedded-dashboard .sidepanel#ControlSidepanel #togglebtn-sidepanel-right::after{
+  content: "«"
+}
+
+.embedded-dashboard .sidepanel#LegendSidepanel #togglebtn-sidepanel-left::after{
+  content: "»"
+}
+
+  /* opened sidepanel */
+.embedded-dashboard .sidepanel#ControlSidepanel.opened, .embedded-dashboard .fullscreen:fullscreen .sidepanel#ControlSidepanel.opened {
+  right: 0;
+}
+
+.embedded-dashboard .sidepanel#LegendSidepanel.opened, .embedded-dashboard .fullscreen:fullscreen .sidepanel#LegendSidepanel.opened {
+  left: 0;
+  /* height: calc(85% - 40px);  */
+}
+
+.embedded-dashboard .sidepanel#ControlSidepanel.opened #togglebtn-sidepanel-right::after{
+  content: "»"
+}
+
+.embedded-dashboard .sidepanel#LegendSidepanel.opened #togglebtn-sidepanel-left::after{
+  content: "«"
+}
+
+/* Position and style the sideboard toggle-button for closed and open sidepanel  */
+.embedded-dashboard .togglebtn-container {
+  position: relative;
+  height: 40px;
+  width: 40px;
+  transition: 0.6s;
+} 
+
+.embedded-dashboard .sidepanel#ControlSidepanel .togglebtn-container {
+  left: -24px;
+  top: -10px;
+  float: left;
+  margin-left: 0px;
+  margin-left: -14px;
+}
+
+.embedded-dashboard .sidepanel#ControlSidepanel.opened .togglebtn-container {
+  margin-left: 0;
+}
+
+.embedded-dashboard .sidepanel#LegendSidepanel .togglebtn-container {
+  right: -24px;
+  bottom: 4px;
+  float: right;
+  margin-right: 0px;
+  margin-right: -14px;
+} 
+
+.embedded-dashboard .sidepanel#LegendSidepanel.opened .togglebtn-container {
+  margin-right: 0;
+}
+
 /*The original fullscreen button*/
+.embedded-dashboard #map.isControlSidePanelOpen .ol-viewport>div>.ol-full-screen {
+  opacity: 0;
+}
 .embedded-dashboard .ol-viewport>div>.ol-full-screen {
   opacity: 1;
   transition: 0.3s opacity;
 }
 
-/*The original fullscreen button in fullscreen*/
 .embedded-dashboard .fullscreen:fullscreen .ol-viewport>div>.ol-full-screen {
   right: calc(0.5em + 20px);
 }
@@ -5618,37 +5683,23 @@ table.dataTable th.focus,
   color: #f1f1f1;
 }
 
-
-/* Position and style the toggle-button (top right corner) */
-.embedded-dashboard .togglebtn-container {
-  position: relative;
-  height: 40px;
-  width: 40px;
-  top: -10px;
-  transition: 0.6s;
-} 
-
-.embedded-dashboard .togglebtn-container#togglebtn-container-sidepanel-right {
-  left: -24px;
-  float: left;
-  margin-left: 0px;
-  margin-left: -14px;
-} 
-
-.embedded-dashboard .togglebtn-container#togglebtn-container-sidepanel-left {
-  right: -24px;
-  float: right;
-  margin-right: 0px;
-  margin-right: -14px;
-} 
+/*Sideboad header body footer, subpanels ...*/
 
 .embedded-dashboard .sidepanel-header{
   padding-top: 10px;
   height: 42px;
 }
 
+.embedded-dashboard .sidepanel-header-name{
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  position: absolute;
+  left: 25%;
+  right: 25%;
+}
+
 .embedded-dashboard .sidepanel-body {
-  /* margin-top: 10px; */
   padding-top: 10px;
   padding-bottom: 10px;
   border-top-width: thin;
@@ -5657,7 +5708,6 @@ table.dataTable th.focus,
 } 
 
 .embedded-dashboard .sidepanel-footer{
-  /* margin-top: 10px; */
   padding-top: 10px;
   border-top-width: thin;
   border-top-style: solid;
@@ -5665,7 +5715,7 @@ table.dataTable th.focus,
 } 
 
 
-.embedded-dashboard .sidepanel-subpanel {
+.embedded-dashboard .sidepanel-subpanel-right {
   margin-top: 5px;
   margin-bottom: 5px;
   margin-right: 10px;
@@ -5673,7 +5723,15 @@ table.dataTable th.focus,
   transition: 0.3s;
 }
 
-.embedded-dashboard .sidepanel-subpanel:hover {
+.embedded-dashboard .sidepanel-subpanel-left {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 10px;
+  border-radius: 4px;
+  transition: 0.3s;
+}
+
+.embedded-dashboard .sidepanel-subpanel-right:hover, .embedded-dashboard .sidepanel-subpanel-left:hover {
   background-color: rgba(0,60,136,.3);
   padding: 5px;
   border-color: #000000;
@@ -5714,48 +5772,51 @@ table.dataTable th.focus,
   border-color: #f1f1f1;
 }
 
-/* closed sidepanel */
-.embedded-dashboard .fullscreen:fullscreen .sidepanel#ControlSidepanel {
-  right: -230px;
+/* Legend */
+
+.embedded-dashboard .legend-container-container {
+  overflow: hidden;
 }
 
-.embedded-dashboard  .sidepanel#ControlSidepanel #togglebtn-sidepanel-right::after{
-  content: "«"
+.embedded-dashboard .legend-container{
+  float: right;
+  margin-left: 12px;
+} 
+
+.embedded-dashboard .legend-text-container{
+  float: right;
+  margin-left: 12px;
 }
 
-
-.embedded-dashboard .fullscreen:fullscreen .sidepanel#LegendSidepanel {
-  left: -130px;
+.embedded-dashboard .legend-scale{
+  height: 40px;
+  width: 20px;
 }
 
-.embedded-dashboard  .sidepanel#LegendSidepanel #togglebtn-sidepanel-left::after{
-  content: "»"
-}
+.embedded-dashboard .legend-textbox{
+  height: 40px;
+  font-size: 0.875rem;
+  padding: 25% 0px;
+} 
 
-  /* opened sidepanel */
-.embedded-dashboard .sidepanel#ControlSidepanel.opened, .embedded-dashboard .fullscreen:fullscreen .sidepanel#ControlSidepanel.opened {
-  right: 0;
+.embedded-dashboard .legend-scale#LegendPiece1{
+  background: linear-gradient(to bottom, rgb(255, 0, 0), rgb(255, 128, 0));
 }
-
-.embedded-dashboard  .sidepanel#ControlSidepanel.opened #togglebtn-sidepanel-right::after{
-  content: "»"
+.embedded-dashboard .legend-scale#LegendPiece2{
+  background: linear-gradient(to bottom, rgb(255, 128, 0), rgb(255, 255, 0));
 }
-.embedded-dashboard .sidepanel#ControlSidepanel.opened .togglebtn-container {
-  margin-left: 0;
+.embedded-dashboard .legend-scale#LegendPiece3{
+  background: linear-gradient(to bottom, rgb(255, 255, 0), rgb(128, 255, 0));
 }
-
-.embedded-dashboard .sidepanel#LegendSidepanel.opened, .embedded-dashboard .fullscreen:fullscreen .sidepanel#LegendSidepanel.opened {
-  left: 0;
+.embedded-dashboard .legend-scale#LegendPiece4{
+  background: linear-gradient(to bottom, rgb(128, 255, 0), rgb(0, 255, 0));
 }
-
-.embedded-dashboard  .sidepanel#LegendSidepanel.opened #togglebtn-sidepanel-left::after{
-  content: "«"
+.embedded-dashboard .legend-scale#LegendTop{
+  margin-top: 50%;
+  height: 10px;
+  background: linear-gradient(to bottom, rgb(192, 0, 0), rgb(255, 0, 0));
 }
-.embedded-dashboard .sidepanel#LegendSidepanel.opened .togglebtn-container {
-  margin-left: 0;
-}
-
-/*The original fullscreen button*/
-.embedded-dashboard #map.isControlSidePanelOpen .ol-viewport>div>.ol-full-screen {
-  opacity: 0;
-}
+.embedded-dashboard .legend-scale#LegendBottom{
+  height: 10px;
+  background: linear-gradient(to bottom, rgb(0, 255, 0), rgb(0, 255, 64));
+};

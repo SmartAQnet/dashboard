@@ -2,16 +2,16 @@
     <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}"></div>
     
     <div class="sidepanel" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
-        <div class="sidepanel-header">
-            <div class="togglebtn-container shift" id="togglebtn-container-sidepanel-right">
+        <div class="sidepanel-header" id="control-sidepanel-header">
+            <div class="sidepanel-header-name">Controls</div>
+            <div class="togglebtn-container">
                 <div class="ol-full-screen ol-unselectable ol-control">
-                    <span title="Toggle control-panel"><button ng-click="toggleControlSidepanel()"
-                            id="togglebtn-sidepanel-right"></button></span>
+                    <span title="Toggle control-panel"><button ng-click="toggleControlSidepanel()" id="togglebtn-sidepanel-right"></button></span>
                 </div>
             </div>
         </div>
         <div class="sidepanel-body">
-            <div class="sidepanel-subpanel" id="Layer-Panel">
+            <div class="sidepanel-subpanel-right" id="Layer-Panel">
                 <div class="sidepanel-subtitle">Layers:</div>
                 <div class="checkbox-container">
                     <input type="checkbox" id="Layer-Pins" name="Layer" ng-model="isLayerPinsActive" ng-change="changedLayerPinsActive()">
@@ -26,7 +26,7 @@
                     <label for="Layer-Kriging">Kriging</label>
                 </div>
             </div>
-            <div class="sidepanel-subpanel" id="Source-Panel">
+            <div class="sidepanel-subpanel-right" id="Source-Panel">
                 <div class="sidepanel-subtitle">Data Source:</div>
                 <div>
                     <input type="radio" id="Source-Real" name="Source" ng-model="source" value="realsource" ng-change="sourceChanged()">
@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="sidepanel-footer">
-            <div class="sidepanel-subpanel" id="Refresh-Panel">
+            <div class="sidepanel-subpanel-right" id="Refresh-Panel">
                 <div>
                     <button class="refreshbutton" id="refreshbutton" ng-click="UpdateMap()">Refresh Map</button>
                     <!-- disable for few sec or until loaded-->
@@ -51,19 +51,46 @@
     </div>
 
     <div class="sidepanel" id="LegendSidepanel" ng-class="{opened: isLegendSidePanelOpen}">
-        <div class="sidepanel-header">
-            <div class="togglebtn-container shift" id="togglebtn-container-sidepanel-left">
-                <div class="ol-full-screen ol-unselectable ol-control">
-                    <span title="Toggle control-panel"><button ng-click="toggleLegendSidepanel()"
-                            id="togglebtn-sidepanel-left"></button></span>
+        <div class="sidepanel-header" id="legend-sidepanel-header"><div class="sidepanel-header-name">Legend</div>
+        </div>
+        <div class="sidepanel-body">
+            <div class="sidepanel-subpanel-left" id="Legend">
+                <div class="legend-container-container">
+                    <div class="legend-text-container">
+                        <div class="legend-textbox" id="LegendText1">100
+                        </div>
+                        <div class="legend-textbox" id="LegendText2">75
+                        </div>
+                        <div class="legend-textbox" id="LegendText3">50
+                        </div>
+                        <div class="legend-textbox" id="LegendText4">25
+                        </div>
+                        <div class="legend-textbox" id="LegendText5">0
+                        </div>
+                    </div>
+                    <div class="legend-container">
+                        <div class="legend-scale" id="LegendTop">
+                        </div>
+                        <div class="legend-scale" id="LegendPiece1">
+                        </div>
+                        <div class="legend-scale" id="LegendPiece2">
+                        </div>
+                        <div class="legend-scale" id="LegendPiece3">
+                        </div>
+                        <div class="legend-scale" id="LegendPiece4">
+                        </div>
+                        <div class="legend-scale" id="LegendBottom">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="sidepanel-body">
-            <div class="sidepanel-subpanel" id="dummypanel">
-            </div>
-        </div>
         <div class="sidepanel-footer">
+            <div class="togglebtn-container">
+                <div class="ol-full-screen ol-unselectable ol-control">
+                    <span title="Toggle control-panel"><button ng-click="toggleLegendSidepanel()" id="togglebtn-sidepanel-left"></button></span>
+                </div>
+            </div>
         </div>
     </div>
 

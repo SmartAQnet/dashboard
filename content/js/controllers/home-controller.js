@@ -41,7 +41,10 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 		$scope.$apply()
 	}
 
-	window.setTimeout($scope.setObservations, 0);
+			// $http.get(getUrl() + "/v1.0/Observations?$top=0&$filter=phenomenonTime%20lt%20now()%20sub%20duration%27PT60s%27&$count=true").then(function (response) {
+			// 	count60sago=response.data["@iot.count"]});
+			// $http.get(getUrl() + "/v1.0/Observations?$top=0&$filter=phenomenonTime%20lt%20now()%20sub%20duration%27PT30s%27&$count=true").then(function (response) {
+			// 	count30sago=response.data["@iot.count"]});
 
 	$scope.$on('$destroy',function(){
 		interval=0;

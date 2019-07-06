@@ -170,27 +170,6 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     /********************************************************************************/
 
 
-    // Define a new legend
-    var legend = new ol.control.Legend({ 
-        title: 'Legend n/a',
-        margin: 5,
-        collapsed: true
-    });
-
-    /*
-        // Add a new one
-    var legend2 = new ol.control.Legend({ 
-            title: ' ',
-            margin: 5,
-            target: legend.element
-        });
-        olMap.addControl(legend2);
-    */
-
-
-    //olMap.addControl(new ol.control.ScaleLine());
-    //olMap.addControl(legend);
-    //olMap.removeControl(legend);
 
 
 
@@ -215,76 +194,6 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     };
 
 
-    var lengthoflegend=0;
-    var obsproperty;
-    var obsvaluelist;
-    var upperlimit;
-    var reducedarraylength;
-
-
-    //takes an array of colors to generate a legend based on color transitions from the first to the last color
-    function calculatelegend(anchorarray){
-
-        function gradientfunction(one, two){
-            var grad = document.createElement('canvas').getContext('2d').createLinearGradient(15, 15, 15, 40);
-                grad.addColorStop(0, one);
-                grad.addColorStop(1, two);
-                return grad;
-        };
-
-
-        for (let i=(lengthoflegend);i>=0;i--) {legend.removeRow()};
-        lengthoflegend = anchorarray.length-2;
-
-        //legend.removeRow();
-        legend.set("title",obspropertydict(obsproperty));
-        
-        upperlimit = (Math.round(Math.max.apply(null,obsvaluelist)/10)+1)*10;
-        if (upperlimit < 50) {upperlimit = 50}
-        else if (upperlimit > 100) {upperlimit = 100}
-
-        reducedarraylength = Math.floor((upperlimit+9)/10);
-        console.log(reducedarraylength)
-        for (let i=(reducedarraylength-2);i>=0;i--) {
-
-            if ( i==(reducedarraylength-2)) {var scale=upperlimit}
-            else if ( i==0 ) {var scale = 0}
-            else {var scale = " "}
-            
-            legend.addRow({
-                title: scale.toString(), 
-                typeGeom: 'Point',
-                style: new ol.style.Style({
-                    image: new ol.style.RegularShape({
-                        points: 4,
-                        radius: 25,
-                        angle: 3.14/4,
-                        //stroke: new ol.style.Stroke({ color: 'black', width: 0.5 }),
-                        fill: new ol.style.Fill({ color: gradientfunction(anchorarray[i+1],anchorarray[i])})
-                    })
-                })
-            });
-        };
-    };
-
-
-    /*
-    customControl = function(opt_options) {
-        var element = document.createElement('div');
-        element.className = 'custom-control ol-unselectable ol-control';
-        ol.control.Control.call(this, {
-        element: element
-        });
-    };
-    ol.inherits(customControl, ol.control.Control);
-
-
-    var testcontrol = new customControl({
-        innterHTML: "test"
-    })
-    */
-
-
     var external_fullscreen = new ol.control.FullScreen({
         target: document.querySelector(".sidepanel-header"),
         source: 'fullscreen'
@@ -301,7 +210,10 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         $scope.isControlSidePanelOpen = !$scope.isControlSidePanelOpen;
     };
 
-
+    $scope.isLegendSidePanelOpen = false;
+    $scope.toggleLegendSidepanel = function(){
+        $scope.isLegendSidePanelOpen = !$scope.isLegendSidePanelOpen;
+    };
 
 
     /************************************ Marker ************************************/
@@ -547,10 +459,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 	togglelayers(ColoredMarkerLayer,false);
 	togglelayers(canvasLayer,false);
 
-	//Default Layers at page loading
-	togglecontrols(legend,false);
-	//togglecontrols(testcontrol,true);
-	
+
 
     $scope.isLayerPinsActive = true;
     $scope.isColorMarkersActive = false;
@@ -560,11 +469,11 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 	$scope.changedLayerPinsActive = function(){
         togglelayers(PinLayer,$scope.isLayerPinsActive);
     }
+    
     $scope.changedColorMarkersActive = function(){
         togglelayers(ColoredMarkerLayer,$scope.isColorMarkersActive);
-        togglecontrols(legend,$scope.isColorMarkersActive);
-        calculatelegend(params.colors);
     }
+
     $scope.changedKrigingActive = function(){
         togglelayers(canvasLayer,$scope.isKrigingActive);
     }
