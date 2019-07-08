@@ -37,6 +37,14 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     })
 
 
+    // //get obs properties stuff for pm10 here
+    // $http.get(getUrl() + "/v1.0/ObservedProperties('saqn%3Aop%3Amcpm10')/properties/conventions").then(function (response) {
+    //     $scope.colorlist = response.data.value;
+    //     angular.forEach($scope.allThings, function (value, key) {
+    //         addGeoJSONFeature(value["Locations"][0]["location"]);
+    //     });
+    // });
+    // $scope.colorlist = params.colors;
 
 
 

@@ -50,8 +50,8 @@
         </div>
     </div>
 
-    <div class="sidepanel" id="LegendSidepanel" ng-class="{opened: isLegendSidePanelOpen}">
-        <div class="sidepanel-header" id="legend-sidepanel-header"><div class="sidepanel-header-name">Legend</div>
+    <!-- <div class="sidepanel" id="LegendSidepanel" ng-class="{opened: isLegendSidePanelOpen}">
+        <div class="sidepanel-header" id="legend-sidepanel-header"><div class="sidepanel-header-name" id="LegendTitle">Legend</div>
         </div>
         <div class="sidepanel-body">
             <div class="sidepanel-subpanel-left" id="Legend">
@@ -92,6 +92,42 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
+
+    <div class="sidepanel" id="LegendSidepanel" ng-class="{opened: isLegendSidePanelOpen}">
+        <div class="sidepanel-header" id="legend-sidepanel-header"><div class="sidepanel-header-name" id="LegendTitle">Legend</div>
+        </div>
+        <div class="sidepanel-body">
+            <div class="sidepanel-subpanel-left" id="Legend">
+                <div class="legend-container-container">
+                    <table class="table table-bordered table-hover st-table table-striped table-sm">
+                        <thead class="st-thead">
+                        <tr>
+                            <th>Name</th>
+                            <!--<th>Description</th>
+                            th>Definition</th>
+                            <th>Delete</th-->
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="x in colorlist">
+                            <div class="legend-scale" id="{{x}}}"><td><style>.embedded-dashboard .legend-scale#{{x}}{background-color: {{x}}}</style></td></div>
+                            <!--<td>{{x["description"]}}</td>
+                            td>{{x["definition"]}}</td>
+                            <td><div class="fa fa-remove delete-entity" ng-click="deleteObservedPropertyClicked(x)"></div></td-->
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="sidepanel-footer">
+            <div class="togglebtn-container">
+                <div class="ol-full-screen ol-unselectable ol-control">
+                    <span title="Toggle control-panel"><button ng-click="toggleLegendSidepanel()" id="togglebtn-sidepanel-left"></button></span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
