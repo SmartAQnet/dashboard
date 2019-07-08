@@ -283,13 +283,6 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     };
 
 
-        //show location of all active things
-        $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27&$expand=Locations&$top=9999999").then(function (response) {
-            $scope.allThings = response.data.value;
-            angular.forEach($scope.allThings, function (value, key) {
-                addGeoJSONFeature(value["Locations"][0]["location"]);
-            });
-        });
 
 
     //function that can be used to add gps pins to the map
@@ -329,9 +322,31 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     };
 
 
+    
+    
+
+    //show location of all active things
+    $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27&$expand=Locations&$top=9999999").then(function (response) {
+        $scope.allThings = response.data.value;
+        angular.forEach($scope.allThings, function (value, key) {
+            addGeoJSONFeature(value["Locations"][0]["location"]);
+        });
+    });
 
 
+    $scope.AllObservedPropertiesDictionary = {}
 
+    //get observed properties to get colors for colored markers and the legend depending on the property requested
+    $http.get(getUrl() + "/v1.0/ObservedProperties?$select=properties").then(function (response) {
+        $scope.allObservedProperties = response.data.value;
+        angular.forEach($scope.allObservedProperties, function (value, key) {
+            $scope.AllObservedPropertiesDictionary[value["@iot.id"]] = value["properties"]["conventions"]
+        });
+    });
+
+    setTimeout(() => {
+        console.log($scope.AllObservedPropertiesDictionary)
+    }, 5000);
 
     /************************************ Kriging ************************************/
     //                               calculate Kriging
