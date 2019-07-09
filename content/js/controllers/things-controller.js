@@ -1,4 +1,3 @@
-// Things controller
 gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams) {
     $scope.Page.setTitle('THINGS');
     $scope.Page.setHeaderIcon(iconThing);

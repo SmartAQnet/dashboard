@@ -10,8 +10,8 @@
         </thead>
         <tbody>
         <tr ng-repeat="x in observedpropertiesList">
-            <td>{{x["name"]}}</td>
-            <td>{{x["description"]}}</td>
+            <td ng-click="observedpropertyClicked(x['@iot.id'])">{{x["name"]}}</td>
+            <td ng-click="observedpropertyClicked(x['@iot.id'])">{{x["description"]}}</td>
             <!--td>{{x["definition"]}}</td>
             <td><div class="fa fa-remove delete-entity" ng-click="deleteObservedPropertyClicked(x)"></div></td-->
         </tr>
