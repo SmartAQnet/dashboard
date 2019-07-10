@@ -11,8 +11,12 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
         $scope.Page.selectedThing = response.data;
     });
 
+
+    $scope.mapVisible = true;
+
     $scope.tabPropertiesClicked = function () {
-        $scope.mapVisible = true;
+
+        //$scope.mapVisible = true;
 
         $http.get(getUrl() + "/v1.0/ObservedProperties(" + getId($scope.id) + ")/Datastreams?$expand=Observations($top=1;$orderby=phenomenonTime%20desc),Observations/FeatureOfInterest").then(function (response) {
             $scope.allObsProps = response.data.value
@@ -30,13 +34,15 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
     
 
 
-    // $scope.tabDatastreamsClicked = function () {
-    //     $scope.mapVisible = false;
+    $scope.tabDatastreamsClicked = function () {
+        
+        //$scope.mapVisible = false;
 
-    //     $http.get(getUrl() + "/v1.0/ObservedProperties(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/Datastreams?$expand=ObservedProperty").then(function (response) {
-    //         $scope.datastreamsList = response.data.value;
-    //     });
-    // };
+        $http.get(getUrl() + "/v1.0/ObservedProperties(" + getId($scope.id) + ")/Datastreams").then(function (response) {
+    
+            $scope.datastreamsList = response.data.value;
+        });
+    };
 
     // $scope.datastreamClicked = function (datastreamID) {
     //     angular.forEach($scope.things, function (value, key) {
@@ -44,7 +50,6 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
     //             $scope.Page.selectedDatastream = value;
     //         }
     //     });
-
     //     $scope.Page.go("datastream/" + datastreamID);
     // };
 

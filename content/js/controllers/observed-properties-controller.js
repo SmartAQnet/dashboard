@@ -7,7 +7,7 @@ gostApp.controller('ObservedPropertiesCtrl', function ($scope, $http, $routePara
     var query=getUrl() + "/v1.0/ObservedProperties"+ Object.keys($routeParams).reduce(
 	    (a, i) => a + i + "=" + $routeParams[i] + "&","?").slice(0,-1) 
 
-    $http.get(getUrl() + "/v1.0/ObservedProperties").then(function (response) {
+    $http.get(query).then(function (response) {
         $scope.observedpropertiesList = response.data.value;
     });
 

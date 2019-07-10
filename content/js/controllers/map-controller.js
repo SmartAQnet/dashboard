@@ -103,6 +103,11 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     //                 create layers with collections and sources
     /********************************************************************************/
 
+    //function that toggles layers on and off
+    function togglelayers(layer,toggle) {
+        if (toggle == true) {olMap.addLayer(layer)}
+        if (toggle == false)  {olMap.removeLayer(layer)}
+    };
 
 
     //pin layer for locations of things
@@ -168,10 +173,30 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     })
     togglelayers(tileLayer,true);
 
-    function togglelayers(layer,toggle) {
-        if (toggle == true) {olMap.addLayer(layer)}
-        if (toggle == false)  {olMap.removeLayer(layer)}
-    };
+
+
+    //Default Layers at page loading
+    $scope.isLayerPinsActive = false;
+    $scope.isColorMarkersActive = true;
+    $scope.isKrigingActive = false;
+        
+    togglelayers(PinLayer,$scope.isLayerPinsActive);
+    togglelayers(ColoredMarkerLayer,$scope.isColorMarkersActive);
+    togglelayers(canvasLayer,$scope.isKrigingActive);
+
+
+    $scope.changedLayerPinsActive = function(){
+        togglelayers(PinLayer,$scope.isLayerPinsActive);
+    }
+    
+    $scope.changedColorMarkersActive = function(){
+        togglelayers(ColoredMarkerLayer,$scope.isColorMarkersActive);
+    }
+
+    $scope.changedKrigingActive = function(){
+        togglelayers(canvasLayer,$scope.isKrigingActive);
+    }
+
 
     /************************************ Controls ***********************************/
     //                                 Create controls
@@ -334,19 +359,6 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     });
 
 
-    $scope.AllObservedPropertiesDictionary = {}
-
-    //get observed properties to get colors for colored markers and the legend depending on the property requested
-    $http.get(getUrl() + "/v1.0/ObservedProperties?$select=properties").then(function (response) {
-        $scope.allObservedProperties = response.data.value;
-        angular.forEach($scope.allObservedProperties, function (value, key) {
-            $scope.AllObservedPropertiesDictionary[value["@iot.id"]] = value["properties"]["conventions"]
-        });
-    });
-
-    setTimeout(() => {
-        console.log($scope.AllObservedPropertiesDictionary)
-    }, 5000);
 
     /************************************ Kriging ************************************/
     //                               calculate Kriging
@@ -452,10 +464,10 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     var kriginglocations = [];
 	var krigingvalues = [];
 	
-	obsproperty = "mcpm10";
+	obsproperty = "mcpm10"; //noch ändern
 	obsvaluelist = [];
 
-
+    console.log($scope)
 	//get datastreams, recent observation value for color, resulttime for id and feature of interest for location
 	$scope.getAllObservations=function(){
 		$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:" + obsproperty + "%27&$expand=Observations($top=1;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
@@ -477,29 +489,10 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
 	window.setTimeout($scope.getAllObservations,0)
 
-	//Default Layers at page loading
-	togglelayers(PinLayer,true);
-	togglelayers(ColoredMarkerLayer,false);
-	togglelayers(canvasLayer,false);
 
 
 
-    $scope.isLayerPinsActive = true;
-    $scope.isColorMarkersActive = false;
-    $scope.isKrigingActive = false;
 
-
-	$scope.changedLayerPinsActive = function(){
-        togglelayers(PinLayer,$scope.isLayerPinsActive);
-    }
-    
-    $scope.changedColorMarkersActive = function(){
-        togglelayers(ColoredMarkerLayer,$scope.isColorMarkersActive);
-    }
-
-    $scope.changedKrigingActive = function(){
-        togglelayers(canvasLayer,$scope.isKrigingActive);
-    }
 
 	var refreshrate = 10000; //initial refresh rate
     $scope.source = "realsource";

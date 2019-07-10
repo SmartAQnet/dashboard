@@ -1,10 +1,8 @@
-<div>
+<div class="col-md-12 main" ng-controller="MapCtrl">
     <div class="card">
         <div class="card-header">
             <ul class="nav nav-tabs">
                 <li class="nav-item" ng-click="tabPropertiesClicked()"><a class="nav-link active show" data-target="#properties" data-toggle="tab">Properties</a></li>
-                <li class="nav-item" ng-click="tabLocationsClicked()"><a class="nav-link" data-target="#locations" data-toggle="tab">Location</a></li>
-                <li class="nav-item" ng-click="tabHistoricalLocationsClicked()"><a class="nav-link" data-target="#historicallocations" data-toggle="tab">Historical Locations</a></li>
                 <li class="nav-item" ng-click="tabDatastreamsClicked()"><a class="nav-link" data-target="#datastreams" data-toggle="tab">Datastreams</a></li>
             </ul>
         </div>
@@ -32,8 +30,7 @@
                         <tr>
                     <th ng-click="sortBy('name')"> Name </th>
                             <!--th>Description</th-->
-                            <th>Observed Property</th>
-                            <!--th>Unit of Measurement</th-->
+                            <th>Unit of Measurement</th>
                             <th>From</th>
                             <th>Until</th>
                             <!--th>Area</th-->
@@ -45,8 +42,7 @@
                                 <span title="{{x['name']}}">{{x["name"] | limitTo : 26}}...</span>
                             </td>
                             <!--td>{{x["description"]}}</td-->
-                            <td>{{x['ObservedProperty']['name']}}</td>
-                            <!--td>{{x["unitOfMeasurement"]}}</td-->
+                            <td>{{x["unitOfMeasurement"]}}</td>
                             <td>{{x["phenomenonTime"] | limitTo : 24 | date:'yyyy-MM-dd HH:mm:ss'}} </td>
                             <td>{{x["phenomenonTime"] | limitTo : -24 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
                             <!--td>{{x["observedArea"]}}</td-->
@@ -55,7 +51,16 @@
                     </table>
                 </div>
             </div>
-            <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px"></div>
         </div>
     </div>
-</div>
+    <div class="row py-2">
+            <div class="col-md-12">
+                <div class="card" >
+                    <div class="card-header">Map showing all Sensors which measure {{name}}</div>
+                    <div class="card-body" id="card-body-map" ng-include="'/dashboard/content/views/map.html'">
+                    </div>            
+                </div>
+            </div>
+        </div>
+    </div>
+    
