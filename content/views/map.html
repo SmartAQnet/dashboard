@@ -60,11 +60,11 @@
                     </div>
                     <div class="legend-text-container">
                         <!--<div ng-style="{'bottom': point.relativeLocation+'%'}" class="legend-textbox" ng-repeat="point in relativePoints">{{point.value}}</div>-->
-                        <div ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space"></div>
-                        <div ng-style="{'height': 100-2*scaleOvershoot+'%'}" class="legend-label-container">
+                        <div ng-if="limitColors.end" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.end}}</div>
+                        <div class="legend-label-container">
                             <div class="legend-textbox" ng-repeat="label in scaleLabels">{{label}}</div>
                         </div>
-                        <div ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space"></div>
+                        <div ng-if="limitColors.start" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.start}}</div>
                     </div>
                 </div>
                 <div id="scaleCaption">

@@ -5789,6 +5789,8 @@ table.dataTable th.focus,
   margin-left: 12px;
   min-width: 40px;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .embedded-dashboard .legend-scale{
@@ -5805,10 +5807,15 @@ table.dataTable th.focus,
   display: flex;
   flex-direction: column-reverse;
   justify-content: space-between;
+  flex-grow: 1;
 }
 
 .embedded-dashboard #scaleCaption{
   margin-top: 10px;
   font-size: 0.7rem;
   text-align: center;
+}
+
+.embedded-dashboard .legend-space{
+  flex-shrink: 0;
 }

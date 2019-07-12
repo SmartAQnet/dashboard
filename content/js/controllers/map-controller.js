@@ -485,7 +485,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
         //get absolute range between highest and lowest valid point
         var range = validPoints[validPoints.length - 1] -validPoints[0];
-        var overshoot = 5; //Size between bottom to first valid point/ last valid point to top of the scale in percent of whole scale;
+        var overshoot = 8; //Size between bottom to first valid point/ last valid point to top of the scale in percent of whole scale;
         $scope.scaleOvershoot = overshoot;
         var relativePoints = validPoints.map(function(point){ //Map all points to their relative location on the scale
             return {
@@ -508,6 +508,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             (limitColors.end ? ", "+limitColors.end + " 100%" : "")+ //Add start only if necessary
             ")").trim()};
         $scope.scaleStyle = scaleStyle;
+        $scope.limitColors = limitColors;
 
         //Build equidistant labels for scale
         var labels = [];
@@ -517,6 +518,10 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         }
 
         $scope.scaleLabels = labels;
+        $scope.scaleLabelsLimits = {
+            start: "<" + labels[0],
+            end: ">" + labels[labels.length - 1],
+        };
     });
 
     console.log($scope)
