@@ -1,5 +1,9 @@
 gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams, Page) {
     $scope.id = $routeParams.id;
+
+    //Set default observed property for the map. The map sub-controller inherits the variable:
+    $scope.selectedObservedProperty = $scope.id.split(":").slice(-1)[0]; //Extracts op from id: "saqn:op:mcpm10" -> "mcpm10". Is there a better way?
+    
     $scope.Page.setTitle('OBSERVED PROPERTY(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
 

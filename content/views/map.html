@@ -56,32 +56,20 @@
         <div class="sidepanel-body">
             <div class="sidepanel-subpanel-left" id="Legend">
                 <div class="legend-container-container">
-                    <div class="legend-text-container">
-                        <div class="legend-textbox" id="LegendText1">100
-                        </div>
-                        <div class="legend-textbox" id="LegendText2">75
-                        </div>
-                        <div class="legend-textbox" id="LegendText3">50
-                        </div>
-                        <div class="legend-textbox" id="LegendText4">25
-                        </div>
-                        <div class="legend-textbox" id="LegendText5">0
-                        </div>
-                    </div>
                     <div class="legend-container">
-                        <div class="legend-scale" id="LegendTop">
-                        </div>
-                        <div class="legend-scale" id="LegendPiece1">
-                        </div>
-                        <div class="legend-scale" id="LegendPiece2">
-                        </div>
-                        <div class="legend-scale" id="LegendPiece3">
-                        </div>
-                        <div class="legend-scale" id="LegendPiece4">
-                        </div>
-                        <div class="legend-scale" id="LegendBottom">
-                        </div>
+                        <div class="legend-scale" ng-style="scaleStyle"></div>
                     </div>
+                    <div class="legend-text-container">
+                        <!--<div ng-style="{'bottom': point.relativeLocation+'%'}" class="legend-textbox" ng-repeat="point in relativePoints">{{point.value}}</div>-->
+                        <div ng-if="limitColors.end" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.end}}</div>
+                        <div class="legend-label-container">
+                            <div class="legend-textbox" ng-repeat="label in scaleLabels">{{label}}</div>
+                        </div>
+                        <div ng-if="limitColors.start" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.start}}</div>
+                    </div>
+                </div>
+                <div id="scaleCaption">
+                    {{obspropertyName}}<br>[{{obspropertyUnit.replace("degC","°C")}}]
                 </div>
             </div>
         </div>
