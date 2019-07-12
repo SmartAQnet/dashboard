@@ -182,13 +182,12 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     
     //Default Layers at page loading
 
-        
     togglelayers(PinLayer,$scope.isLayerPinsActive);
     togglelayers(ColoredMarkerLayer,$scope.isColorMarkersActive);
     togglelayers(canvasLayer,$scope.isKrigingActive);
 
 
-//----------------------not working yet----------------------
+//----------------------not working yet---------->>>>>>>------------
     var tooltip = document.getElementById('map-feature-tooltip');
     var overlay = new ol.Overlay({
       element: tooltip,
@@ -202,18 +201,18 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     function displayTooltip(evt) {
         var pixel = evt.pixel;
         var feature = olMap.forEachFeatureAtPixel(pixel, function(feature) {
-            console.log(feature)
             return feature;
-        });
+        }); 
+               
         tooltip.style.display = feature ? '' : 'none';
         if (feature) {
             overlay.setPosition(evt.coordinate);
             tooltip.innerHTML = feature.get('name');
-        }
+        };
     };
     
     olMap.on('pointermove', displayTooltip);
-//----------------------not working yet----------------------
+//---------<<<<<<<-------------not working yet----------------------
 
 
     $scope.changedLayerPinsActive = function(){
@@ -222,12 +221,20 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     
     $scope.changedColorMarkersActive = function(){
         togglelayers(ColoredMarkerLayer,$scope.isColorMarkersActive);
+        enableLegendSidepanel();
     }
 
     $scope.changedKrigingActive = function(){
         togglelayers(canvasLayer,$scope.isKrigingActive);
+        enableLegendSidepanel();
     }
 
+    function enableLegendSidepanel() {
+        var element = document.getElementById("LegendSidepanel");
+        if (($scope.isColorMarkersActive || $scope.isKrigingActive) == false) {element.classList.add("invisible")
+            } else if ($scope.isColorMarkersActive || $scope.isKrigingActive) {element.classList.remove("invisible")
+        }
+    };
 
     /************************************ Controls ***********************************/
     //                                 Create controls
@@ -264,10 +271,10 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     });
     olMap.addControl(external_fullscreen);
 
-    function togglecontrols(control,toggle) {
-        if (toggle == true) {olMap.addControl(control)}
-        if (toggle == false)  {olMap.removeControl(control)}
-    };
+    // function togglecontrols(control,toggle) {
+    //     if (toggle == true) {olMap.addControl(control)}
+    //     if (toggle == false)  {olMap.removeControl(control)}
+    // };
 
     $scope.isControlSidePanelOpen = false;
     $scope.toggleControlSidepanel = function(){
@@ -504,7 +511,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         var conventions = response.data.properties.conventions;
         $scope.obspropertyName = response.data.name;
         $scope.obspropertyUnit = response.data.properties.conventions.unitOfMeasurement.symbol;
-        var numberOfLabels = 11;
+        var numberOfLabels = Object.keys(conventions.fixedPoints).length;
 
         //valid points will be an array containing keys only for non-limit points
         var validPoints = Object.keys(conventions.fixedPoints).sort(function(a, b){
@@ -603,10 +610,14 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 			PinLayer.setSource(PinSource);
 			ColoredMarkerLayer.setSource(ColoredMarkerSource);
             refreshrate = 10000
-        } else {
+        } else if ($scope.source == "simulationsource"){
 			PinLayer.setSource(null);
 			ColoredMarkerLayer.setSource(SimulationSource);
             refreshrate = 1000
+        } else {
+            PinLayer.setSource(null);
+            ColoredMarkerLayer.setSource(null);
+            console.log("no source set");
         }
     }
 

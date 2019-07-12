@@ -5579,6 +5579,10 @@ table.dataTable th.focus,
   padding-left: 24px;
 }
 
+.embedded-dashboard .invisible {
+  opacity: 0;
+}
+
 .embedded-dashboard .sidepanel#LegendSidepanel {
   /* height: calc(100% - 40px);  */
   width: 120px; 
