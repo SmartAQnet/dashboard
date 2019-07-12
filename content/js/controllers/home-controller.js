@@ -1,4 +1,5 @@
-gostApp.controller('HomeCtrl', function ($scope, $http) {
+gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
+	$scope.id = "saqn:home:";
 	$scope.Page.setTitle('smartAQnet');
 	$scope.Page.setHeaderIcon('');
 
@@ -10,6 +11,13 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 	var lasttime=null;
 	var lastcount;
 	var count=0;
+
+
+
+	// $http.get(getUrl() + "/v1.0/Observations?$top=0&$count=true").then(function (response) {
+	// 	$scope.n_observations=response.data["@iot.count"];
+	// });	
+
 
 
 	$scope.setObservations=function(){
@@ -39,7 +47,9 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 			if(interval>0) window.setTimeout($scope.setObservations, interval);
 		}
 		$scope.$apply()
-	}
+	};
+
+	window.setTimeout($scope.setObservations, 0);
 
 			// $http.get(getUrl() + "/v1.0/Observations?$top=0&$filter=phenomenonTime%20lt%20now()%20sub%20duration%27PT60s%27&$count=true").then(function (response) {
 			// 	count60sago=response.data["@iot.count"]});

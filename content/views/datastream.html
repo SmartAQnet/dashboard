@@ -1,4 +1,4 @@
-<div>
+<div class="col-md-12 main" ng-controller="MapCtrl">
     <div class="card">
         <div class="card-header">
             <!--button class="backbutton"-->
@@ -156,7 +156,6 @@
                     </div>
                 </div>
             </div>
-            <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px"></div>
         </div>
     </div>
     <!-- Thing selection for comparison -->
@@ -317,4 +316,14 @@
             </div>
         </div>
     </div>
+    <div class="row py-2">
+        <div class="col-md-12">
+            <div class="card" >
+                <div class="card-header">Map showing active Sensors</div>
+                <div class="card-body" id="card-body-map" ng-include="'/dashboard/content/views/map.html'">
+                </div>            
+            </div>
+        </div>
+    </div>
+</div>
 </div>

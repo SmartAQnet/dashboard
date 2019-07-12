@@ -5820,3 +5820,14 @@ table.dataTable th.focus,
   height: 10px;
   background: linear-gradient(to bottom, rgb(0, 255, 0), rgb(0, 255, 64));
 };
+
+
+.embedded-dashboard .map-feature-tooltip {
+  position: relative;
+  padding: 3px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  opacity: 0.7;
+  white-space: nowrap;
+  font: 10pt sans-serif;
+}

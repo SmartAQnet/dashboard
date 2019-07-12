@@ -20,7 +20,6 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
 
         $http.get(getUrl() + "/v1.0/ObservedProperties(" + getId($scope.id) + ")/Datastreams?$expand=Observations($top=1;$orderby=phenomenonTime%20desc),Observations/FeatureOfInterest").then(function (response) {
             $scope.allObsProps = response.data.value
-            togglelayers(ColoredMarkerLayer,true);
             angular.forEach($scope.observedproperties, function (value, key) {
                 $scope.thisResultValue = response.data.value["Observation"]["result"];
                 $scope.thisFoI = response.data.value["Observation"]["FeatureOfInterest"]["feature"];
@@ -44,14 +43,28 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
         });
     };
 
-    // $scope.datastreamClicked = function (datastreamID) {
-    //     angular.forEach($scope.things, function (value, key) {
-    //         if (value["@iot.id"] == thingID) {
-    //             $scope.Page.selectedDatastream = value;
-    //         }
-    //     });
-    //     $scope.Page.go("datastream/" + datastreamID);
-    // };
+    //Collapsibles 
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.maxHeight){
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } 
+        });
+    };
+
+    $scope.datastreamClicked = function (datastreamID) {
+        angular.forEach($scope.observedproperties, function (value, key) {
+            $scope.Page.selectedDatastream = value;
+        });
+        $scope.Page.go("datastream/" + datastreamID);
+    };
 
 //   $scope.sortBy = function(propertyName) {
 //     $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;

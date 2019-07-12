@@ -1,6 +1,7 @@
 <div ng-controller="MapCtrl" id="fullscreen" class="fullscreen">
-    <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}"></div>
-    
+    <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}">
+        <div id="map-feature-tooltip" class="map-feature-tooltip"></div>
+    </div>
     <div class="sidepanel" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
         <div class="sidepanel-header" id="control-sidepanel-header">
             <div class="sidepanel-header-name">Controls</div>

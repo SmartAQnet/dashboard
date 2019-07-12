@@ -173,16 +173,59 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     })
     togglelayers(tileLayer,true);
 
+    $scope.isKrigingActive = false
 
-
+    if($scope.id.match(/:home:/)){ 
+        $scope.isLayerPinsActive = true
+        $scope.isColorMarkersActive = false
+    } else if($scope.id.match(/:t:/)){
+        $scope.isLayerPinsActive = true
+        $scope.isColorMarkersActive = false
+    } else if ($scope.id.match(/:op:/)){ 
+        $scope.isLayerPinsActive = false
+        $scope.isColorMarkersActive = true
+    } else if($scope.id.match(/:ds:/)){
+        $scope.isLayerPinsActive = false
+        $scope.isColorMarkersActive = true
+    } else if($scope.id.match(/:s:/)){
+        $scope.isLayerPinsActive = false
+        $scope.isColorMarkersActive = true
+    };
+    
     //Default Layers at page loading
-    $scope.isLayerPinsActive = false;
-    $scope.isColorMarkersActive = true;
-    $scope.isKrigingActive = false;
+
         
     togglelayers(PinLayer,$scope.isLayerPinsActive);
     togglelayers(ColoredMarkerLayer,$scope.isColorMarkersActive);
     togglelayers(canvasLayer,$scope.isKrigingActive);
+
+
+//----------------------not working yet----------------------
+    var tooltip = document.getElementById('map-feature-tooltip');
+    var overlay = new ol.Overlay({
+      element: tooltip,
+      offset: [10, 0],
+      positioning: 'bottom-left'
+    });
+    olMap.addOverlay(overlay);
+    
+    console.log(tooltip)
+    
+    function displayTooltip(evt) {
+        var pixel = evt.pixel;
+        var feature = olMap.forEachFeatureAtPixel(pixel, function(feature) {
+            console.log(feature)
+            return feature;
+        });
+        tooltip.style.display = feature ? '' : 'none';
+        if (feature) {
+            overlay.setPosition(evt.coordinate);
+            tooltip.innerHTML = feature.get('name');
+        }
+    };
+    
+    olMap.on('pointermove', displayTooltip);
+//----------------------not working yet----------------------
 
 
     $scope.changedLayerPinsActive = function(){
@@ -468,6 +511,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 	obsvaluelist = [];
 
     console.log($scope)
+    console.log($scope.id)
 	//get datastreams, recent observation value for color, resulttime for id and feature of interest for location
 	$scope.getAllObservations=function(){
 		$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:" + obsproperty + "%27&$expand=Observations($top=1;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
