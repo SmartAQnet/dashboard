@@ -37,18 +37,6 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     })
 
 
-    // //get obs properties stuff for pm10 here
-    // $http.get(getUrl() + "/v1.0/ObservedProperties('saqn%3Aop%3Amcpm10')/properties/conventions").then(function (response) {
-    //     $scope.colorlist = response.data.value;
-    //     angular.forEach($scope.allThings, function (value, key) {
-    //         addGeoJSONFeature(value["Locations"][0]["location"]);
-    //     });
-    // });
-    // $scope.colorlist = params.colors;
-
-
-
-
     /************************************** Map *************************************/
     //                                create the Map
     /********************************************************************************/
@@ -464,14 +452,78 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     var kriginglocations = [];
 	var krigingvalues = [];
 	
-	obsproperty = "mcpm10"; //noch ändern
-	obsvaluelist = [];
+	obsproperty = $scope.selectedObservedProperty || "mcpm10"; //Reads selectedObservedProperty first, possibly from a parent controller. "mcpm10" is the fallback.
+    obsvaluelist = [];
+    
+
+    //get obs properties conventions (e.g. fixed points for color gradients)
+    $http.get(getUrl() + "/v1.0/ObservedProperties('saqn:op:" + obsproperty + "')").then(function (response) {
+        var conventions = response.data.properties.conventions;
+        $scope.obspropertyName = response.data.name;
+        $scope.obspropertyUnit = response.data.properties.conventions.unitOfMeasurement.symbol;
+        var numberOfLabels = 11;
+
+        //valid points will be an array containing keys only for non-limit points
+        var validPoints = Object.keys(conventions.fixedPoints).sort(function(a, b){
+            return parseInt(a) - parseInt(b);
+        });
+        var limitColors = {
+            start: null,
+            end: null
+        }
+        //
+        var limitNumber = 0; //0 if all points are valid, 1 if either top or bottom is max int limit, 2 if both are
+        //Remove limit points from validPoints and add them to limits
+        if(validPoints[0] == "-2147483647"){
+            limitColors.start = conventions.fixedPoints[validPoints.shift()];
+            limitNumber++;
+        }
+        if(validPoints[validPoints.length - 1] == "2147483647"){
+            limitColors.end = conventions.fixedPoints[validPoints.pop()];
+            limitNumber++;
+        }
+
+        //get absolute range between highest and lowest valid point
+        var range = validPoints[validPoints.length - 1] -validPoints[0];
+        var overshoot = 5; //Size between bottom to first valid point/ last valid point to top of the scale in percent of whole scale;
+        $scope.scaleOvershoot = overshoot;
+        var relativePoints = validPoints.map(function(point){ //Map all points to their relative location on the scale
+            return {
+                relativeLocation: ((point-validPoints[0]) / range) * (100 - (overshoot * limitNumber)), //relative position of fixed point on scale
+                color: conventions.fixedPoints[point], //original color
+                value: point
+            };
+        });
+        $scope.relativePoints = relativePoints;
+
+        var relativePointStrings = relativePoints.map(function(point){ // build strings ["#ff00ff 0%", ...]
+            return point.color + " " + point.relativeLocation + "%";
+        })
+        //Build one gradient for all fixed points
+        var scaleStyle = {"background-image": ("\
+            linear-gradient(\
+            to top, "+
+            (limitColors.start ? limitColors.start + "," : "")+ //Add start only if necessary
+            relativePointStrings.join(",")+
+            (limitColors.end ? ", "+limitColors.end + " 100%" : "")+ //Add start only if necessary
+            ")").trim()};
+        $scope.scaleStyle = scaleStyle;
+
+        //Build equidistant labels for scale
+        var labels = [];
+
+        for(var i = 0; i < numberOfLabels; i++){
+            labels[i] = Math.round(parseInt(validPoints[0]) + range * i / (numberOfLabels - 1));
+        }
+
+        $scope.scaleLabels = labels;
+    });
 
     console.log($scope)
 	//get datastreams, recent observation value for color, resulttime for id and feature of interest for location
 	$scope.getAllObservations=function(){
 		$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:" + obsproperty + "%27&$expand=Observations($top=1;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
-			$scope.alldatastreams = response.data.value;
+            $scope.alldatastreams = response.data.value;
 			angular.forEach($scope.alldatastreams, function (value, key) {
 				if (value["Observations"].length > 0){
 				$scope.obsresult = value["Observations"][0]["result"];

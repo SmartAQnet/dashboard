@@ -5776,47 +5776,39 @@ table.dataTable th.focus,
 
 .embedded-dashboard .legend-container-container {
   overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  height: 200px;
 }
 
 .embedded-dashboard .legend-container{
-  float: right;
   margin-left: 12px;
 } 
 
 .embedded-dashboard .legend-text-container{
-  float: right;
   margin-left: 12px;
+  min-width: 40px;
+  position: relative;
 }
 
 .embedded-dashboard .legend-scale{
-  height: 40px;
   width: 20px;
+  height: 100%;
 }
 
 .embedded-dashboard .legend-textbox{
-  height: 40px;
-  font-size: 0.875rem;
-  padding: 25% 0px;
-} 
+  font-size: 0.7rem;
+  min-height: 0;
+}
 
-.embedded-dashboard .legend-scale#LegendPiece1{
-  background: linear-gradient(to bottom, rgb(255, 0, 0), rgb(255, 128, 0));
+.embedded-dashboard .legend-label-container{
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
 }
-.embedded-dashboard .legend-scale#LegendPiece2{
-  background: linear-gradient(to bottom, rgb(255, 128, 0), rgb(255, 255, 0));
+
+.embedded-dashboard #scaleCaption{
+  margin-top: 10px;
+  font-size: 0.7rem;
+  text-align: center;
 }
-.embedded-dashboard .legend-scale#LegendPiece3{
-  background: linear-gradient(to bottom, rgb(255, 255, 0), rgb(128, 255, 0));
-}
-.embedded-dashboard .legend-scale#LegendPiece4{
-  background: linear-gradient(to bottom, rgb(128, 255, 0), rgb(0, 255, 0));
-}
-.embedded-dashboard .legend-scale#LegendTop{
-  margin-top: 50%;
-  height: 10px;
-  background: linear-gradient(to bottom, rgb(192, 0, 0), rgb(255, 0, 0));
-}
-.embedded-dashboard .legend-scale#LegendBottom{
-  height: 10px;
-  background: linear-gradient(to bottom, rgb(0, 255, 0), rgb(0, 255, 64));
-};
