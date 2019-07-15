@@ -1,84 +1,115 @@
 <div ng-controller="MapCtrl" id="fullscreen" class="fullscreen">
-    <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}">
-        <div id="map-feature-tooltip" class="map-feature-tooltip"></div>
-    </div>
-    <div class="sidepanel" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
-        <div class="sidepanel-header" id="control-sidepanel-header">
-            <div class="sidepanel-header-name">Controls</div>
-            <div class="togglebtn-container">
-                <div class="ol-full-screen ol-unselectable ol-control">
-                    <span title="Toggle control-panel"><button ng-click="toggleControlSidepanel()" id="togglebtn-sidepanel-right"></button></span>
-                </div>
-            </div>
+    <div class="card-body" id="card-body-map">
+        <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}">
         </div>
-        <div class="sidepanel-body">
-            <div class="sidepanel-subpanel-right" id="Layer-Panel">
-                <div class="sidepanel-subtitle">Layers:</div>
-                <div class="checkbox-container">
-                    <input type="checkbox" id="Layer-Pins" name="Layer" ng-model="isLayerPinsActive" ng-change="changedLayerPinsActive()">
-                    <label for="Layer-Pins">Pins</label>
-                </div>
-                <div class="checkbox-container">
-                    <input type="checkbox" id="Layer-ColoredMarkers" name="Layer" ng-model="isColorMarkersActive" ng-change="changedColorMarkersActive()">
-                    <label for="Layer-ColoredMarkers">Colored Markers</label>
-                </div>
-                <div class="checkbox-container">
-                    <input type="checkbox" id="Layer-Kriging" name="Layer" ng-model="isKrigingActive" ng-change="changedKrigingActive()">
-                    <label for="Layer-Kriging">Kriging</label>
-                </div>
-            </div>
-            <div class="sidepanel-subpanel-right" id="Source-Panel">
-                <div class="sidepanel-subtitle">Data Source:</div>
-                <div>
-                    <input type="radio" id="Source-Real" name="Source" ng-model="source" value="realsource" ng-change="sourceChanged()">
-                    <label for="Source-Real">Real Data</label>
-                </div>
-                <div>
-                    <input type="radio" id="Source-Simulation" name="Source" ng-model="source" value="simulationsource" ng-change="sourceChanged()">
-                    <label for="Source-Simulation">Simulation Data</label>
-                </div>
-            </div>
-        </div>
-        <div class="sidepanel-footer">
-            <div class="sidepanel-subpanel-right" id="Refresh-Panel">
-                <div>
-                    <button class="refreshbutton" id="refreshbutton" ng-click="UpdateMap()">Refresh Map</button>
-                    <!-- disable for few sec or until loaded-->
-                </div>
-                <input type="checkbox" id="auto-refresh" name="auto-refresh" ng-model="isAutoRefreshActive" ng-change="changedAutoRefreshActive()">
-                <label for="auto-refresh">Auto-Refresh</label>
-            </div>
-        </div>
-    </div>
-    <div class="sidepanel invisible" id="LegendSidepanel" ng-class="{opened: isLegendSidePanelOpen}">
-        <div class="sidepanel-header" id="legend-sidepanel-header"><div class="sidepanel-header-name" id="LegendTitle">Legend</div>
-        </div>
-        <div class="sidepanel-body">
-            <div class="sidepanel-subpanel-left" id="Legend">
-                <div class="legend-container-container">
-                    <div class="legend-container">
-                        <div class="legend-scale" ng-style="scaleStyle"></div>
+        <!-- <div id="map-feature-tooltip" class="map-feature-tooltip"></div> -->
+        <div class="sidepanel" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
+            <div class="sidepanel-header" id="control-sidepanel-header">
+                <div class="sidepanel-header-name">Controls</div>
+                <div class="togglebtn-container">
+                    <div class="ol-full-screen ol-unselectable ol-control">
+                        <span title="Toggle control-panel"><button ng-click="toggleControlSidepanel()" id="togglebtn-sidepanel-right"></button></span>
                     </div>
-                    <div class="legend-text-container">
-                        <!--<div ng-style="{'bottom': point.relativeLocation+'%'}" class="legend-textbox" ng-repeat="point in relativePoints">{{point.value}}</div>-->
-                        <div ng-if="limitColors.end" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.end}}</div>
-                        <div class="legend-label-container">
-                            <div class="legend-textbox" ng-repeat="label in scaleLabels">{{label}}</div>
+                </div>
+            </div>
+            <div class="sidepanel-body">
+                <div class="sidepanel-subpanel-right" id="Layer-Panel">
+                    <div class="sidepanel-subtitle">Layers:</div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="Layer-Pins" name="Layer" ng-model="isLayerPinsActive" ng-change="changedLayerPinsActive()">
+                        <label for="Layer-Pins">Pins</label>
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="Layer-ColoredMarkers" name="Layer" ng-model="isColorMarkersActive" ng-change="changedColorMarkersActive()">
+                        <label for="Layer-ColoredMarkers">Colored Markers</label>
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="Layer-Kriging" name="Layer" ng-model="isKrigingActive" ng-change="changedKrigingActive()">
+                        <label for="Layer-Kriging">Kriging</label>
+                    </div>
+                </div>
+                <div class="sidepanel-subpanel-right" id="Source-Panel">
+                    <div class="sidepanel-subtitle">Data Source:</div>
+                    <div>
+                        <input type="radio" id="Source-Real" name="Source" ng-model="source" value="realsource" ng-change="sourceChanged()">
+                        <label for="Source-Real">Real Data</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="Source-Simulation" name="Source" ng-model="source" value="simulationsource" ng-change="sourceChanged()">
+                        <label for="Source-Simulation">Simulation Data</label>
+                    </div>
+                </div>
+            </div>
+            <div class="sidepanel-footer">
+                <div class="sidepanel-subpanel-right" id="Refresh-Panel">
+                    <div>
+                        <button class="refreshbutton" id="refreshbutton" ng-click="UpdateMap()">Refresh Map</button>
+                        <!-- disable for few sec or until loaded-->
+                    </div>
+                    <input type="checkbox" id="auto-refresh" name="auto-refresh" ng-model="isAutoRefreshActive" ng-change="changedAutoRefreshActive()">
+                    <label for="auto-refresh">Auto-Refresh</label>
+                </div>
+            </div>
+        </div>
+        <div class="sidepanel invisible" id="LegendSidepanel" ng-class="{opened: isLegendSidePanelOpen}">
+            <div class="sidepanel-header" id="legend-sidepanel-header"><div class="sidepanel-header-name" id="LegendTitle">Legend</div>
+            </div>
+            <div class="sidepanel-body">
+                <div class="sidepanel-subpanel-left" id="Legend">
+                    <div class="legend-container-container">
+                        <div class="legend-container">
+                            <div class="legend-scale" ng-style="scaleStyle"></div>
                         </div>
-                        <div ng-if="limitColors.start" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.start}}</div>
+                        <div class="legend-text-container">
+                            <!--<div ng-style="{'bottom': point.relativeLocation+'%'}" class="legend-textbox" ng-repeat="point in relativePoints">{{point.value}}</div>-->
+                            <div ng-if="limitColors.end" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.end}}</div>
+                            <div class="legend-label-container">
+                                <div class="legend-textbox" ng-repeat="label in scaleLabels">{{label}}</div>
+                            </div>
+                            <div ng-if="limitColors.start" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.start}}</div>
+                        </div>
+                    </div>
+                    <div id="scaleCaption">
+                        {{obspropertyName}}<br>[{{obspropertyUnit.replace("degC","°C")}}]
                     </div>
                 </div>
-                <div id="scaleCaption">
-                    {{obspropertyName}}<br>[{{obspropertyUnit.replace("degC","°C")}}]
+            </div>
+            <div class="sidepanel-footer">
+                <div class="togglebtn-container">
+                    <div class="ol-full-screen ol-unselectable ol-control">
+                        <span title="Toggle control-panel"><button ng-click="toggleLegendSidepanel()" id="togglebtn-sidepanel-left"></button></span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="sidepanel-footer">
-            <div class="togglebtn-container">
-                <div class="ol-full-screen ol-unselectable ol-control">
-                    <span title="Toggle control-panel"><button ng-click="toggleLegendSidepanel()" id="togglebtn-sidepanel-left"></button></span>
+    </div>
+    <div class="card-footer">
+        <div class="sidepanel" id="InfoSidepanel"  ng-class="{opened: isInfoSidePanelOpen}">
+            <div class="sidepanel-header" id="info-sidepanel-header">
+                <div class="sidepanel-header-name">Information</div>
+                <div class="togglebtn-container">
+                    <div class="ol-full-screen ol-unselectable ol-control">
+                        <span title="Toggle info-panel"><button ng-click="toggleInfoSidepanel()" id="togglebtn-sidepanel-bottom"></button></span>
+                    </div>
                 </div>
+            </div>
+            <div class="sidepanel-body closed" id="InfoPanelBody">
+                <div class="sidepanel-subpanel-bottom" id="Info-Panel">
+                    <div class="sidepanel-subtitle">Detailed Information</div>
+                    <div id="map-detailed-tooltip"></div>
+                </div>
+                <div class="sidepanel-subpanel-bottom" id="Link-Panel">
+                    <div class="sidepanel-subtitle">Links</div>
+                    <div id="map-crosslinks"></div>
+                </div>
+            </div>
+            <div class="sidepanel-footer">
+                <div class="sidepanel-subpanel-bottom" id="Bottom-Footer-Panel"></div>
             </div>
         </div>
     </div>
 </div>
+
+
+
+

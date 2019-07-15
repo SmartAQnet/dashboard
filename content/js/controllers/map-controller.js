@@ -187,32 +187,81 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     togglelayers(canvasLayer,$scope.isKrigingActive);
 
 
-//----------------------not working yet---------->>>>>>>------------
-    var tooltip = document.getElementById('map-feature-tooltip');
-    var overlay = new ol.Overlay({
-      element: tooltip,
-      offset: [10, 0],
-      positioning: 'bottom-left'
-    });
-    olMap.addOverlay(overlay);
-    
-    console.log(tooltip)
-    
-    function displayTooltip(evt) {
-        var pixel = evt.pixel;
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
+
+
+
+
+
+/* --------------------------------------------------Tooltip Info---------------------------------------------------------------------- */
+    var displayFeatureTooltip = function(pixel) {
+
         var feature = olMap.forEachFeatureAtPixel(pixel, function(feature) {
             return feature;
-        }); 
-               
-        tooltip.style.display = feature ? '' : 'none';
-        if (feature) {
-            overlay.setPosition(evt.coordinate);
-            tooltip.innerHTML = feature.get('name');
-        };
+        });
+
+        var info = document.getElementById('map-feature-tooltip');
+        if (feature) {console.log('hover tooltip');
+            // //feature.setStyle({color: 'rgba(128,255,128,0.9)'});
+            // var allinfo = feature.getProperties();
+            // var info = document.getElementById('map-detailed-tooltip');
+            // var crosslinks = document.getElementById('map-crosslinks');
+            // //feature.setStyle({color: 'rgba(128,255,128,0.9)'});
+            // info.innerHTML =  'Result: ' + allinfo['result'] + "<br />" + 'Result Time: ' + allinfo['resulttime'];
+            // crosslinks.innerHTML =  'Thing: <a href="#/thing/' + allinfo['thingId'] + '?$expand=Locations" target="_blank"> Thingname </a><br /> ' + 
+            // 'Datastream: <a href="#/datastream/' + allinfo['datastreamId'] + '" target="_blank"> Datastreamname </a><br /> ' + 
+            // 'Observed Property: <a href="#/observedproperty/' + allinfo['observedpropertyId'] + '" target="_blank"> ObservedPropertyName </a><br /> ' + 
+            // 'Sensor: <a href="#/sensor/' + allinfo['sensorId'] + '" target="_blank"> Sensorname </a>';
+        } else {
+            info.innerHTML = '&nbsp;';
+        }
     };
-    
-    olMap.on('pointermove', displayTooltip);
-//---------<<<<<<<-------------not working yet----------------------
+
+    // olMap.on('pointermove', function(evt) {
+    // if (evt.dragging) {
+    //     return;
+    // }
+    // var pixel = olMap.getEventPixel(evt.originalEvent);
+    // displayFeatureTooltip(pixel);
+    // });
+
+
+
+
+
+
+
+
+
+
+/* --------------------------------------------------Click Tooltip Detailed Info (Sideboard Bottom)---------------------------------------------------------------------- */
+    var displayFeatureInfo = function(feature) {
+        var observationId = feature.getProperties()['@iot.id'];
+        $http.get(getUrl() + "/v1.0/Observations('" + observationId + "')?$expand=FeatureOfInterest,Datastream($expand=Thing,ObservedProperty,Sensor)").then(function (response) {
+            observationInfo = response.data;
+        
+            var info = document.getElementById('map-detailed-tooltip');
+            var crosslinks = document.getElementById('map-crosslinks');
+            //feature.setStyle({color: 'rgba(128,255,128,0.9)'});
+            info.innerHTML =  'Result: ' + observationInfo['result'] + "<br />" + 'Phenomenon Time (UTC): ' + observationInfo['phenomenonTime'];
+            crosslinks.innerHTML =  'Thing: <a href="#/thing/' + observationInfo['Datastream']['Thing']['@iot.id'] + '?$expand=Locations" target="_blank">' + observationInfo['Datastream']['Thing']['name'] + '</a><br /> ' + 
+            'Datastream: <a href="#/datastream/' + observationInfo['Datastream']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['name'] + '</a><br /> ' + 
+            'Observed Property: <a href="#/observedproperty/' + observationInfo['Datastream']['ObservedProperty']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['ObservedProperty']['name'] + '</a><br /> ' + 
+            'Sensor: <a href="#/sensor/' + observationInfo['Datastream']['Sensor']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['Sensor']['name'] + '</a>';
+        });
+    };
+
+
+    olMap.on('click', function(evt) {
+        var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature});
+        if (feature) {displayFeatureInfo(feature)};
+    });
+
+
+
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
 
 
     $scope.changedLayerPinsActive = function(){
@@ -284,6 +333,11 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     $scope.isLegendSidePanelOpen = false;
     $scope.toggleLegendSidepanel = function(){
         $scope.isLegendSidePanelOpen = !$scope.isLegendSidePanelOpen;
+    };
+    
+    $scope.isInfoSidePanelOpen = false;
+    $scope.toggleInfoSidepanel = function(){
+        $scope.isInfoSidePanelOpen = !$scope.isInfoSidePanelOpen;
     };
 
 
@@ -364,27 +418,41 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         }
     }
 
+    // //function that can be used to add features to the map with gps coordinates and a value for value height which is used for color coding
+    // function addGeoJSONcolorFeature(geojson, result, resulttime) {
+    //     var defaultGeoJSONProjection = 'EPSG:4326';
+    //     var mapProjection = olMap.getView().getProjection();
+
+    //     if (JSON.stringify(geojson).includes("FeatureCollection")) {
+    //         ColoredMarkerCollection.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
+    //         //HeatmapCollection.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
+    //     }
+    //     else {
+    //         var geom = (new ol.format.GeoJSON()).readGeometry(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
+    //         var colormarkerfeature = new ol.Feature(geom);
+    //         colormarkerfeature.setStyle(stylefunction(result));
+    //         colormarkerfeature.setId(resulttime);
+    //         ColoredMarkerCollection.push(colormarkerfeature);
+    //         //var heatmapfeature = heatmapfeature(geom,result);
+    //         //HeatmapCollection.push(heatmapfeature);
+    //     }
+    // };
+
+
+    //allinfo: result, resulttime, @iot.id, FeatureOfInterest
     //function that can be used to add features to the map with gps coordinates and a value for value height which is used for color coding
-    function addGeoJSONcolorFeature(geojson, result, resulttime) {
+    function addColorFeature(allinfo) {
         var defaultGeoJSONProjection = 'EPSG:4326';
         var mapProjection = olMap.getView().getProjection();
+        var geom = (new ol.format.GeoJSON()).readGeometry(allinfo.FeatureOfInterest, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
+        
+        var feature = new ol.Feature(geom);
+        feature.setStyle(stylefunction(allinfo.result));
+        feature.setId(allinfo.resulttime);
+        feature.setProperties(allinfo);
 
-        if (JSON.stringify(geojson).includes("FeatureCollection")) {
-            ColoredMarkerCollection.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
-            HeatmapCollection.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
-        }
-        else {
-            var geom = (new ol.format.GeoJSON()).readGeometry(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
-            var colormarkerfeature = new ol.Feature(geom);
-            colormarkerfeature.setStyle(stylefunction(result));
-            colormarkerfeature.setId(resulttime);
-            ColoredMarkerCollection.push(colormarkerfeature);
-            //var heatmapfeature = heatmapfeature(geom,result);
-            //HeatmapCollection.push(heatmapfeature);
-        }
+        ColoredMarkerCollection.push(feature);
     };
-
-
     
     
 
@@ -574,29 +642,51 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         };
     });
 
-    console.log($scope)
-    console.log($scope.id)
+    console.log("scope: " + $scope)
 	//get datastreams, recent observation value for color, resulttime for id and feature of interest for location
-	$scope.getAllObservations=function(){
-		$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:" + obsproperty + "%27&$expand=Observations($top=1;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
+	// $scope.getAllObservations=function(){
+	// 	$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:" + obsproperty + "%27&$expand=Observations($top=1;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
+    //         $scope.alldatastreams = response.data.value;
+	// 		angular.forEach($scope.alldatastreams, function (value, key) {
+	// 			if (value["Observations"].length > 0){
+	// 			$scope.obsresult = value["Observations"][0]["result"];
+	// 			$scope.obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
+	// 			$scope.obsresulttime = Date.parse(value["Observations"][0]["resultTime"]);
+	// 			obsvaluelist.push($scope.obsresult);
+	// 			//krigingvalues.push($scope.obsresult);
+	// 			//kriginglocations.push([$scope.obsFOI["coordinates"][0],$scope.obsFOI["coordinates"][1]]);
+	// 			addGeoJSONcolorFeature($scope.obsFOI,$scope.obsresult,$scope.obsresulttime);
+	// 			}
+			
+	// 		});
+	// 	});
+	// };
+
+	// window.setTimeout($scope.getAllObservations,0)
+
+
+    $scope.getAllObservations=function(){
+		$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:" + obsproperty + "%27&$expand=Observations($top=1;$expand=FeatureOfInterest)&$top=999999&$orderby=phenomenonTime%20desc").then(function (response) {
             $scope.alldatastreams = response.data.value;
 			angular.forEach($scope.alldatastreams, function (value, key) {
 				if (value["Observations"].length > 0){
 				$scope.obsresult = value["Observations"][0]["result"];
 				$scope.obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
-				$scope.obsresulttime = Date.parse(value["Observations"][0]["resultTime"]);
-				obsvaluelist.push($scope.obsresult);
-				//krigingvalues.push($scope.obsresult);
-				//kriginglocations.push([$scope.obsFOI["coordinates"][0],$scope.obsFOI["coordinates"][1]]);
-				addGeoJSONcolorFeature($scope.obsFOI,$scope.obsresult,$scope.obsresulttime);
-				}
-			
+                $scope.obsresulttime = Date.parse(value["Observations"][0]["resultTime"]);
+                $scope.obsId = value["Observations"][0]["@iot.id"];
+                // let datastreamId = value["@iot.id"];
+                // let thingId = value["Thing@iot.navigationLink"].match(/'([^']+)'/)[1];
+                // let sensorId = value["Sensor@iot.navigationLink"].match(/'([^']+)'/)[1];
+                // let observedpropertyId = "saqn:op:" + obsproperty;
+
+                featureinfo = {"result": $scope.obsresult, "resulttime": $scope.obsresulttime, "@iot.id": $scope.obsId, "FeatureOfInterest": $scope.obsFOI};
+				addColorFeature(featureinfo);
+				};
 			});
 		});
 	};
 
 	window.setTimeout($scope.getAllObservations,0)
-
 
 
 

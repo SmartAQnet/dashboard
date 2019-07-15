@@ -5571,16 +5571,23 @@ table.dataTable th.focus,
   user-select: none; /* Standard */
 }
 
+.embedded-dashboard .invisible {
+  opacity: 0;
+}
+
+.embedded-dashboard .fullscreen:fullscreen .sidepanel {
+  height: 100%;
+  margin: 0;
+}
+
+
+  /* ----------------------------- Sidepanels -----------------------------*/
 .embedded-dashboard .sidepanel#ControlSidepanel {
   height: calc(100% - 40px); 
   width: 250px; 
   top: 0;
   right: -250px;
   padding-left: 24px;
-}
-
-.embedded-dashboard .invisible {
-  opacity: 0;
 }
 
 .embedded-dashboard .sidepanel#LegendSidepanel {
@@ -5591,12 +5598,20 @@ table.dataTable th.focus,
   padding-right: 24px;
 }
 
-.embedded-dashboard .fullscreen:fullscreen .sidepanel {
-  height: 100%;
-  margin: 0;
+.embedded-dashboard .sidepanel#InfoSidepanel {
+  position: relative;
+  top: 0;
+  padding: 4px 24px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  margin-left: 0px;
+  margin-right: 0px;
+  overflow: hidden;
 }
 
-/* closed sidepanel */
+
+
+  /* ----------------------------- closed sidepanel -----------------------------*/
 .embedded-dashboard .fullscreen:fullscreen .sidepanel#ControlSidepanel {
   right: -230px;
 }
@@ -5604,6 +5619,17 @@ table.dataTable th.focus,
 .embedded-dashboard .fullscreen:fullscreen .sidepanel#LegendSidepanel {
   left: -100px;
 }
+
+/* .embedded-dashboard .fullscreen:fullscreen .sidepanel#InfoSidepanel {
+} */
+
+.embedded-dashboard .sidepanel-body#InfoPanelBody.closed {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  border-top-style: none;
+  height: 0px;
+  overflow: hidden;
+} 
 
 .embedded-dashboard .sidepanel#ControlSidepanel #togglebtn-sidepanel-right::after{
   content: "«"
@@ -5613,7 +5639,11 @@ table.dataTable th.focus,
   content: "»"
 }
 
-  /* opened sidepanel */
+.embedded-dashboard .sidepanel#InfoSidepanel #togglebtn-sidepanel-bottom::after{
+  content: "⇩"
+}
+
+  /* ----------------------------- opened sidepanel -----------------------------*/
 .embedded-dashboard .sidepanel#ControlSidepanel.opened, .embedded-dashboard .fullscreen:fullscreen .sidepanel#ControlSidepanel.opened {
   right: 0;
 }
@@ -5623,6 +5653,9 @@ table.dataTable th.focus,
   /* height: calc(85% - 40px);  */
 }
 
+/* .embedded-dashboard .sidepanel#InfoSidepanel.opened, .embedded-dashboard .fullscreen:fullscreen .sidepanel#InfoSidepanel.opened {
+} */
+
 .embedded-dashboard .sidepanel#ControlSidepanel.opened #togglebtn-sidepanel-right::after{
   content: "»"
 }
@@ -5631,6 +5664,11 @@ table.dataTable th.focus,
   content: "«"
 }
 
+.embedded-dashboard .sidepanel#InfoSidepanel.opened #togglebtn-sidepanel-bottom::after{
+  content: "⇧"
+}
+
+  /* ----------------------------- Sidepanel Togglebuttons -----------------------------*/
 /* Position and style the sideboard toggle-button for closed and open sidepanel  */
 .embedded-dashboard .togglebtn-container {
   position: relative;
@@ -5662,6 +5700,16 @@ table.dataTable th.focus,
 .embedded-dashboard .sidepanel#LegendSidepanel.opened .togglebtn-container {
   margin-right: 0;
 }
+
+.embedded-dashboard .sidepanel#InfoSidepanel .togglebtn-container {
+  position: absolute;
+  top: 0;
+  right: 0; 
+}
+
+/* .embedded-dashboard .sidepanel#InfoSidepanel.opened .togglebtn-container {
+} */
+
 
 /*The original fullscreen button*/
 .embedded-dashboard #map.isControlSidePanelOpen .ol-viewport>div>.ol-full-screen {
@@ -5735,7 +5783,14 @@ table.dataTable th.focus,
   transition: 0.3s;
 }
 
-.embedded-dashboard .sidepanel-subpanel-right:hover, .embedded-dashboard .sidepanel-subpanel-left:hover {
+.embedded-dashboard .sidepanel-subpanel-bottom {
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  transition: 0.3s;
+}
+
+.embedded-dashboard .sidepanel-subpanel-right:hover, .embedded-dashboard .sidepanel-subpanel-left:hover, .embedded-dashboard .sidepanel-subpanel-bottom:hover {
   background-color: rgba(0,60,136,.3);
   padding: 5px;
   border-color: #000000;
@@ -5825,7 +5880,11 @@ table.dataTable th.focus,
   background: linear-gradient(to bottom, rgb(0, 255, 0), rgb(0, 255, 64));
 };
 
-.embedded-dashboard .map-feature-tooltip {
+.embedded-dashboard .legend-space{
+  flex-shrink: 0;
+};
+
+/* .embedded-dashboard #map-feature-tooltip {
   position: relative;
   padding: 3px;
   background: rgba(0, 0, 0, 0.5);
@@ -5833,8 +5892,25 @@ table.dataTable th.focus,
   opacity: 0.7;
   white-space: nowrap;
   font: 10pt sans-serif;
-};
+}; */
 
-.embedded-dashboard .legend-space{
-  flex-shrink: 0;
-};
+
+/* .embedded-dashboard #map-feature-tooltip {
+  z-index: 1;
+  opacity: 0;
+  position: absolute;
+  bottom: 0;
+  margin: 0;
+  background: rgba(0,60,136,0.7);
+  color: white;
+  border: 0;
+  transition: opacity 100ms ease-in;
+} */
+
+.embedded-dashboard #map-detailed-tooltip {
+  transition: opacity 100ms ease-in;
+}
+
+
+
+
