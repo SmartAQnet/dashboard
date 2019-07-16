@@ -255,7 +255,11 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
     olMap.on('click', function(evt) {
         var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature});
-        if (feature) {displayFeatureInfo(feature)};
+        if (feature) {
+            $scope.isInfoSidePanelClosed = false;
+            $scope.toggleInfoSidepanel;
+            displayFeatureInfo(feature)
+        };
     });
 
 
@@ -335,11 +339,17 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         $scope.isLegendSidePanelOpen = !$scope.isLegendSidePanelOpen;
     };
     
-    $scope.isInfoSidePanelOpen = false;
+    // added function call to click event on feature to open the panel; togglebutton only closes
+    $scope.isInfoSidePanelClosed = true;
     $scope.toggleInfoSidepanel = function(){
-        $scope.isInfoSidePanelOpen = !$scope.isInfoSidePanelOpen;
+        if ($scope.isInfoSidePanelClosed == false){$scope.isInfoSidePanelClosed = true};
     };
 
+    // //toggle switch for testing purpose
+    // $scope.isInfoSidePanelClosed = false;
+    // $scope.toggleInfoSidepanel = function(){
+    //     $scope.isInfoSidePanelClosed = !$scope.isInfoSidePanelClosed;
+    // };
 
     /************************************ Marker ************************************/
     //                               create Markers

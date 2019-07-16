@@ -84,7 +84,7 @@
         </div>
     </div>
     <div class="card-footer">
-        <div class="sidepanel" id="InfoSidepanel"  ng-class="{opened: isInfoSidePanelOpen}">
+        <div class="sidepanel" id="InfoSidepanel"  ng-class="{closed: isInfoSidePanelClosed}">
             <div class="sidepanel-header" id="info-sidepanel-header">
                 <div class="sidepanel-header-name">Information</div>
                 <div class="togglebtn-container">
@@ -93,7 +93,7 @@
                     </div>
                 </div>
             </div>
-            <div class="sidepanel-body closed" id="InfoPanelBody">
+            <div class="sidepanel-body" id="InfoPanelBody" ng-class="{closed: isInfoSidePanelClosed}">
                 <div class="sidepanel-subpanel-bottom" id="Info-Panel">
                     <div class="sidepanel-subtitle">Detailed Information</div>
                     <div id="map-detailed-tooltip"></div>

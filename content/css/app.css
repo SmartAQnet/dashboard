@@ -5639,8 +5639,8 @@ table.dataTable th.focus,
   content: "»"
 }
 
-.embedded-dashboard .sidepanel#InfoSidepanel #togglebtn-sidepanel-bottom::after{
-  content: "⇩"
+.embedded-dashboard .sidepanel#InfoSidepanel.closed #togglebtn-sidepanel-bottom::after{
+  content: " "
 }
 
   /* ----------------------------- opened sidepanel -----------------------------*/
@@ -5664,8 +5664,8 @@ table.dataTable th.focus,
   content: "«"
 }
 
-.embedded-dashboard .sidepanel#InfoSidepanel.opened #togglebtn-sidepanel-bottom::after{
-  content: "⇧"
+.embedded-dashboard .sidepanel#InfoSidepanel #togglebtn-sidepanel-bottom::after{
+  content: "x"
 }
 
   /* ----------------------------- Sidepanel Togglebuttons -----------------------------*/
