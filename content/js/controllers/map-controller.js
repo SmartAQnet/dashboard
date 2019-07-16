@@ -191,83 +191,6 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 /* ------------------------------------------------------------------------------------------------------------------------ */
 
 
-
-
-
-/* --------------------------------------------------Tooltip Info---------------------------------------------------------------------- */
-    var displayFeatureTooltip = function(pixel) {
-
-        var feature = olMap.forEachFeatureAtPixel(pixel, function(feature) {
-            return feature;
-        });
-
-        var info = document.getElementById('map-feature-tooltip');
-        if (feature) {console.log('hover tooltip');
-            // //feature.setStyle({color: 'rgba(128,255,128,0.9)'});
-            // var allinfo = feature.getProperties();
-            // var info = document.getElementById('map-detailed-tooltip');
-            // var crosslinks = document.getElementById('map-crosslinks');
-            // //feature.setStyle({color: 'rgba(128,255,128,0.9)'});
-            // info.innerHTML =  'Result: ' + allinfo['result'] + "<br />" + 'Result Time: ' + allinfo['resulttime'];
-            // crosslinks.innerHTML =  'Thing: <a href="#/thing/' + allinfo['thingId'] + '?$expand=Locations" target="_blank"> Thingname </a><br /> ' + 
-            // 'Datastream: <a href="#/datastream/' + allinfo['datastreamId'] + '" target="_blank"> Datastreamname </a><br /> ' + 
-            // 'Observed Property: <a href="#/observedproperty/' + allinfo['observedpropertyId'] + '" target="_blank"> ObservedPropertyName </a><br /> ' + 
-            // 'Sensor: <a href="#/sensor/' + allinfo['sensorId'] + '" target="_blank"> Sensorname </a>';
-        } else {
-            info.innerHTML = '&nbsp;';
-        }
-    };
-
-    // olMap.on('pointermove', function(evt) {
-    // if (evt.dragging) {
-    //     return;
-    // }
-    // var pixel = olMap.getEventPixel(evt.originalEvent);
-    // displayFeatureTooltip(pixel);
-    // });
-
-
-
-
-
-
-
-
-
-
-/* --------------------------------------------------Click Tooltip Detailed Info (Sideboard Bottom)---------------------------------------------------------------------- */
-    var displayFeatureInfo = function(feature) {
-        var observationId = feature.getProperties()['@iot.id'];
-        $http.get(getUrl() + "/v1.0/Observations('" + observationId + "')?$expand=FeatureOfInterest,Datastream($expand=Thing,ObservedProperty,Sensor)").then(function (response) {
-            observationInfo = response.data;
-        
-            var info = document.getElementById('map-detailed-tooltip');
-            var crosslinks = document.getElementById('map-crosslinks');
-            //feature.setStyle({color: 'rgba(128,255,128,0.9)'});
-            info.innerHTML =  'Result: ' + observationInfo['result'] + "<br />" + 'Phenomenon Time (UTC): ' + observationInfo['phenomenonTime'];
-            crosslinks.innerHTML =  'Thing: <a href="#/thing/' + observationInfo['Datastream']['Thing']['@iot.id'] + '?$expand=Locations" target="_blank">' + observationInfo['Datastream']['Thing']['name'] + '</a><br /> ' + 
-            'Datastream: <a href="#/datastream/' + observationInfo['Datastream']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['name'] + '</a><br /> ' + 
-            'Observed Property: <a href="#/observedproperty/' + observationInfo['Datastream']['ObservedProperty']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['ObservedProperty']['name'] + '</a><br /> ' + 
-            'Sensor: <a href="#/sensor/' + observationInfo['Datastream']['Sensor']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['Sensor']['name'] + '</a>';
-        });
-    };
-
-
-    olMap.on('click', function(evt) {
-        var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature});
-        if (feature) {
-            $scope.isInfoSidePanelClosed = false;
-            $scope.toggleInfoSidepanel;
-            displayFeatureInfo(feature)
-        };
-    });
-
-
-
-
-/* ------------------------------------------------------------------------------------------------------------------------ */
-
-
     $scope.changedLayerPinsActive = function(){
         togglelayers(PinLayer,$scope.isLayerPinsActive);
     }
@@ -412,21 +335,21 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
 
 
-    //function that can be used to add gps pins to the map
-    function addGeoJSONFeature(geojson) {
-        var defaultGeoJSONProjection = 'EPSG:4326';
-        var mapProjection = olMap.getView().getProjection();
+    // //function that can be used to add gps pins to the map
+    // function addGeoJSONFeature(geojson) {
+    //     var defaultGeoJSONProjection = 'EPSG:4326';
+    //     var mapProjection = olMap.getView().getProjection();
 
-        if (JSON.stringify(geojson).includes("FeatureCollection")) {
-            PinCollection.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
-        }
-        else {
-            var geom = (new ol.format.GeoJSON()).readGeometry(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
-            var pinfeature = new ol.Feature(geom);
-            pinfeature.setStyle(defaultMarkerStyle);
-            PinCollection.push(pinfeature);
-        }
-    }
+    //     if (JSON.stringify(geojson).includes("FeatureCollection")) {
+    //         PinCollection.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
+    //     }
+    //     else {
+    //         var geom = (new ol.format.GeoJSON()).readGeometry(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
+    //         var pinfeature = new ol.Feature(geom);
+    //         pinfeature.setStyle(defaultMarkerStyle);
+    //         PinCollection.push(pinfeature);
+    //     }
+    // }
 
     // //function that can be used to add features to the map with gps coordinates and a value for value height which is used for color coding
     // function addGeoJSONcolorFeature(geojson, result, resulttime) {
@@ -449,6 +372,20 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     // };
 
 
+
+    //function that can be used to add gps pins to the map
+    function addPinFeature(allinfo) {
+        var defaultGeoJSONProjection = 'EPSG:4326';
+        var mapProjection = olMap.getView().getProjection();
+        var geom = (new ol.format.GeoJSON()).readGeometry(allinfo.location, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
+
+        var feature = new ol.Feature(geom);
+        feature.setStyle(defaultMarkerStyle);
+        feature.setProperties(allinfo);
+
+        PinCollection.push(feature);
+    }
+
     //allinfo: result, resulttime, @iot.id, FeatureOfInterest
     //function that can be used to add features to the map with gps coordinates and a value for value height which is used for color coding
     function addColorFeature(allinfo) {
@@ -458,7 +395,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         
         var feature = new ol.Feature(geom);
         feature.setStyle(stylefunction(allinfo.result));
-        feature.setId(allinfo.resulttime);
+        feature.setId(allinfo.resulttime); //wäre besser die filter direkt über zeit laufen zu lassen und nicht über id?
         feature.setProperties(allinfo);
 
         ColoredMarkerCollection.push(feature);
@@ -466,14 +403,137 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     
     
 
-    //show location of all active things
-    $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27&$expand=Locations&$top=9999999").then(function (response) {
-        $scope.allThings = response.data.value;
-        angular.forEach($scope.allThings, function (value, key) {
-            addGeoJSONFeature(value["Locations"][0]["location"]);
+    //get all things for pins
+    $scope.getAllLocations=function(){
+        $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27&$expand=Locations&$top=9999999").then(function (response) {
+            $scope.allThings = response.data.value;
+            angular.forEach($scope.allThings, function (value, key) {
+                $scope.thinglocation = value["Locations"][0]["location"];
+                $scope.thinglocationname = value["Locations"][0]["name"];
+                $scope.thingid = value["@iot.id"]
+                $scope.thingname = value["name"]
+                
+                featureinfo = {"location": $scope.thinglocation, "locationname": $scope.thinglocationname, "@iot.id": $scope.thingid, "thingname": $scope.thingname};
+                addPinFeature(featureinfo);
+            });
         });
-    });
+    };
 
+
+    //get all observations for colored markers
+    $scope.getAllObservations=function(){
+		$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:" + obsproperty + "%27&$expand=Observations($top=1;$orderby=phenomenonTime%20desc;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
+            $scope.alldatastreams = response.data.value;
+			angular.forEach($scope.alldatastreams, function (value, key) {
+				if (value["Observations"].length > 0){
+				$scope.obsresult = value["Observations"][0]["result"];
+				$scope.obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
+                $scope.obsresulttime = Date.parse(value["Observations"][0]["resultTime"]);
+                $scope.obsId = value["Observations"][0]["@iot.id"];
+                // let datastreamId = value["@iot.id"];
+                // let thingId = value["Thing@iot.navigationLink"].match(/'([^']+)'/)[1];
+                // let sensorId = value["Sensor@iot.navigationLink"].match(/'([^']+)'/)[1];
+                // let observedpropertyId = "saqn:op:" + obsproperty;
+
+                featureinfo = {"result": $scope.obsresult, "resulttime": $scope.obsresulttime, "@iot.id": $scope.obsId, "FeatureOfInterest": $scope.obsFOI};
+				addColorFeature(featureinfo);
+				};
+			});
+		});
+	};
+
+	window.setTimeout($scope.getAllLocations,0)
+    window.setTimeout($scope.getAllObservations,0)
+
+
+
+
+/* --------------------------------------------------Tooltip Info---------------------------------------------------------------------- */
+var displayFeatureTooltip = function(feature) {
+
+    var info = document.getElementById('map-feature-tooltip');
+    if (feature) {
+        if (feature.getProperties()['result']) { console.log(feature.getProperties())}
+        else {console.log(feature.getProperties())}
+
+    } else {
+        info.innerHTML = '&nbsp;';
+    }
+};
+
+olMap.on('pointermove', function(evt) {
+    if (evt.dragging) {return};
+
+    var pixel = olMap.getEventPixel(evt.originalEvent);
+    var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature});
+    if (feature) {displayFeatureTooltip(feature)};
+});
+
+
+//trying bootstrap tooltips, not working yet
+/*
+$('.ol-zoom-in, .ol-zoom-out').tooltip({placement: 'right'});
+
+$('.ol-full-screen').tooltip({placement: 'left'});
+
+
+var alltodo = document.querySelectorAll('title');
+Array.from(alltodo).forEach(function(element){element.setAttribute("data-toggle", "tooltip")});
+$(document).ready(function(){$('[data-toggle="tooltip"]').tooltip()});
+*/
+
+
+/* --------------------------------------------------Click Tooltip Detailed Info (Sideboard Bottom)---------------------------------------------------------------------- */
+
+
+var displayFeatureInfo = function(feature) {
+    var observationId = feature.getProperties()['@iot.id'];
+    $http.get(getUrl() + "/v1.0/Observations('" + observationId + "')?$expand=FeatureOfInterest,Datastream($expand=Thing,ObservedProperty,Sensor)").then(function (response) {
+        observationInfo = response.data;
+    
+        var info = document.getElementById('map-detailed-tooltip');
+        var crosslinks = document.getElementById('map-crosslinks');
+        // feature.setStyle({stroke: 'rgba(255,255,255,1.0)'});
+
+
+        info.innerHTML =  'Result: ' + observationInfo['result'] + "<br />" + 'Phenomenon Time (UTC): ' + observationInfo['phenomenonTime'];
+        crosslinks.innerHTML =  'Thing: <a href="#/thing/' + observationInfo['Datastream']['Thing']['@iot.id'] + '?$expand=Locations" target="_blank">' + observationInfo['Datastream']['Thing']['name'] + '</a><br /> ' + 
+        'Datastream: <a href="#/datastream/' + observationInfo['Datastream']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['name'] + '</a><br /> ' + 
+        'Observed Property: <a href="#/observedproperty/' + observationInfo['Datastream']['ObservedProperty']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['ObservedProperty']['name'] + '</a><br /> ' + 
+        'Sensor: <a href="#/sensor/' + observationInfo['Datastream']['Sensor']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['Sensor']['name'] + '</a>';
+    });
+};
+
+var displayreducedFeatureInfo = function(feature) {
+    var thingId = feature.getProperties()['@iot.id'];
+    $http.get(getUrl() + "/v1.0/Things('" + thingId + "')?$expand=Locations,Datastreams").then(function (response) {
+        ThingInfo = response.data;
+    
+        var info = document.getElementById('map-detailed-tooltip');
+        var crosslinks = document.getElementById('map-crosslinks');
+        // feature.setStyle({color: 'rgba(255,64,64,1.0)'});
+
+
+        info.innerHTML = 'Location Name: ' + ThingInfo['Locations'][0]['name'] + "<br />" + "<p>" + 'GPS Coordinates: ' + "<br />" + '&emsp; - Latitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["1"] + "<br />" + '&emsp; - Longitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["0"] + "</p>";
+        crosslinks.innerHTML = 'Thing: <a href="#/thing/' + ThingInfo['@iot.id'] + '?$expand=Locations" target="_blank">' + ThingInfo['name'] + '</a>';
+    });
+};
+
+
+olMap.on('click', function(evt) {
+    var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature});
+    if (feature) {
+        $scope.isInfoSidePanelClosed = false;
+        $scope.toggleInfoSidepanel;
+        if (feature.getProperties()['result']) {displayFeatureInfo(feature)}
+        else {displayreducedFeatureInfo(feature)};
+    };
+});
+
+
+
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
 
 
     /************************************ Kriging ************************************/
@@ -674,29 +734,6 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
 	// window.setTimeout($scope.getAllObservations,0)
 
-
-    $scope.getAllObservations=function(){
-		$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:" + obsproperty + "%27&$expand=Observations($top=1;$expand=FeatureOfInterest)&$top=999999&$orderby=phenomenonTime%20desc").then(function (response) {
-            $scope.alldatastreams = response.data.value;
-			angular.forEach($scope.alldatastreams, function (value, key) {
-				if (value["Observations"].length > 0){
-				$scope.obsresult = value["Observations"][0]["result"];
-				$scope.obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
-                $scope.obsresulttime = Date.parse(value["Observations"][0]["resultTime"]);
-                $scope.obsId = value["Observations"][0]["@iot.id"];
-                // let datastreamId = value["@iot.id"];
-                // let thingId = value["Thing@iot.navigationLink"].match(/'([^']+)'/)[1];
-                // let sensorId = value["Sensor@iot.navigationLink"].match(/'([^']+)'/)[1];
-                // let observedpropertyId = "saqn:op:" + obsproperty;
-
-                featureinfo = {"result": $scope.obsresult, "resulttime": $scope.obsresulttime, "@iot.id": $scope.obsId, "FeatureOfInterest": $scope.obsFOI};
-				addColorFeature(featureinfo);
-				};
-			});
-		});
-	};
-
-	window.setTimeout($scope.getAllObservations,0)
 
 
 
