@@ -2,6 +2,24 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     $scope.id = $routeParams.id;
     $scope.Page.setTitle('DATASTREAM(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconDatastream);
+ 
+    
+/*
+    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$orderby=resultTime%20desc&$expand=FeatureOfInterest&$top=1").then(function (response) {
+        $scope.latestResultValue = response.data.value[0]["result"];
+        $scope.latestFoI = response.data.value[0]["FeatureOfInterest"]["feature"];
+    });
+*/
+
+    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/ObservedProperty").then(function (response) {
+        $scope.observedPropertyId = response.data["@iot.id"];
+        $scope.observedPropertyName = response.data["name"];
+        $scope.observedPropertyDescription = response.data["description"];
+        $scope.observedPropertyDefinition = response.data["definition"];
+    });
+
+    
+
 
     $scope.safeApply = function(fn) {
         var phase = this.$root.$$phase;
@@ -101,12 +119,14 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
   
 
     //Initialize Thing ID and Description for Back Button
-    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing").then(function (response) {
-        $scope.thingId = response.data["@iot.id"];
-        $scope.thingName = response.data["name"];
-    });
+    // $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing").then(function (response) {
+    //     $scope.thingId = response.data["@iot.id"];
+    //     $scope.thingName = response.data["name"];
+    // });
 
-    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")").then(function (response) {
+    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")?$expand=Thing").then(function (response) {
+        $scope.thingId = response.data["Thing"]["@iot.id"];
+        $scope.thingName = response.data["Thing"]["name"];
         $scope.name = response.data["name"];
         $scope.description = response.data["description"];
         $scope.unitOfMeasurement = response.data["unitOfMeasurement"];
@@ -115,40 +135,10 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     });
 
 
-
-
-
     $scope.mapVisible = true;
 
 
-    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$orderby=resultTime%20desc&$expand=FeatureOfInterest&$top=1").then(function (response) {
-        $scope.latestResultValue = response.data.value[0]["result"];
-        $scope.latestFoI = response.data.value[0]["FeatureOfInterest"]["feature"];
-        togglelayers(ColoredMarkerLayer,true);
-        addGeoJSONcolorFeature($scope.latestFoI,$scope.latestResultValue);
-        setview($scope.latestFoI["coordinates"]);
-    });
-
-
-
-
-    /*
-    // Example of setting a fixed marker 
-    var karlsruhe = {
-       "type": "Point",
-        "coordinates": [8.4,49]
-    };
-
-    //addGeoJSONcolorFeature(karlsruhe,Math.random()*100)
-    addGeoJSONFeature(karlsruhe)
-    */
-    
-
-
-
-    $scope.tabPropertiesClicked = function () {
-
-    };
+    //$scope.tabPropertiesClicked = function () {};
 
     $scope.tabThingClicked = function () {
         $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing").then(function (response) {
@@ -176,14 +166,9 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         }, 10);
     };
 
-	$scope.tabObservedPropertyClicked = function () {
-		$http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/ObservedProperty").then(function (response) {
-			$scope.observedPropertyId = response.data["@iot.id"];
-            $scope.observedPropertyName = response.data["name"];
-            $scope.observedPropertyDescription = response.data["description"];
-            $scope.observedPropertyDefinition = response.data["definition"];
-        });
-    };
+
+	// $scope.tabObservedPropertyClicked = function () {
+    // };
 
     $scope.changedLive = function(){
         datastreams.setLive($scope.isLive);

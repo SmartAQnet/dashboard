@@ -10,7 +10,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     var karlsruhe = [8.4,49];
 
     var params={
-        mapCenter: augsburg,
+        mapCenter: karlsruhe,
         maxValue: 100,
         krigingModel: 'exponential',//model还可选'gaussian','spherical','exponential'
         krigingSigma2: 0,
@@ -163,18 +163,22 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
     $scope.isKrigingActive = false
 
+
+    //views anpassen funktioniert nicht, obwohl console.log($scope) anzeigt, dass die da sein sollten
     if($scope.id.match(/:home:/)){ 
         $scope.isLayerPinsActive = true
         $scope.isColorMarkersActive = false
     } else if($scope.id.match(/:t:/)){
         $scope.isLayerPinsActive = true
         $scope.isColorMarkersActive = false
+        //setview($scope.thinglocation["coordinates"]);
     } else if ($scope.id.match(/:op:/)){ 
         $scope.isLayerPinsActive = false
         $scope.isColorMarkersActive = true
     } else if($scope.id.match(/:ds:/)){
         $scope.isLayerPinsActive = false
         $scope.isColorMarkersActive = true
+        //setview($scope.obsFOI["coordinates"]);
     } else if($scope.id.match(/:s:/)){
         $scope.isLayerPinsActive = false
         $scope.isColorMarkersActive = true
@@ -217,40 +221,12 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     /********************************************************************************/
 
 
-
-
-
-
-    function obspropertydict(obsprop){
-        if (obsprop == "mcpm10"){
-            return("PM 10")
-        }
-        else if (obsprop == "mcpm2p5"){
-            return("PM 2.5")
-        }
-        else if (obsprop == "hur"){
-            return("Relative Humidity")
-        }
-        else if (obsprop == "plev"){
-            return("Air Pressure")
-        }
-        else if (obsprop == "ta"){
-            return("Air Temperature")
-        }
-        else{return(obsprop)};
-    };
-
-
     var external_fullscreen = new ol.control.FullScreen({
         target: document.querySelector(".sidepanel-header"),
         source: 'fullscreen'
     });
     olMap.addControl(external_fullscreen);
 
-    // function togglecontrols(control,toggle) {
-    //     if (toggle == true) {olMap.addControl(control)}
-    //     if (toggle == false)  {olMap.removeControl(control)}
-    // };
 
     $scope.isControlSidePanelOpen = false;
     $scope.toggleControlSidepanel = function(){
@@ -268,11 +244,6 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         if ($scope.isInfoSidePanelClosed == false){$scope.isInfoSidePanelClosed = true};
     };
 
-    // //toggle switch for testing purpose
-    // $scope.isInfoSidePanelClosed = false;
-    // $scope.toggleInfoSidepanel = function(){
-    //     $scope.isInfoSidePanelClosed = !$scope.isInfoSidePanelClosed;
-    // };
 
     /************************************ Marker ************************************/
     //                               create Markers
@@ -288,10 +259,18 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             anchorYUnits: 'fraction',
             //color: [127,127,0,0.1],
             src: '/dashboard/content/assets/img/map_marker.svg'
-        }))
-    })
+        })), zIndex: 2
+    });
 
-
+    var selectedMarkerStyle = new ol.style.Style({
+        image: new ol.style.Icon(({
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            color: [255,64,64,1],
+            src: '/dashboard/content/assets/img/map_marker.svg'
+        })), zIndex: 3
+    });
 
 
     var brownanchor = 100
@@ -327,50 +306,28 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
                     color: colorfunction(pmvalue,0.8),
                     width: 3
                 })
-            })
-        })
+            }), zIndex: 2
+        }) 
         return(colormarker)
     };
 
 
+    var emphasizestylefunction = function(pmvalue){
 
-
-    // //function that can be used to add gps pins to the map
-    // function addGeoJSONFeature(geojson) {
-    //     var defaultGeoJSONProjection = 'EPSG:4326';
-    //     var mapProjection = olMap.getView().getProjection();
-
-    //     if (JSON.stringify(geojson).includes("FeatureCollection")) {
-    //         PinCollection.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
-    //     }
-    //     else {
-    //         var geom = (new ol.format.GeoJSON()).readGeometry(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
-    //         var pinfeature = new ol.Feature(geom);
-    //         pinfeature.setStyle(defaultMarkerStyle);
-    //         PinCollection.push(pinfeature);
-    //     }
-    // }
-
-    // //function that can be used to add features to the map with gps coordinates and a value for value height which is used for color coding
-    // function addGeoJSONcolorFeature(geojson, result, resulttime) {
-    //     var defaultGeoJSONProjection = 'EPSG:4326';
-    //     var mapProjection = olMap.getView().getProjection();
-
-    //     if (JSON.stringify(geojson).includes("FeatureCollection")) {
-    //         ColoredMarkerCollection.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
-    //         //HeatmapCollection.push((new ol.format.GeoJSON()).readFeatures(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection }));
-    //     }
-    //     else {
-    //         var geom = (new ol.format.GeoJSON()).readGeometry(geojson, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
-    //         var colormarkerfeature = new ol.Feature(geom);
-    //         colormarkerfeature.setStyle(stylefunction(result));
-    //         colormarkerfeature.setId(resulttime);
-    //         ColoredMarkerCollection.push(colormarkerfeature);
-    //         //var heatmapfeature = heatmapfeature(geom,result);
-    //         //HeatmapCollection.push(heatmapfeature);
-    //     }
-    // };
-
+        var colormarker = new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 12,
+                fill: new ol.style.Fill({
+                    color: colorfunction(pmvalue,0.4)
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(0,0,0,1)',
+                    width: 3
+                })
+            }), zIndex: 3
+        })
+        return(colormarker)
+    };
 
 
     //function that can be used to add gps pins to the map
@@ -401,7 +358,9 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         ColoredMarkerCollection.push(feature);
     };
     
-    
+
+    obsproperty = $scope.observedPropertyId || "saqn:op:mcpm10"; //Reads observedPropertyId first, possibly from a parent controller. "saqn:op:mcpm10" is the fallback.
+    obspropertyName = $scope.observedPropertyName || "PM10"; 
 
     //get all things for pins
     $scope.getAllLocations=function(){
@@ -413,7 +372,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
                 $scope.thingid = value["@iot.id"]
                 $scope.thingname = value["name"]
                 
-                featureinfo = {"location": $scope.thinglocation, "locationname": $scope.thinglocationname, "@iot.id": $scope.thingid, "thingname": $scope.thingname};
+                featureinfo = {"location": $scope.thinglocation, "locationname": $scope.thinglocationname, "@iot.id": $scope.thingid, "thingname": $scope.thingname, "tooltip": "Located at: " + $scope.thinglocationname};
                 addPinFeature(featureinfo);
             });
         });
@@ -422,118 +381,235 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
     //get all observations for colored markers
     $scope.getAllObservations=function(){
-		$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:" + obsproperty + "%27&$expand=Observations($top=1;$orderby=phenomenonTime%20desc;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27" + obsproperty + "%27&$expand=ObservedProperty,Observations($top=1;$orderby=phenomenonTime%20desc;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
             $scope.alldatastreams = response.data.value;
-			angular.forEach($scope.alldatastreams, function (value, key) {
-				if (value["Observations"].length > 0){
-				$scope.obsresult = value["Observations"][0]["result"];
-				$scope.obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
+            angular.forEach($scope.alldatastreams, function (value, key) {
+                if (value["Observations"].length > 0){
+                $scope.obsresult = value["Observations"][0]["result"];
+                $scope.obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
                 $scope.obsresulttime = Date.parse(value["Observations"][0]["resultTime"]);
                 $scope.obsId = value["Observations"][0]["@iot.id"];
-                // let datastreamId = value["@iot.id"];
-                // let thingId = value["Thing@iot.navigationLink"].match(/'([^']+)'/)[1];
-                // let sensorId = value["Sensor@iot.navigationLink"].match(/'([^']+)'/)[1];
-                // let observedpropertyId = "saqn:op:" + obsproperty;
+                $scope.dsUnit = value["unitOfMeasurement"];
+                //obspropertyName = value["ObservedProperty"]["name"] //doesnt work anyway in the datastream part. seems to be a different problem. can remove the expand observedproperty. 
 
-                featureinfo = {"result": $scope.obsresult, "resulttime": $scope.obsresulttime, "@iot.id": $scope.obsId, "FeatureOfInterest": $scope.obsFOI};
-				addColorFeature(featureinfo);
-				};
-			});
-		});
-	};
-
-	window.setTimeout($scope.getAllLocations,0)
-    window.setTimeout($scope.getAllObservations,0)
-
-
-
-
-/* --------------------------------------------------Tooltip Info---------------------------------------------------------------------- */
-var displayFeatureTooltip = function(feature) {
-
-    var info = document.getElementById('map-feature-tooltip');
-    if (feature) {
-        if (feature.getProperties()['result']) { console.log(feature.getProperties())}
-        else {console.log(feature.getProperties())}
-
-    } else {
-        info.innerHTML = '&nbsp;';
-    }
-};
-
-olMap.on('pointermove', function(evt) {
-    if (evt.dragging) {return};
-
-    var pixel = olMap.getEventPixel(evt.originalEvent);
-    var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature});
-    if (feature) {displayFeatureTooltip(feature)};
-});
-
-
-//trying bootstrap tooltips, not working yet
-/*
-$('.ol-zoom-in, .ol-zoom-out').tooltip({placement: 'right'});
-
-$('.ol-full-screen').tooltip({placement: 'left'});
-
-
-var alltodo = document.querySelectorAll('title');
-Array.from(alltodo).forEach(function(element){element.setAttribute("data-toggle", "tooltip")});
-$(document).ready(function(){$('[data-toggle="tooltip"]').tooltip()});
-*/
-
-
-/* --------------------------------------------------Click Tooltip Detailed Info (Sideboard Bottom)---------------------------------------------------------------------- */
-
-
-var displayFeatureInfo = function(feature) {
-    var observationId = feature.getProperties()['@iot.id'];
-    $http.get(getUrl() + "/v1.0/Observations('" + observationId + "')?$expand=FeatureOfInterest,Datastream($expand=Thing,ObservedProperty,Sensor)").then(function (response) {
-        observationInfo = response.data;
-    
-        var info = document.getElementById('map-detailed-tooltip');
-        var crosslinks = document.getElementById('map-crosslinks');
-        // feature.setStyle({stroke: 'rgba(255,255,255,1.0)'});
-
-
-        info.innerHTML =  'Result: ' + observationInfo['result'] + "<br />" + 'Phenomenon Time (UTC): ' + observationInfo['phenomenonTime'];
-        crosslinks.innerHTML =  'Thing: <a href="#/thing/' + observationInfo['Datastream']['Thing']['@iot.id'] + '?$expand=Locations" target="_blank">' + observationInfo['Datastream']['Thing']['name'] + '</a><br /> ' + 
-        'Datastream: <a href="#/datastream/' + observationInfo['Datastream']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['name'] + '</a><br /> ' + 
-        'Observed Property: <a href="#/observedproperty/' + observationInfo['Datastream']['ObservedProperty']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['ObservedProperty']['name'] + '</a><br /> ' + 
-        'Sensor: <a href="#/sensor/' + observationInfo['Datastream']['Sensor']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['Sensor']['name'] + '</a>';
-    });
-};
-
-var displayreducedFeatureInfo = function(feature) {
-    var thingId = feature.getProperties()['@iot.id'];
-    $http.get(getUrl() + "/v1.0/Things('" + thingId + "')?$expand=Locations,Datastreams").then(function (response) {
-        ThingInfo = response.data;
-    
-        var info = document.getElementById('map-detailed-tooltip');
-        var crosslinks = document.getElementById('map-crosslinks');
-        // feature.setStyle({color: 'rgba(255,64,64,1.0)'});
-
-
-        info.innerHTML = 'Location Name: ' + ThingInfo['Locations'][0]['name'] + "<br />" + "<p>" + 'GPS Coordinates: ' + "<br />" + '&emsp; - Latitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["1"] + "<br />" + '&emsp; - Longitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["0"] + "</p>";
-        crosslinks.innerHTML = 'Thing: <a href="#/thing/' + ThingInfo['@iot.id'] + '?$expand=Locations" target="_blank">' + ThingInfo['name'] + '</a>';
-    });
-};
-
-
-olMap.on('click', function(evt) {
-    var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature});
-    if (feature) {
-        $scope.isInfoSidePanelClosed = false;
-        $scope.toggleInfoSidepanel;
-        if (feature.getProperties()['result']) {displayFeatureInfo(feature)}
-        else {displayreducedFeatureInfo(feature)};
+                featureinfo = {"result": $scope.obsresult, "resulttime": $scope.obsresulttime, "@iot.id": $scope.obsId, "FeatureOfInterest": $scope.obsFOI, "tooltip": obspropertyName + " [" + $scope.dsUnit["symbol"] +  "]: " + $scope.obsresult};
+                addColorFeature(featureinfo);
+                };
+            });
+        });
     };
-});
+
+    window.setTimeout($scope.getAllObservations,0)
+	window.setTimeout($scope.getAllLocations,0)
 
 
 
 
-/* ------------------------------------------------------------------------------------------------------------------------ */
+    /* --------------------------------------------------Tooltip Info---------------------------------------------------------------------- */
+
+    // $scope.isTooltipHidden = true;
+
+    var storedfeature;
+    var storedstyle; 
+
+    var displayFeatureTooltip = function(feature) {
+
+
+        var info = document.getElementById('map-feature-tooltip');
+        if (feature) {
+            position = olMap.getPixelFromCoordinate(feature.getGeometry().getCoordinates());
+            /*
+            $scope.isTooltipHidden = false;
+            $scope.featureTooltipStyle = {left: position[0] + 40 + "px", top: position[1] + "px"};
+            $scope.featureTooltip = feature.getProperties()["thingname"];
+            */
+
+            info.innerHTML = feature.getProperties()["tooltip"];
+            info.style.left = position[0] + 40 + "px";
+            info.style.top = position[1] + "px";
+            info.style.position = "absolute";
+            info.style.display = "inherit";
+            info.style.background = "rgba(0,60,136,.2)";
+            info.style.borderRadius = "4px";
+            info.style.padding = "4px 8px";
+            info.style.zIndex = "10";
+            
+            if (storedfeature != undefined){            // if a feature is stored
+                if (storedfeature != feature){          // if an old feature is stored (moving from one to the next without clear map inbetween) --> reset old one, change and store new one
+                    storedfeature.setStyle(storedstyle); 
+                    storedfeature = feature;
+                    storedstyle = feature.getStyle();
+
+                    if (feature.getProperties()['result']) {
+                        feature.setStyle(emphasizestylefunction(feature.getProperties()['result']));
+                    } else {
+                    feature.setStyle(selectedMarkerStyle);
+                    };
+
+                }; 
+            } else {                                    // if no feature is stored --> store feature and change appearance
+                storedfeature = feature;
+                storedstyle = feature.getStyle();
+
+                if (feature.getProperties()['result']) {
+                    feature.setStyle(emphasizestylefunction(feature.getProperties()['result']));
+                } else {
+                feature.setStyle(selectedMarkerStyle);
+                };
+            };
+        } else {
+            if (storedfeature != undefined) {
+                storedfeature.setStyle(storedstyle);     //if a storedfeature exists, reset its style and undefine the variable
+                storedfeature = undefined;
+                storedstyle = undefined;
+            };
+            info.style.display = "none";
+            //$scope.isTooltipHidden = true;
+
+        }
+    };
+
+    olMap.on('pointermove', function(evt) {
+        if (evt.dragging) {return};
+
+        var pixel = olMap.getEventPixel(evt.originalEvent);
+        var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature});
+        displayFeatureTooltip(feature);
+    });
+
+
+
+    /* --------------------------------------------------Click Tooltip Detailed Info (Sideboard Bottom)---------------------------------------------------------------------- */
+
+
+    var displayFeatureInfo = function(feature) {
+        var observationId = feature.getProperties()['@iot.id'];
+        $http.get(getUrl() + "/v1.0/Observations('" + observationId + "')?$expand=FeatureOfInterest,Datastream($expand=Thing,ObservedProperty,Sensor)").then(function (response) {
+            observationInfo = response.data;
+        
+            var info = document.getElementById('map-detailed-tooltip');
+            var crosslinks = document.getElementById('map-crosslinks');
+            // feature.setStyle({stroke: 'rgba(255,255,255,1.0)'});
+
+
+            info.innerHTML =  feature.getProperties()['tooltip'] + "<br />" + 'Phenomenon Time (UTC): ' + observationInfo['phenomenonTime'];
+            crosslinks.innerHTML =  'Thing: <a href="#/thing/' + observationInfo['Datastream']['Thing']['@iot.id'] + '?$expand=Locations" target="_blank">' + observationInfo['Datastream']['Thing']['name'] + '</a><br /> ' + 
+            'Datastream: <a href="#/datastream/' + observationInfo['Datastream']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['name'] + '</a><br /> ' + 
+            'Observed Property: <a href="#/observedproperty/' + observationInfo['Datastream']['ObservedProperty']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['ObservedProperty']['name'] + '</a><br /> ' + 
+            'Sensor: <a href="#/sensor/' + observationInfo['Datastream']['Sensor']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['Sensor']['name'] + '</a>';
+        });
+    };
+
+    var displayreducedFeatureInfo = function(feature) {
+        var thingId = feature.getProperties()['@iot.id'];
+        $http.get(getUrl() + "/v1.0/Things('" + thingId + "')?$expand=Locations,Datastreams").then(function (response) {
+            ThingInfo = response.data;
+        
+            var info = document.getElementById('map-detailed-tooltip');
+            var crosslinks = document.getElementById('map-crosslinks');
+            // feature.setStyle({color: 'rgba(255,64,64,1.0)'});
+
+
+            info.innerHTML = 'Location Name: ' + ThingInfo['Locations'][0]['name'] + "<br />" + "<p>" + 'GPS Coordinates: ' + "<br />" + '&emsp; - Latitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["1"] + "<br />" + '&emsp; - Longitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["0"] + "</p>";
+            crosslinks.innerHTML = 'Thing: <a href="#/thing/' + ThingInfo['@iot.id'] + '?$expand=Locations" target="_blank">' + ThingInfo['name'] + '</a>';
+        });
+    };
+
+
+    olMap.on('click', function(evt) {
+        var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature});
+        if (feature) {
+            $scope.isInfoSidePanelClosed = false;
+            $scope.toggleInfoSidepanel;
+            if (feature.getProperties()['result']) {displayFeatureInfo(feature)}
+            else {displayreducedFeatureInfo(feature)};
+        };
+    });
+
+
+
+
+    /* ------------------------------------------------------------------------------------------------------------------------ */
+
+    //* -------------------------------------------Construct Legend--------------------------------------------------------------------------------- */
+
+
+
+    //get obs properties conventions (e.g. fixed points for color gradients)
+    $http.get(getUrl() + "/v1.0/ObservedProperties('" + obsproperty + "')").then(function (response) {
+        var conventions = response.data.properties.conventions;
+        $scope.obspropertyName = response.data.name;
+        $scope.obspropertyUnit = response.data.properties.conventions.unitOfMeasurement.symbol;
+
+
+        var numberOfLabels = Object.keys(conventions.fixedPoints).length;
+
+        //valid points will be an array containing keys only for non-limit points
+        var validPoints = Object.keys(conventions.fixedPoints).sort(function(a, b){
+            return parseInt(a) - parseInt(b);
+        });
+        var limitColors = {
+            start: null,
+            end: null
+        }
+        //
+        var limitNumber = 0; //0 if all points are valid, 1 if either top or bottom is max int limit, 2 if both are
+        //Remove limit points from validPoints and add them to limits
+        if(validPoints[0] == "-2147483647"){
+            limitColors.start = conventions.fixedPoints[validPoints.shift()];
+            limitNumber++;
+        }
+        if(validPoints[validPoints.length - 1] == "2147483647"){
+            limitColors.end = conventions.fixedPoints[validPoints.pop()];
+            limitNumber++;
+        }
+
+        //get absolute range between highest and lowest valid point
+        var range = validPoints[validPoints.length - 1] -validPoints[0];
+        var overshoot = 8; //Size between bottom to first valid point/ last valid point to top of the scale in percent of whole scale;
+        $scope.scaleOvershoot = overshoot;
+        var relativePoints = validPoints.map(function(point){ //Map all points to their relative location on the scale
+            return {
+                relativeLocation: ((point-validPoints[0]) / range) * (100 - (overshoot * limitNumber)), //relative position of fixed point on scale
+                color: conventions.fixedPoints[point], //original color
+                value: point
+            };
+        });
+        $scope.relativePoints = relativePoints;
+
+        var relativePointStrings = relativePoints.map(function(point){ // build strings ["#ff00ff 0%", ...]
+            return point.color + " " + point.relativeLocation + "%";
+        })
+        //Build one gradient for all fixed points
+        var scaleStyle = {"background-image": ("\
+            linear-gradient(\
+            to top, "+
+            (limitColors.start ? limitColors.start + "," : "")+ //Add start only if necessary
+            relativePointStrings.join(",")+
+            (limitColors.end ? ", "+limitColors.end + " 100%" : "")+ //Add start only if necessary
+            ")").trim()};
+        $scope.scaleStyle = scaleStyle;
+        $scope.limitColors = limitColors;
+
+        //Build equidistant labels for scale
+        var labels = [];
+
+        for(var i = 0; i < numberOfLabels; i++){
+            labels[i] = Math.round(parseInt(validPoints[0]) + range * i / (numberOfLabels - 1));
+        }
+
+        $scope.scaleLabels = labels;
+        $scope.scaleLabelsLimits = {
+            start: "<" + labels[0],
+            end: ">" + labels[labels.length - 1],
+        };
+    });
+
+
+    /* ------------------------------------------------------------------------------------------------------------------------ */
+
+
+
 
 
     /************************************ Kriging ************************************/
@@ -636,105 +712,6 @@ olMap.on('click', function(evt) {
         canvasLayer.getSource().changed();
     };
     */
-
-    var kriginglocations = [];
-	var krigingvalues = [];
-	
-	obsproperty = $scope.selectedObservedProperty || "mcpm10"; //Reads selectedObservedProperty first, possibly from a parent controller. "mcpm10" is the fallback.
-    obsvaluelist = [];
-    
-
-    //get obs properties conventions (e.g. fixed points for color gradients)
-    $http.get(getUrl() + "/v1.0/ObservedProperties('saqn:op:" + obsproperty + "')").then(function (response) {
-        var conventions = response.data.properties.conventions;
-        $scope.obspropertyName = response.data.name;
-        $scope.obspropertyUnit = response.data.properties.conventions.unitOfMeasurement.symbol;
-        var numberOfLabels = Object.keys(conventions.fixedPoints).length;
-
-        //valid points will be an array containing keys only for non-limit points
-        var validPoints = Object.keys(conventions.fixedPoints).sort(function(a, b){
-            return parseInt(a) - parseInt(b);
-        });
-        var limitColors = {
-            start: null,
-            end: null
-        }
-        //
-        var limitNumber = 0; //0 if all points are valid, 1 if either top or bottom is max int limit, 2 if both are
-        //Remove limit points from validPoints and add them to limits
-        if(validPoints[0] == "-2147483647"){
-            limitColors.start = conventions.fixedPoints[validPoints.shift()];
-            limitNumber++;
-        }
-        if(validPoints[validPoints.length - 1] == "2147483647"){
-            limitColors.end = conventions.fixedPoints[validPoints.pop()];
-            limitNumber++;
-        }
-
-        //get absolute range between highest and lowest valid point
-        var range = validPoints[validPoints.length - 1] -validPoints[0];
-        var overshoot = 8; //Size between bottom to first valid point/ last valid point to top of the scale in percent of whole scale;
-        $scope.scaleOvershoot = overshoot;
-        var relativePoints = validPoints.map(function(point){ //Map all points to their relative location on the scale
-            return {
-                relativeLocation: ((point-validPoints[0]) / range) * (100 - (overshoot * limitNumber)), //relative position of fixed point on scale
-                color: conventions.fixedPoints[point], //original color
-                value: point
-            };
-        });
-        $scope.relativePoints = relativePoints;
-
-        var relativePointStrings = relativePoints.map(function(point){ // build strings ["#ff00ff 0%", ...]
-            return point.color + " " + point.relativeLocation + "%";
-        })
-        //Build one gradient for all fixed points
-        var scaleStyle = {"background-image": ("\
-            linear-gradient(\
-            to top, "+
-            (limitColors.start ? limitColors.start + "," : "")+ //Add start only if necessary
-            relativePointStrings.join(",")+
-            (limitColors.end ? ", "+limitColors.end + " 100%" : "")+ //Add start only if necessary
-            ")").trim()};
-        $scope.scaleStyle = scaleStyle;
-        $scope.limitColors = limitColors;
-
-        //Build equidistant labels for scale
-        var labels = [];
-
-        for(var i = 0; i < numberOfLabels; i++){
-            labels[i] = Math.round(parseInt(validPoints[0]) + range * i / (numberOfLabels - 1));
-        }
-
-        $scope.scaleLabels = labels;
-        $scope.scaleLabelsLimits = {
-            start: "<" + labels[0],
-            end: ">" + labels[labels.length - 1],
-        };
-    });
-
-    console.log("scope: " + $scope)
-	//get datastreams, recent observation value for color, resulttime for id and feature of interest for location
-	// $scope.getAllObservations=function(){
-	// 	$http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27saqn:op:" + obsproperty + "%27&$expand=Observations($top=1;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
-    //         $scope.alldatastreams = response.data.value;
-	// 		angular.forEach($scope.alldatastreams, function (value, key) {
-	// 			if (value["Observations"].length > 0){
-	// 			$scope.obsresult = value["Observations"][0]["result"];
-	// 			$scope.obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
-	// 			$scope.obsresulttime = Date.parse(value["Observations"][0]["resultTime"]);
-	// 			obsvaluelist.push($scope.obsresult);
-	// 			//krigingvalues.push($scope.obsresult);
-	// 			//kriginglocations.push([$scope.obsFOI["coordinates"][0],$scope.obsFOI["coordinates"][1]]);
-	// 			addGeoJSONcolorFeature($scope.obsFOI,$scope.obsresult,$scope.obsresulttime);
-	// 			}
-			
-	// 		});
-	// 	});
-	// };
-
-	// window.setTimeout($scope.getAllObservations,0)
-
-
 
 
 

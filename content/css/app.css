@@ -5884,32 +5884,21 @@ table.dataTable th.focus,
   flex-shrink: 0;
 };
 
-/* .embedded-dashboard #map-feature-tooltip {
-  position: relative;
-  padding: 3px;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  opacity: 0.7;
-  white-space: nowrap;
-  font: 10pt sans-serif;
+
+ /* .embedded-dashboard #map-feature-tooltip {
+  z-index: 10;
+  position: absolute;
+  background: rgba(0,60,136,.2);
+  display: inherit;
+  padding: 4px 8px;
+  border-radius: 4px;
+};
+
+
+.embedded-dashboard #map-feature-tooltip.nodisplay{
+  display: none; 
 }; */
 
-
-/* .embedded-dashboard #map-feature-tooltip {
-  z-index: 1;
-  opacity: 0;
-  position: absolute;
-  bottom: 0;
-  margin: 0;
-  background: rgba(0,60,136,0.7);
-  color: white;
-  border: 0;
-  transition: opacity 100ms ease-in;
-} */
-
-.embedded-dashboard #map-detailed-tooltip {
-  transition: opacity 100ms ease-in;
-}
 
 
 

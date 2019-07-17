@@ -409,7 +409,7 @@ Datastreams.prototype.getUpdatedChartAxes = function(){
             beginAtZero:false
         }
     }];
-
+    
     document.getElementById("unitOfMeasurementone").innerHTML = axisLabels[0]["symbolName"];
     if (Object.keys(this.streams).length > 1) {
         try{
@@ -418,7 +418,7 @@ Datastreams.prototype.getUpdatedChartAxes = function(){
         }
         catch(e){console.log("we get an error like:" + e)} //warum ignoriert er das komplett?
     };
-
+    
     return yAxes;
 }
 

@@ -2,7 +2,8 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
     $scope.id = $routeParams.id;
 
     //Set default observed property for the map. The map sub-controller inherits the variable:
-    $scope.selectedObservedProperty = $scope.id.split(":").slice(-1)[0]; //Extracts op from id: "saqn:op:mcpm10" -> "mcpm10". Is there a better way?
+    $scope.observedPropertyId = $scope.id;
+    $scope.observedPropertyName = $scope.name;
     
     $scope.Page.setTitle('OBSERVED PROPERTY(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
@@ -19,8 +20,6 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
     $scope.mapVisible = true;
 
     $scope.tabPropertiesClicked = function () {
-
-        //$scope.mapVisible = true;
 
         $http.get(getUrl() + "/v1.0/ObservedProperties(" + getId($scope.id) + ")/Datastreams?$expand=Observations($top=1;$orderby=phenomenonTime%20desc),Observations/FeatureOfInterest").then(function (response) {
             $scope.allObsProps = response.data.value
@@ -39,7 +38,6 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
 
     $scope.tabDatastreamsClicked = function () {
         
-        //$scope.mapVisible = false;
 
         $http.get(getUrl() + "/v1.0/ObservedProperties(" + getId($scope.id) + ")/Datastreams").then(function (response) {
     

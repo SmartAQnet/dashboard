@@ -1,8 +1,8 @@
 <div ng-controller="MapCtrl" id="fullscreen" class="fullscreen">
     <div class="card-body" id="card-body-map">
-        <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}">
-        </div>
-        <!-- <div id="map-feature-tooltip" class="map-feature-tooltip"></div> -->
+        <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}"></div>
+        <!-- <div id="map-feature-tooltip" ng-style="featureTooltipStyle" ng-class="{nodisplay: isTooltipHidden}">{{featureTooltip}}</div> -->
+        <div id="map-feature-tooltip"></div>
         <div class="sidepanel" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
             <div class="sidepanel-header" id="control-sidepanel-header">
                 <div class="sidepanel-header-name">Controls</div>
@@ -61,7 +61,7 @@
                             <div class="legend-scale" ng-style="scaleStyle"></div>
                         </div>
                         <div class="legend-text-container">
-                            <!--<div ng-style="{'bottom': point.relativeLocation+'%'}" class="legend-textbox" ng-repeat="point in relativePoints">{{point.value}}</div>-->
+                            <!-- <div ng-style="{'bottom': point.relativeLocation+'%'}" class="legend-textbox" ng-repeat="point in relativePoints">{{point.value}}</div> -->
                             <div ng-if="limitColors.end" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.end}}</div>
                             <div class="legend-label-container">
                                 <div class="legend-textbox" ng-repeat="label in scaleLabels">{{label}}</div>
