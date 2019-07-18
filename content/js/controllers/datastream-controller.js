@@ -10,12 +10,12 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         $scope.latestFoI = response.data.value[0]["FeatureOfInterest"]["feature"];
     });
 */
-
     $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/ObservedProperty").then(function (response) {
         $scope.observedPropertyId = response.data["@iot.id"];
         $scope.observedPropertyName = response.data["name"];
         $scope.observedPropertyDescription = response.data["description"];
         $scope.observedPropertyDefinition = response.data["definition"];
+        $scope.showMap = true;
     });
 
     

@@ -395,11 +395,13 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         ColoredMarkerCollection.push(feature);
     };
     
-    $scope.$on("observedPropertyUpdate", function(obsprop){
-        console.log(obsprop);
-    });
-    obsproperty = $scope.observedPropertyId || "saqn:op:mcpm10"; //Reads observedPropertyId first, possibly from a parent controller. "saqn:op:mcpm10" is the fallback.
-    obspropertyName = $scope.observedPropertyName || "PM10"; 
+    var obsproperty = $scope.observedPropertyId || "saqn:op:mcpm10"; //Reads observedPropertyId first, possibly from a parent controller. "saqn:op:mcpm10" is the fallback.
+    
+    function observedPropertyHasChanged(obsprop){
+        obsproperty = obsprop;
+        updateFeatures();
+        constructLegend();
+    }
 
     //get all things for pins
     function getAllLocations(){
@@ -446,7 +448,6 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     };
 
     function updateFeatures(){
-        debugger;
         ColoredMarkerSource.clear();
         PinSource.clear();
         getAllLocations();

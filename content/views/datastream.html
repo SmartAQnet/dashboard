@@ -1,4 +1,4 @@
-<div class="col-md-12 main" ng-controller="MapCtrl">
+<div class="col-md-12 main">
     <div class="card">
         <div class="card-header">
             <!--button class="backbutton"-->
@@ -320,7 +320,7 @@
         <div class="col-md-12">
             <div class="card" >
                 <div class="card-header">Map showing active Sensors</div>
-                <div class="map-container" ng-include="'/dashboard/content/views/map.html'">
+                <div ng-if="showMap" class="map-container" ng-include="'/dashboard/content/views/map.html'">
                 </div>            
             </div>
         </div>
