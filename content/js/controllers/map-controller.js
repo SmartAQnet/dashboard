@@ -422,8 +422,9 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     //get all observations for colored markers
     function getAllObservations(){
         $http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27" + obsproperty + "%27&$expand=ObservedProperty,Observations($top=1;$orderby=phenomenonTime%20desc;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
-            $scope.alldatastreams = response.data.value;
-            angular.forEach($scope.alldatastreams, function (value, key) {
+            var alldatastreams = response.data.value;
+            Object.keys(alldatastreams).forEach(function (key) {
+                var value = alldatastreams[key];
                 if (value["Observations"].length > 0){
                 $scope.obsresult = value["Observations"][0]["result"];
                 $scope.obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
