@@ -211,10 +211,13 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
     function enableLegendSidepanel() {
         var element = document.getElementById("LegendSidepanel");
-        if (($scope.isColorMarkersActive || $scope.isKrigingActive) == false) {element.classList.add("invisible")
-            } else if ($scope.isColorMarkersActive || $scope.isKrigingActive) {element.classList.remove("invisible")
+        if (($scope.isColorMarkersActive || $scope.isKrigingActive) == false) {
+            $scope.isLegendInvisible = true;
+        } else if ($scope.isColorMarkersActive || $scope.isKrigingActive) {
+            $scope.isLegendInvisible = false;
         }
     };
+    enableLegendSidepanel();
 
     /************************************ Controls ***********************************/
     //                                 Create controls
