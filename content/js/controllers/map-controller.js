@@ -272,38 +272,73 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         })), zIndex: 3
     });
 
+    function interpolateColor(allPoints, value, alpha){
+        var colorLimitsAndValidPoints = getLimitsAndValidPoints(allPoints)
+        //Find index of the fixed color point below the given value;
+        var belowPoint = 0;
+        //var validPoints = colorLimitsAndValidPoints.validPoints;
+        var validColorFixedPoints = colorLimitsAndValidPoints.validPoints;
+        var wholeRange = validColorFixedPoints[validColorFixedPoints.length - 1] - validColorFixedPoints[0];
 
-    var brownanchor = 100
-    var redanchor = 66
-    var yellowanchor = 33
-    var greenanchor = 0
+        while(validColorFixedPoints[belowPoint] && value > validColorFixedPoints[belowPoint]){
+            belowPoint++;
+        }
+        var color;
+        if(belowPoint > 0 && belowPoint < validColorFixedPoints.length){
+            //easy linear interpolation between points on scale.
+            var range = validColorFixedPoints[belowPoint] - validColorFixedPoints[belowPoint-1];
+            var rightRatio = (value - validColorFixedPoints[belowPoint-1]) / range;
+            return interpolateBetween2Color(allPoints[validColorFixedPoints[belowPoint-1]], allPoints[validColorFixedPoints[belowPoint]], rightRatio, alpha);
+        }
+        else if(belowPoint == 0){
+            //point below first valid point
+            if(colorLimitsAndValidPoints.limits.start){
+                //point between limit and first valid point
+                return interpolateBetween2Color(colorLimitsAndValidPoints.limits.start, allPoints[validColorFixedPoints[0]],
+                    Math.max(0, (value - (validColorFixedPoints[0] - wholeRange)) / wholeRange), alpha); // values one whole scale below the start limit have the color of the limit
+            }
+            return colorLimitsAndValidPoints.limits.start;
+        }
+        else if(belowPoint == validColorFixedPoints.length){
+            if(colorLimitsAndValidPoints.limits.end){
+                return interpolateBetween2Color(allPoints[validColorFixedPoints[validColorFixedPoints.length - 1]], colorLimitsAndValidPoints.limits.end,
+                    Math.min(1, (value - (validColorFixedPoints[validColorFixedPoints.length - 1] + wholeRange)) / wholeRange), alpha);// values one whole scale above the end limit have the color of the limit
+            }
+            return colorLimitsAndValidPoints.limits.end;
+        }
+    }
 
-    var redrgb;
-    var bluergb;
-    var greenrgb;
+    function interpolateBetween2Color(left, right, ratio, alpha){
+        var rightRatio = ratio;
+        var leftRatio = 1-rightRatio;
+        var color = {
+            left: {
+                r: parseInt(left.slice(1,3), 16),
+                g: parseInt(left.slice(3,5), 16),
+                b: parseInt(left.slice(5,7), 16)
+            },
+            right: {
+                r: parseInt(right.slice(1,3), 16),
+                g: parseInt(right.slice(3,5), 16),
+                b: parseInt(right.slice(5,7), 16)
+            }
+        }
+        return "rgba(" + ((leftRatio * color.left.r) + (rightRatio * color.right.r)) + "," +
+            ((leftRatio * color.left.g) + (rightRatio * color.right.g)) + "," +
+            ((leftRatio * color.left.b) + (rightRatio * color.right.b)) + ", " + alpha + ")";
+    }
 
-    var colorfunction = function(result,opacity){
-        
-        if (result > brownanchor) {redrgb = 96, greenrgb = 64, bluergb = 0} //brown area
-        if (result > redanchor && result < brownanchor) {redrgb = (192-96)*(1-((result-redanchor)/(brownanchor-redanchor))) + 96 , greenrgb=64*((result-redanchor)/(brownanchor-redanchor)), bluergb=0} //slide red to brown: (192,0,0) - (96,64,0)
-        if (result < redanchor && result > yellowanchor) {redrgb = 192, greenrgb=(1-((result-yellowanchor)/(redanchor-yellowanchor)))*192, bluergb=0} // slide yellow to red: (192,192,0) - (192,0,0)
-        if (result < yellowanchor && result > greenanchor) {redrgb = ((result-greenanchor)/(yellowanchor-greenanchor))*192, greenrgb = 192, bluergb = 0} //slide green to yellow (0,192,0) - (192,192,0)
-        if (result < greenanchor) {redrgb = 0, greenrgb = 192, bluergb = 0} //green area
 
-        return('rgba(' + redrgb.toString() + ',' + greenrgb.toString() + ',' + bluergb.toString()  + ',' + opacity + ')')
-    };
-
-
-    var stylefunction = function(pmvalue){
+    var stylefunction = function(feature){
 
         var colormarker = new ol.style.Style({
             image: new ol.style.Circle({
                 radius: 10,
                 fill: new ol.style.Fill({
-                    color: colorfunction(pmvalue,0.2)
+                    color: interpolateColor(feature.colorFixedPoints, feature.result, 0.2)
                 }),
                 stroke: new ol.style.Stroke({
-                    color: colorfunction(pmvalue,0.8),
+                    color: interpolateColor(feature.colorFixedPoints, feature.result, 0.8),
                     width: 3
                 })
             }), zIndex: 2
@@ -312,13 +347,13 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     };
 
 
-    var emphasizestylefunction = function(pmvalue){
+    var emphasizestylefunction = function(feature){
 
         var colormarker = new ol.style.Style({
             image: new ol.style.Circle({
                 radius: 12,
                 fill: new ol.style.Fill({
-                    color: colorfunction(pmvalue,0.4)
+                    color: interpolateColor(feature.colorFixedPoints, feature.result, 0.4)
                 }),
                 stroke: new ol.style.Stroke({
                     color: 'rgba(0,0,0,1)',
@@ -349,16 +384,17 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         var defaultGeoJSONProjection = 'EPSG:4326';
         var mapProjection = olMap.getView().getProjection();
         var geom = (new ol.format.GeoJSON()).readGeometry(allinfo.FeatureOfInterest, { dataProjection: defaultGeoJSONProjection, featureProjection: mapProjection });
-        
         var feature = new ol.Feature(geom);
-        feature.setStyle(stylefunction(allinfo.result));
+        feature.setStyle(stylefunction(allinfo));
         feature.setId(allinfo.resulttime); //wäre besser die filter direkt über zeit laufen zu lassen und nicht über id?
         feature.setProperties(allinfo);
 
         ColoredMarkerCollection.push(feature);
     };
     
-
+    $scope.$on("observedPropertyUpdate", function(obsprop){
+        console.log(obsprop);
+    });
     obsproperty = $scope.observedPropertyId || "saqn:op:mcpm10"; //Reads observedPropertyId first, possibly from a parent controller. "saqn:op:mcpm10" is the fallback.
     obspropertyName = $scope.observedPropertyName || "PM10"; 
 
@@ -380,7 +416,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
 
     //get all observations for colored markers
-    $scope.getAllObservations=function(){
+    function getAllObservations(){
         $http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27" + obsproperty + "%27&$expand=ObservedProperty,Observations($top=1;$orderby=phenomenonTime%20desc;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
             $scope.alldatastreams = response.data.value;
             angular.forEach($scope.alldatastreams, function (value, key) {
@@ -390,16 +426,23 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
                 $scope.obsresulttime = Date.parse(value["Observations"][0]["resultTime"]);
                 $scope.obsId = value["Observations"][0]["@iot.id"];
                 $scope.dsUnit = value["unitOfMeasurement"];
-                //obspropertyName = value["ObservedProperty"]["name"] //doesnt work anyway in the datastream part. seems to be a different problem. can remove the expand observedproperty. 
+                var obspropertyName = value["ObservedProperty"]["name"];
+                var obsPropertyColorFixedPoints = value.ObservedProperty.properties.conventions.fixedPoints;
 
-                featureinfo = {"result": $scope.obsresult, "resulttime": $scope.obsresulttime, "@iot.id": $scope.obsId, "FeatureOfInterest": $scope.obsFOI, "tooltip": obspropertyName + " [" + $scope.dsUnit["symbol"] +  "]: " + $scope.obsresult};
+                featureinfo = {
+                    "result": $scope.obsresult,
+                    "resulttime": $scope.obsresulttime,
+                    "@iot.id": $scope.obsId,
+                    "FeatureOfInterest": $scope.obsFOI,
+                    "tooltip": obspropertyName + " [" + $scope.dsUnit["symbol"] + "]: " + $scope.obsresult,
+                    "colorFixedPoints": obsPropertyColorFixedPoints
+                };
                 addColorFeature(featureinfo);
                 };
             });
         });
     };
-
-    window.setTimeout($scope.getAllObservations,0)
+    window.setTimeout(getAllObservations,0)
 	window.setTimeout($scope.getAllLocations,0)
 
 
@@ -441,7 +484,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
                     storedstyle = feature.getStyle();
 
                     if (feature.getProperties()['result']) {
-                        feature.setStyle(emphasizestylefunction(feature.getProperties()['result']));
+                        feature.setStyle(emphasizestylefunction(feature.getProperties()));
                     } else {
                     feature.setStyle(selectedMarkerStyle);
                     };
@@ -452,7 +495,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
                 storedstyle = feature.getStyle();
 
                 if (feature.getProperties()['result']) {
-                    feature.setStyle(emphasizestylefunction(feature.getProperties()['result']));
+                    feature.setStyle(emphasizestylefunction(feature.getProperties()));
                 } else {
                 feature.setStyle(selectedMarkerStyle);
                 };
@@ -544,25 +587,10 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
         var numberOfLabels = Object.keys(conventions.fixedPoints).length;
 
-        //valid points will be an array containing keys only for non-limit points
-        var validPoints = Object.keys(conventions.fixedPoints).sort(function(a, b){
-            return parseInt(a) - parseInt(b);
-        });
-        var limitColors = {
-            start: null,
-            end: null
-        }
-        //
-        var limitNumber = 0; //0 if all points are valid, 1 if either top or bottom is max int limit, 2 if both are
-        //Remove limit points from validPoints and add them to limits
-        if(validPoints[0] == "-2147483647"){
-            limitColors.start = conventions.fixedPoints[validPoints.shift()];
-            limitNumber++;
-        }
-        if(validPoints[validPoints.length - 1] == "2147483647"){
-            limitColors.end = conventions.fixedPoints[validPoints.pop()];
-            limitNumber++;
-        }
+        var limitsAndValids = getLimitsAndValidPoints(conventions.fixedPoints);
+        var validPoints = limitsAndValids.validPoints;
+        var limitColors = limitsAndValids.limits;
+        var limitNumber = 0 + (!!limitColors.start) + (!!limitColors.end); //hacky Javascripty Way to count non-null limits
 
         //get absolute range between highest and lowest valid point
         var range = validPoints[validPoints.length - 1] -validPoints[0];
@@ -604,6 +632,40 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             end: ">" + labels[labels.length - 1],
         };
     });
+
+    /**
+     * Takes an properties.conventions.fixedPoints object (e.g. {0: "#ec8f04", 50: "#d45908", 100: "#b02d0c", 2147483647: "#8a0f0f"})
+     * and returns an object with valid points (real values can be near them) and limits (used to define points at Infinity)
+     * 
+     * Returns in this example:
+     * {
+     *  validPoints:{0: "#ec8f04", 50: "#d45908", 100: "#b02d0c"}
+     *  limits:{"start":null, "end":"#8a0f0f"}
+     * }
+     */
+    function getLimitsAndValidPoints(fixedPoints){
+        //valid points will be an array containing keys only for non-limit points
+        var validPoints = Object.keys(fixedPoints).sort(function(a, b){
+            return parseInt(a) - parseInt(b);
+        });
+        var limitColors = {
+            start: null,
+            end: null
+        }
+        //
+        var limitNumber = 0; //0 if all points are valid, 1 if either top or bottom is max int limit, 2 if both are
+        //Remove limit points from validPoints and add them to limits
+        if(validPoints[0] == "-2147483647"){
+            limitColors.start = fixedPoints[validPoints.shift()];
+        }
+        if(validPoints[validPoints.length - 1] == "2147483647"){
+            limitColors.end = fixedPoints[validPoints.pop()];
+        }
+        return {
+            validPoints: validPoints,
+            limits: limitColors
+        }
+    }
 
 
     /* ------------------------------------------------------------------------------------------------------------------------ */
@@ -687,7 +749,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         });
 
         SimulatedFeature.setId(Date.now());
-        SimulatedFeature.setStyle(stylefunction(randomvalue[id]))
+        //SimulatedFeature.setStyle(stylefunction(randomvalue[id])) //Needs information aboaut obsprop to calculate style
         SimulationInvisibleSource.addFeature(SimulatedFeature);
 
         removeoldfeatures(900); //store time in milliseconds
@@ -742,7 +804,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 			SimulationSource.addFeatures(SimulationInvisibleSource.getFeatures());
 		};
 		/*if (realradio.checked){ //cant get it to work properly, need to rework this
-			$scope.getAllObservations; //function that grabs new features
+			getAllObservations; //function that grabs new features
 			//need function here that removes old features
 		};*/
 		ColoredMarkerLayer.getSource().changed();
