@@ -402,7 +402,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     obspropertyName = $scope.observedPropertyName || "PM10"; 
 
     //get all things for pins
-    $scope.getAllLocations=function(){
+    function getAllLocations(){
         $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27&$expand=Locations&$top=9999999").then(function (response) {
             $scope.allThings = response.data.value;
             angular.forEach($scope.allThings, function (value, key) {
@@ -415,8 +415,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
                 addPinFeature(featureinfo);
             });
         });
-    };
-
+    }
 
     //get all observations for colored markers
     function getAllObservations(){
@@ -445,11 +444,15 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             });
         });
     };
-    window.setTimeout(getAllObservations,0)
-	window.setTimeout($scope.getAllLocations,0)
 
-
-
+    function updateFeatures(){
+        debugger;
+        ColoredMarkerSource.clear();
+        PinSource.clear();
+        getAllLocations();
+        getAllObservations();
+    }
+    updateFeatures();
 
     /* --------------------------------------------------Tooltip Info---------------------------------------------------------------------- */
 
@@ -582,59 +585,62 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
 
     //get obs properties conventions (e.g. fixed points for color gradients)
-    $http.get(getUrl() + "/v1.0/ObservedProperties('" + obsproperty + "')").then(function (response) {
-        var conventions = response.data.properties.conventions;
-        $scope.obspropertyName = response.data.name;
-        $scope.obspropertyUnit = response.data.properties.conventions.unitOfMeasurement.symbol;
-
-
-        var numberOfLabels = Object.keys(conventions.fixedPoints).length;
-
-        var limitsAndValids = getLimitsAndValidPoints(conventions.fixedPoints);
-        var validPoints = limitsAndValids.validPoints;
-        var limitColors = limitsAndValids.limits;
-        var limitNumber = 0 + (!!limitColors.start) + (!!limitColors.end); //hacky Javascripty Way to count non-null limits
-
-        //get absolute range between highest and lowest valid point
-        var range = validPoints[validPoints.length - 1] -validPoints[0];
-        var overshoot = 8; //Size between bottom to first valid point/ last valid point to top of the scale in percent of whole scale;
-        $scope.scaleOvershoot = overshoot;
-        var relativePoints = validPoints.map(function(point){ //Map all points to their relative location on the scale
-            return {
-                relativeLocation: ((point-validPoints[0]) / range) * (100 - (overshoot * limitNumber)), //relative position of fixed point on scale
-                color: conventions.fixedPoints[point], //original color
-                value: point
+    function constructLegend(){
+        $http.get(getUrl() + "/v1.0/ObservedProperties('" + obsproperty + "')").then(function (response) {
+            var conventions = response.data.properties.conventions;
+            $scope.obspropertyName = response.data.name;
+            $scope.obspropertyUnit = response.data.properties.conventions.unitOfMeasurement.symbol;
+    
+    
+            var numberOfLabels = Object.keys(conventions.fixedPoints).length;
+    
+            var limitsAndValids = getLimitsAndValidPoints(conventions.fixedPoints);
+            var validPoints = limitsAndValids.validPoints;
+            var limitColors = limitsAndValids.limits;
+            var limitNumber = 0 + (!!limitColors.start) + (!!limitColors.end); //hacky Javascripty Way to count non-null limits
+    
+            //get absolute range between highest and lowest valid point
+            var range = validPoints[validPoints.length - 1] -validPoints[0];
+            var overshoot = 8; //Size between bottom to first valid point/ last valid point to top of the scale in percent of whole scale;
+            $scope.scaleOvershoot = overshoot;
+            var relativePoints = validPoints.map(function(point){ //Map all points to their relative location on the scale
+                return {
+                    relativeLocation: ((point-validPoints[0]) / range) * (100 - (overshoot * limitNumber)), //relative position of fixed point on scale
+                    color: conventions.fixedPoints[point], //original color
+                    value: point
+                };
+            });
+            $scope.relativePoints = relativePoints;
+    
+            var relativePointStrings = relativePoints.map(function(point){ // build strings ["#ff00ff 0%", ...]
+                return point.color + " " + point.relativeLocation + "%";
+            })
+            //Build one gradient for all fixed points
+            var scaleStyle = {"background-image": ("\
+                linear-gradient(\
+                to top, "+
+                (limitColors.start ? limitColors.start + "," : "")+ //Add start only if necessary
+                relativePointStrings.join(",")+
+                (limitColors.end ? ", "+limitColors.end + " 100%" : "")+ //Add start only if necessary
+                ")").trim()};
+            $scope.scaleStyle = scaleStyle;
+            $scope.limitColors = limitColors;
+    
+            //Build equidistant labels for scale
+            var labels = [];
+    
+            for(var i = 0; i < numberOfLabels; i++){
+                labels[i] = Math.round(parseInt(validPoints[0]) + range * i / (numberOfLabels - 1));
+            }
+    
+            $scope.scaleLabels = labels;
+            $scope.scaleLabelsLimits = {
+                start: "<" + labels[0],
+                end: ">" + labels[labels.length - 1],
             };
         });
-        $scope.relativePoints = relativePoints;
-
-        var relativePointStrings = relativePoints.map(function(point){ // build strings ["#ff00ff 0%", ...]
-            return point.color + " " + point.relativeLocation + "%";
-        })
-        //Build one gradient for all fixed points
-        var scaleStyle = {"background-image": ("\
-            linear-gradient(\
-            to top, "+
-            (limitColors.start ? limitColors.start + "," : "")+ //Add start only if necessary
-            relativePointStrings.join(",")+
-            (limitColors.end ? ", "+limitColors.end + " 100%" : "")+ //Add start only if necessary
-            ")").trim()};
-        $scope.scaleStyle = scaleStyle;
-        $scope.limitColors = limitColors;
-
-        //Build equidistant labels for scale
-        var labels = [];
-
-        for(var i = 0; i < numberOfLabels; i++){
-            labels[i] = Math.round(parseInt(validPoints[0]) + range * i / (numberOfLabels - 1));
-        }
-
-        $scope.scaleLabels = labels;
-        $scope.scaleLabelsLimits = {
-            start: "<" + labels[0],
-            end: ">" + labels[labels.length - 1],
-        };
-    });
+    }
+    constructLegend();
 
     /**
      * Takes an properties.conventions.fixedPoints object (e.g. {0: "#ec8f04", 50: "#d45908", 100: "#b02d0c", 2147483647: "#8a0f0f"})
@@ -805,12 +811,14 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 			krigstuff(randomlocation,randomvalue);
 			SimulationSource.clear();
 			SimulationSource.addFeatures(SimulationInvisibleSource.getFeatures());
-		};
+		} else {
+            updateFeatures();
+        }
 		/*if (realradio.checked){ //cant get it to work properly, need to rework this
 			getAllObservations; //function that grabs new features
 			//need function here that removes old features
 		};*/
-		ColoredMarkerLayer.getSource().changed();
+        ColoredMarkerLayer.getSource().changed();
 		canvasLayer.getSource().changed();
 		 
 	};
