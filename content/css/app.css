@@ -5534,18 +5534,32 @@ table.dataTable th.focus,
 
 /** /Loading Spinner **/
 
-
-
-
-
-/* ****************************   Map Sidepanel  **************************** */
-
-
-
+/* ****************************   Map Fullscreen  **************************** */
 
 .embedded-dashboard .fullscreen:fullscreen #map {
   height: 100%;
 }
+
+.embedded-dashboard #fullscreen:fullscreen{
+  height: 100%;
+  position: relative;
+}
+
+.embedded-dashboard .fullscreen:fullscreen .card-body{
+  padding: 0;
+  height: 80%;
+}
+.embedded-dashboard .fullscreen:fullscreen .card-footer{
+  padding: 0;
+  height: 20%;
+}
+
+.embedded-dashboard .fullscreen:fullscreen #LegendSidepanel{
+  height: unset;
+}
+
+
+/* ****************************   Map Sidepanel  **************************** */
 
 .embedded-dashboard .custom-control {
   top: 20px;
