@@ -155,6 +155,9 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     //tile layer for the actual map
     var tileLayer = new ol.layer.Tile({
         source: new ol.source.XYZ({
+        attributions: [new ol.Attribution({
+            html: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>"
+            })],
         tileSize: [512, 512],
         url: 'https://api.mapbox.com/styles/v1/edenhalperin/cih84uopy000a95m41htugsnm/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWRlbmhhbHBlcmluIiwiYSI6IlFRZG0zMWMifQ.QUNKx4tIMjZfwmrE8SE6Bg'
         })

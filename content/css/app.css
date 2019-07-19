@@ -9,6 +9,10 @@
 	float: left;
 }
 
+.ol-attribution img{
+  padding: 0;
+}
+
 .tab-pane{
   overflow-x: auto;
 }
