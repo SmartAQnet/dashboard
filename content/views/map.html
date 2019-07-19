@@ -23,12 +23,12 @@
                         <input type="checkbox" id="Layer-ColoredMarkers" name="Layer" ng-model="isColorMarkersActive" ng-change="changedColorMarkersActive()">
                         <label for="Layer-ColoredMarkers">Colored Markers</label>
                     </div>
-                    <div class="checkbox-container">
+                    <div class="checkbox-container" style="display: none">
                         <input type="checkbox" id="Layer-Kriging" name="Layer" ng-model="isKrigingActive" ng-change="changedKrigingActive()">
                         <label for="Layer-Kriging">Kriging</label>
                     </div>
                 </div>
-                <div class="sidepanel-subpanel-right" id="Source-Panel">
+                <div class="sidepanel-subpanel-right" style="display: none" id="Source-Panel">
                     <div class="sidepanel-subtitle">Data Source:</div>
                     <div>
                         <input type="radio" id="Source-Real" name="Source" ng-model="source" value="realsource" ng-change="sourceChanged()">

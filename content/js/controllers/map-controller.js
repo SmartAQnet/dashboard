@@ -10,7 +10,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     var karlsruhe = [8.4,49];
 
     var params={
-        mapCenter: karlsruhe,
+        mapCenter: augsburg,
         maxValue: 100,
         krigingModel: 'exponential',//model还可选'gaussian','spherical','exponential'
         krigingSigma2: 0,
@@ -260,6 +260,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
+            scale: 1.0,
             //color: [127,127,0,0.1],
             src: '/dashboard/content/assets/img/map_marker.svg'
         })), zIndex: 2
@@ -270,8 +271,9 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
-            color: [255,64,64,1],
-            src: '/dashboard/content/assets/img/map_marker.svg'
+            scale: 1.2,
+            //color: [255,64,64,1],
+            src: '/dashboard/content/assets/img/map_marker_emph.svg'
         })), zIndex: 3
     });
 
@@ -348,6 +350,25 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         }) 
         return(colormarker)
     };
+
+
+    /*
+    //Try a stylefunction with a white svg cricle that has radially declining opacity, at the moment for testing uses random colors between red and green (linear color scale)
+    // question about if and if so how they should scale remains
+    var stylefunction = function(feature){
+        var colormarker = new ol.style.Style({
+            image: new ol.style.Icon(({
+                anchor: [0.5, 0.5],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'fraction',
+                scale: 1.0,
+                color: "rgb(" + String(Math.floor(Math.random() * (255 - 0 + 1)) + 0) + "," + String(Math.floor(Math.random() * (255 - 0 + 1)) + 0) + ",0)",
+                src: '/dashboard/content/assets/img/circle_layer_marker.svg'
+            })), zIndex: 3
+        });
+        return(colormarker)
+    };
+    */
 
 
     var emphasizestylefunction = function(feature){
@@ -637,8 +658,8 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     
             $scope.scaleLabels = labels;
             $scope.scaleLabelsLimits = {
-                start: "<" + labels[0],
-                end: ">" + labels[labels.length - 1],
+                start: "≤" + labels[0],
+                end: "≥" + labels[labels.length - 1],
             };
         });
     }
