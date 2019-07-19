@@ -228,7 +228,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     $scope.removeComparison = function() {
         var secondaryStream = Object.keys(datastreams.streams)[1];
         if(secondaryStream){
-            datastreams.removeStream(secondaryStream);
+            datastreams.removeStream(secondaryStream, true);
         }
     }
 });

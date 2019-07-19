@@ -235,7 +235,7 @@ Datastreams.prototype.handleHttpError = function(error, streamId){
         case Datastreams.states["main_loading"]:
         case Datastreams.states["secondary_loading"]:
             if(streamId){
-                this.removeStream(streamId);
+                this.removeStream(streamId, true);
             }
             break;
         case Datastreams.states["adjusting_timeframe"]:
@@ -297,7 +297,7 @@ Datastreams.prototype._subscribe = function(id){
     console.log("v1.0/Datastreams(" + getId(id) + ")/Observations subscribed");
 }
 
-Datastreams.prototype.removeStream = function (id) {
+Datastreams.prototype.removeStream = function (id, updateChart) {
     this.client.unsubscribe("v1.0/Datastreams(" + getId(id) + ")/Observations");
     delete this.streams[id];
     if (Object.keys(this.streams).length == 0){
@@ -306,17 +306,21 @@ Datastreams.prototype.removeStream = function (id) {
     else{
         this.setState(Datastreams.states["main_loaded"]);
     }
-    this.toChart();
+    if(updateChart){
+        this.toChart();
+    }
 }
 
 Datastreams.prototype.removeAllStreams = function (id) {
     Object.keys(this.streams).forEach(function(key){
-        this.removeStream(key);
+        this.removeStream(key, false);
     }.bind(this));
 }
 
 Datastreams.prototype.disconnectMQTTClient = function () {
-    this.client.disconnect();
+    if(this.isClientConnected){
+        this.client.disconnect();
+    }
 }
 
 Datastreams.prototype._dataChanged = function(){
