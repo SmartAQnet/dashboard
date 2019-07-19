@@ -160,7 +160,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
 
     $scope.tabObservationsClicked = function () {
         setTimeout(function(){
-            $('#observations').bootstrapMaterialDesign();
+            //$('#observations').bootstrapMaterialDesign();
             $scope.observationsList = datastreams.addStream($scope.id).dataset;
             datastreams.toChart("#observationChart");
         }, 10);

@@ -324,6 +324,9 @@ Datastreams.prototype._dataChanged = function(){
     if(this.chart != null){
         var yAxes = this.getUpdatedChartAxes();
         this.chart.options.scales.yAxes = yAxes;
+        if(yAxes.length == 1 && this.chart.data.datasets.length > 1){
+            this.chart.data.datasets[1].yAxisID = "main";
+        }
 		this.chart.update();	
     }
     this.notify();
