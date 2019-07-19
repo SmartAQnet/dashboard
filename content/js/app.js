@@ -1,6 +1,10 @@
 //First line should be empty or a comment (this comment). Line is overwritten by the docker-entrypoint script
 var gostApp = angular.module('gostApp', ['ngRoute', 'vs-repeat']);
 
+gostApp.run(function($rootScope, $window) {
+  $rootScope.$window = $window;
+});
+
 gostApp.factory('Page', function () {
     var title = 'SmartAQnet';
     return {
