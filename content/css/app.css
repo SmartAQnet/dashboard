@@ -29,7 +29,28 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+.dashboard-menu a{
+  color: white;
+}
+
+.card {
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.dashboard-menu a.active, .dashboard-menu a:hover{
+  color: rgba(255, 255, 255, 0.788);
+}
+
 .header-icon{
+	width: 62px;
+	height: 48px;
+	margin-top: 7px;
+	margin-left: 5px;
+	float: left;
+}
 	width: 62px;
 	height: 48px;
 	margin-top: 7px;
