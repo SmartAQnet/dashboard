@@ -1,8 +1,3 @@
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Roboto', sans-serif;
-  font-weight: 700;
-}
-
 .header{
     color: #000000;
 	font-size: 1.25rem;
@@ -45,12 +40,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .header-icon{
-	width: 62px;
-	height: 48px;
-	margin-top: 7px;
-	margin-left: 5px;
-	float: left;
-}
 	width: 62px;
 	height: 48px;
 	margin-top: 7px;
@@ -5159,6 +5148,7 @@ ul.notifications {
 .fullscreen:fullscreen .card-footer{
   padding: 0;
   height: 20%;
+  overflow-y: auto;
 }
 
 .fullscreen:fullscreen #LegendSidepanel{
