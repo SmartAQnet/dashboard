@@ -171,18 +171,20 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     } else if($scope.id.match(/:t:/)){
         $scope.isLayerPinsActive = true
         $scope.isColorMarkersActive = false
-        //setview($scope.thinglocation["coordinates"]);
     } else if ($scope.id.match(/:op:/)){ 
         $scope.isLayerPinsActive = false
         $scope.isColorMarkersActive = true
     } else if($scope.id.match(/:ds:/)){
         $scope.isLayerPinsActive = false
         $scope.isColorMarkersActive = true
-        //setview($scope.obsFOI["coordinates"]);
     } else if($scope.id.match(/:s:/)){
         $scope.isLayerPinsActive = false
         $scope.isColorMarkersActive = true
     };
+
+    $scope.$on("centerOn", function(event, location){
+        setview(location.coordinates);
+    });
     
     //Default Layers at page loading
 
@@ -427,14 +429,19 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     //get all things for pins
     function getAllLocations(){
         $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27&$expand=Locations&$top=9999999").then(function (response) {
-            $scope.allThings = response.data.value;
-            angular.forEach($scope.allThings, function (value, key) {
-                $scope.thinglocation = value["Locations"][0]["location"];
-                $scope.thinglocationname = value["Locations"][0]["name"];
-                $scope.thingid = value["@iot.id"]
-                $scope.thingname = value["name"]
+            var allThings = response.data.value;
+            Object.keys(allThings).forEach(function(key){
+                var value = allThings[key];
+                var thinglocation = value["Locations"][0]["location"];
+                var thinglocationname = value["Locations"][0]["name"];
+                var thingid = value["@iot.id"]
+                var thingname = value["name"]
+                if(!$scope.wasAlreadyCentered && $scope.id == thingid){
+                    $scope.$emit("centerOn", thinglocation);
+                    $scope.wasAlreadyCentered = true;
+                }
                 
-                featureinfo = {"location": $scope.thinglocation, "locationname": $scope.thinglocationname, "@iot.id": $scope.thingid, "thingname": $scope.thingname, "tooltip": "Located at: " + $scope.thinglocationname};
+                featureinfo = {"location": thinglocation, "locationname": thinglocationname, "@iot.id": thingid, "thingname": thingname, "tooltip": "Located at: " + thinglocationname};
                 addPinFeature(featureinfo);
             });
         });
@@ -447,20 +454,24 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             Object.keys(alldatastreams).forEach(function (key) {
                 var value = alldatastreams[key];
                 if (value["Observations"].length > 0){
-                $scope.obsresult = value["Observations"][0]["result"];
-                $scope.obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
-                $scope.obsresulttime = Date.parse(value["Observations"][0]["resultTime"]);
-                $scope.obsId = value["Observations"][0]["@iot.id"];
-                $scope.dsUnit = value["unitOfMeasurement"];
+                var obsresult = value["Observations"][0]["result"];
+                var obsFOI = value["Observations"][0]["FeatureOfInterest"]["feature"];
+                var obsresulttime = Date.parse(value["Observations"][0]["resultTime"]);
+                var obsId = value["Observations"][0]["@iot.id"];
+                var dsUnit = value["unitOfMeasurement"];
                 var obspropertyName = value["ObservedProperty"]["name"];
                 var obsPropertyColorFixedPoints = value.ObservedProperty.properties.conventions.fixedPoints;
+                if(!$scope.wasAlreadyCentered && $scope.id == value["@iot.id"]){
+                    $scope.$emit("centerOn", obsFOI);
+                    $scope.wasAlreadyCentered = true;
+                }
 
                 featureinfo = {
-                    "result": $scope.obsresult,
-                    "resulttime": $scope.obsresulttime,
-                    "@iot.id": $scope.obsId,
-                    "FeatureOfInterest": $scope.obsFOI,
-                    "tooltip": obspropertyName + " [" + $scope.dsUnit["symbol"] + "]: " + $scope.obsresult,
+                    "result": obsresult,
+                    "resulttime": obsresulttime,
+                    "@iot.id": obsId,
+                    "FeatureOfInterest": obsFOI,
+                    "tooltip": obspropertyName + " [" + dsUnit["symbol"] + "]: " + obsresult,
                     "colorFixedPoints": obsPropertyColorFixedPoints
                 };
                 addColorFeature(featureinfo);
