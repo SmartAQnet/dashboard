@@ -37,6 +37,13 @@ html{
   }
 }
 
+.dashboard-menu{
+  display: flex;
+  flex-direction: column;
+  flex-basis: 200px;
+  flex-shrink: 0;
+}
+
 .dashboard-menu a{
   color: white;
 }
@@ -525,8 +532,6 @@ html, body, #map {
 }
 .nav-sm .container.body .right_col {
   padding: 10px 20px;
-  margin-left: 70px;
-  z-index: 2;
 }
 .nav-sm .navbar.nav_title {
   width: 70px;
@@ -707,8 +712,10 @@ body .container.body .right_col {
 }
 .nav-md .container.body .right_col {
   padding: 10px 20px 0;
-  margin-left: 230px;
   height: 100%;
+  flex-grow: 1;
+  height: 100vh;
+  overflow-y: auto;
 }
 .nav_title {
   width: 230px;
@@ -850,12 +857,9 @@ body {
   font-weight: 400;
   line-height: 1.471;
 }
-.main_container .top_nav {
-  display: block;
-  margin-left: 230px;
-}
 .main_container {
    height: 100%;
+   display: flex;
 }
 .no-padding {
   padding: 0 !important;
