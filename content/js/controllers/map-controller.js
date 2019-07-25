@@ -267,7 +267,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             anchorYUnits: 'fraction',
             scale: 1.0,
             //color: [127,127,0,0.1],
-            src: '/dashboard/content/assets/img/map_marker.svg'
+            src: window.dashboardSettings.root + 'assets/img/map_marker.svg'
         })), zIndex: 2
     });
 
@@ -278,7 +278,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             anchorYUnits: 'fraction',
             scale: 1.2,
             //color: [255,64,64,1],
-            src: '/dashboard/content/assets/img/map_marker_emph.svg'
+            src: window.dashboardSettings.root + 'assets/img/map_marker_emph.svg'
         })), zIndex: 3
     });
 
