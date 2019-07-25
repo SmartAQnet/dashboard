@@ -1,3 +1,12 @@
+html{
+  font-size: 16px;
+}
+.card .card-header{
+  padding: 1rem;
+}
+.card .card-body, .card .card-footer{
+  padding: 1.25rem;
+}
 .header{
     color: #000000;
 	font-size: 1.25rem;
@@ -35,7 +44,6 @@
 .card {
     border: 1px solid lightgray;
     border-radius: 4px;
-    padding: 10px;
     margin: 10px 0;
 }
 
