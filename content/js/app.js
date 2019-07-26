@@ -28,6 +28,7 @@ gostApp.config(function ($routeProvider) {
 		when('/datastreams', { templateUrl: window.dashboardSettings.root + 'views/datastreams.html', controller: "DatastreamsCtrl", activetab: 'sensors' }).
 		when('/observations', { templateUrl: window.dashboardSettings.root + 'views/observations.html', controller: "ObservationsCtrl", activetab: 'sensors' }).
 		when('/featuresofinterest', { templateUrl: window.dashboardSettings.root + 'views/featuresofinterest.html', controller: "FeaturesOfInterestCtrl" }).
+		// when('/patch', { templateUrl: window.dashboardSettings.root + 'views/patch.html', controller: "PatchCtrl" }).
 		when('/mqtt', { templateUrl: window.dashboardSettings.root + 'views/mqtt.html', controller: "MqttCtrl" }).
 		otherwise({redirectTo: '/home' });
 });

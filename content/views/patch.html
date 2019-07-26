@@ -1,0 +1,20 @@
+<div>
+    <table class="table table-bordered table-hover st-table table-striped table-sm">
+        <thead class="st-thead">
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <!--th>Definition</th>
+            <th>Delete</th-->
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="x in observedpropertiesList">
+            <td ng-click="observedpropertyClicked(x['@iot.id'])">{{x["name"]}}</td>
+            <td ng-click="observedpropertyClicked(x['@iot.id'])">{{x["description"]}}</td>
+            <!--td>{{x["definition"]}}</td>
+            <td><div class="fa fa-remove delete-entity" ng-click="deleteObservedPropertyClicked(x)"></div></td-->
+        </tr>
+        </tbody>
+    </table>
+</div>
