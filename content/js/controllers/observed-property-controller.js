@@ -67,7 +67,7 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
         });
         $scope.Page.go("datastream/" + datastreamID);
     };
-
+    console.log($scope)
 //   $scope.sortBy = function(propertyName) {
 //     $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;
 //     $scope.propertyName = propertyName;

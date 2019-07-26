@@ -1,5 +1,5 @@
-gostApp.controller('ObservedPropertiesCtrl', function ($scope, $http, $routeParams) {
-    $scope.Page.setTitle('OBSERVED PROPERTIES');
+gostApp.controller('PatchCtrl', function ($scope, $http, $routeParams) {
+    $scope.Page.setTitle('PATCHING');
     $scope.Page.setHeaderIcon(iconObservedProperty);
 
     if(! "$orderby" in $routeParams) $routeParams["$orderby"]="name asc";
@@ -8,18 +8,9 @@ gostApp.controller('ObservedPropertiesCtrl', function ($scope, $http, $routePara
 	    (a, i) => a + i + "=" + $routeParams[i] + "&","?").slice(0,-1) 
 
     $http.get(query).then(function (response) {
-        $scope.observedpropertiesList = response.data.value;
+        $scope.dataliste = response.data.value;
     });
 
-    $scope.observedpropertyClicked = function (observedpropertyID) {
-        angular.forEach($scope.observedproperties, function (value, key) {
-            if (value["@iot.id"] == observedpropertyID) {
-                $scope.Page.selectedObservedProperty = value;
-            }
-        });
-
-        $scope.Page.go("observedproperty/" + observedpropertyID);
-    };
 
     // $scope.addNewThing = function(newThing) {
     //     var res = $http.post(getUrl() + '/v1.0/Things', newThing);
@@ -30,9 +21,9 @@ gostApp.controller('ObservedPropertiesCtrl', function ($scope, $http, $routePara
     //         alert( "failure: " + JSON.stringify({data: data}));
     //     });
     // };
-    
-     $scope.deleteObservedPropertyClicked = function (entity) {
-        var res = $http.delete(getUrl() + '/v1.0/ObservedProperty(' + getId(entity["@iot.id"]) + ')');
+
+     $scope.patchEntity = function (entity) {
+        var res = $http.patch(getUrl() + '/v1.0/' +  + '(' + getId(entity["@iot.id"]) + ')');
         res.success(function(data, status, headers, config) {
             var index = $scope.observedpropertiesList.indexOf(entity);
             $scope.observedpropertiesList.splice(index, 1);
