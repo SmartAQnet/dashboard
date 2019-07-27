@@ -1,6 +1,21 @@
 <div ng-controller="MapCtrl" id="fullscreen" class="fullscreen">
     <div class="card-body" id="card-body-map">
         <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}"></div>
+        <div id="mapOverlay" ng-class="{active: isMapOverlayVisible}">
+            <div id="mapOverlayUI">
+                <div id="mapOverlayLabel">
+                    <h3>Please adjust the map to capture the area of interest</h3>
+                </div>
+                <div id="mapOverlayButtons">
+                        <button ng-click="cancelHistoricDataSelection()"  class="btn btn-secondary btn-raised"  type="button">Cancel</button>
+                        <button ng-click="confirmHistoricDataSelection()" class="btn btn-primary btn-raised"  type="button">Load data of this area</button>
+                </div>
+            </div>
+            <div class="map-viewfinder map-viewfinder-lt"></div>
+            <div class="map-viewfinder map-viewfinder-rt"></div>
+            <div class="map-viewfinder map-viewfinder-lb"></div>
+            <div class="map-viewfinder map-viewfinder-rb"></div>
+        </div>
         <!-- <div id="map-feature-tooltip" ng-style="featureTooltipStyle" ng-class="{nodisplay: isTooltipHidden}">{{featureTooltip}}</div> -->
         <div id="map-feature-tooltip"></div>
         <div class="sidepanel" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
@@ -41,6 +56,14 @@
                 </div>
             </div>
             <div class="sidepanel-footer">
+                    <div class="dropdown obspropertyList-dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              {{obspropertyName}}
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                              <a ng-repeat="property in obspropertyList" ng-click="selectedObsproperty(property)" class="dropdown-item" href="javascript:void(0);">{{property.name}}</a>
+                            </div>
+                          </div>
                 <div class="sidepanel-subpanel-right" id="Refresh-Panel">
                     <div>
                         <button class="refreshbutton" id="refreshbutton" ng-click="UpdateMap()">Refresh Map</button>
@@ -84,6 +107,10 @@
         </div>
     </div>
     <div class="card-footer">
+        <button ng-click="openHistoricDataCollapse()" id="historicDataButton" class="btn btn-secondary dropdown-toggle"  type="button" aria-haspopup="true" aria-expanded="false">Displayed Data: Latest</button>
+        <rzslider rz-slider-model="slider.minValue"
+            rz-slider-high="slider.maxValue"
+            rz-slider-options="slider.options"></rzslider>
         <div class="sidepanel" id="InfoSidepanel"  ng-class="{closed: isInfoSidePanelClosed}">
             <div class="sidepanel-header" id="info-sidepanel-header">
                 <div class="sidepanel-header-name">Information</div>

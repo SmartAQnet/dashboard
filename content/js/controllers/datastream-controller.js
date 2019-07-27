@@ -18,20 +18,6 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         $scope.showMap = true;
     });
 
-    
-
-
-    $scope.safeApply = function(fn) {
-        var phase = this.$root.$$phase;
-        if(phase == '$apply' || phase == '$digest') {
-          if(fn && (typeof(fn) === 'function')) {
-            fn();
-          }
-        } else {
-          this.$apply(fn);
-        }
-      };
-
     var datastreams = new Datastreams($http);
     $scope.datastreams = datastreams;
     $scope.Datastreams = Datastreams;
