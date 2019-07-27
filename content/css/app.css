@@ -382,6 +382,41 @@ html, body, #map {
   height: 400px;
 }
 
+#map div.ol-zoom-custom{
+  position: absolute;
+  top: 7px;
+  left: 10px;
+}
+#map div.ol-fullscreen-custom{
+  position: absolute;
+  top: 7px;
+  right: 10px;
+}
+#map .ol-custom-button button{
+  color: #fff;
+  background-color: #2d497f;
+  border-color: #2d497f;
+  cursor: pointer;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+  outline: 0;
+  transition: box-shadow .2s cubic-bezier(.4,0,1,1),background-color .2s cubic-bezier(.4,0,.2,1),color .2s cubic-bezier(.4,0,.2,1);
+  will-change: box-shadow,transform;
+  letter-spacing: 0;
+  vertical-align: middle;
+  user-select: none;
+  text-transform: uppercase;
+}
+#map .ol-custom-button button:active{
+  background-color: #284070;
+  border-color: #1d2f52;
+  box-shadow: none;
+}
+#map .ol-custom-button button:hover{
+  background-color: #284070;
+  border-color: #1d2f52;
+  box-shadow: 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12), 0 2px 4px -1px rgba(0,0,0,.2);
+}
+
 .box {
     position: relative;
     border-radius: 3px;
@@ -1865,43 +1900,6 @@ ul.msg_list li a .time {
 ul.msg_list li a .message {
   display: block !important;
   font-size: 11px;
-}
-.dropdown-menu.msg_list span {
-  white-space: normal;
-}
-.dropdown-menu {
-  border: medium none;
-  box-shadow: none;
-  display: none;
-  float: left;
-  font-size: 0.75rem;
-  left: 0;
-  list-style: none outside none;
-  padding: 0;
-  position: absolute;
-  text-shadow: none;
-  top: 100%;
-  z-index: 1000;
-  border: 1px solid #D9DEE4;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  
-}
-.dropdown-menu>li>a {
-  color: #5A738E;
-}
-.navbar-nav .open .dropdown-menu {
-  position: absolute;
-  background: #fff;
-  margin-top: 0;
-  border: 1px solid #D9DEE4;
-  -webkit-box-shadow: none;
-  right: 0;
-  left: auto;
-  width: 220px;
-}
-.navbar-nav .open .dropdown-menu.msg_list {
-  width: 300px;
 }
 .info-number .badge {
   font-size: 0.625rem;
@@ -4372,9 +4370,6 @@ div[data-role="editor-toolbar"] {
   user-select: none;
 }
 
-.dropdown-menu a {
-  cursor: pointer;
-}
 /** /bootstrap-wysiwyg **/
 
 /** Select2 **/

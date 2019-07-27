@@ -54,11 +54,15 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         olMap = new ol.Map({
 
             //Set of controls included in maps by default. Unless configured otherwise, this returns a collection containing an instance of controls. Add with extend. 
-            controls: ol.control.defaults({ 
-                attributionOptions: ({
-                    collapsible: false
+            controls: new ol.Collection([
+                new ol.control.FullScreen({
+                    className: "ol-fullscreen-custom ol-custom-button",
+                    source: 'fullscreen'
+                }),
+                new ol.control.Zoom({
+                    className: "ol-zoom-custom ol-custom-button"
                 })
-            }).extend([new ol.control.FullScreen({source: 'fullscreen'})]),
+            ]),
 
             //Set layers
             layers: [],
