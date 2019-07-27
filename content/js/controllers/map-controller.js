@@ -396,7 +396,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         })
         return(colormarker)
     };
-
+    window.testMap = olMap;
 
     //function that can be used to add gps pins to the map
     function addPinFeature(allinfo) {
@@ -563,7 +563,11 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         if (evt.dragging) {return};
 
         var pixel = olMap.getEventPixel(evt.originalEvent);
-        var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature});
+        var feature = olMap.forEachFeatureAtPixel(evt.pixel, function(feature) {return feature}, this,
+            function(layer){ //show tooltip only for pins and colored markers
+                return layer == PinLayer || layer == ColoredMarkerLayer;
+            }
+        );
         displayFeatureTooltip(feature);
     });
 
@@ -890,4 +894,118 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             window.clearInterval(autorefreshtimer)
         }
     }
+
+    /************************************ Timeline ************************************/
+    //                  create Timeline / Historic Data Selection
+    /************************************************************************************/
+
+    $scope.openHistoricDataCollapse = function(){
+
+    }
+
+    $('#historicDataButton').daterangepicker({
+        //parentEl: $("#collapseHistoricSelection .card"),
+        timePicker: true,
+        timePicker24Hour: true,
+        ranges: {
+            'Last Hour': [moment(), moment().subtract(1, 'hours')],
+            'Last 3 Hours': [moment(), moment().subtract(3, 'hours')],
+            'Last 6 Hours': [moment(), moment().subtract(6, 'hours')],
+            'Last 12 Hours': [moment(), moment().subtract(12, 'hours')],
+            'Last 24 Hours': [moment(), moment().subtract(24, 'hours')],
+            'Last 3 Days': [moment(), moment().subtract(3, 'days')]
+        },
+        startDate: moment().subtract(1, 'hours'),
+        endDate: moment(),
+        locale: {
+          format: 'YYYY-MM-DD HH:mm:ss'
+        }
+      }, otherDateSelected);
+
+      function otherDateSelected(start, end){
+        $scope.startDateMoment = start;
+        $scope.endDateMoment = end;
+        $scope.startDate = start.format('YYYY-MM-DD HH:mm:ss');
+        $scope.endDate = end.format('YYYY-MM-DD HH:mm:ss');
+        $scope.isMapOverlayVisible = true;
+        ViewfinderSource.clear();
+        $scope.safeApply();
+        try{
+            $("#map")[0].scrollIntoView();
+        }
+        catch(e){}
+    }
+
+    $scope.cancelHistoricDataSelection = function(){
+        $scope.isMapOverlayVisible = false;
+    }
+
+    //layer for polygon indicating area to load
+    var ViewfinderSource = new ol.source.Vector({
+        wrapX: false,
+    });
+    var ViewfinderLayer = new ol.layer.Vector({
+        source: ViewfinderSource,
+        style: [
+            new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: '#2d497f55',
+                    width: 3
+                })
+            })
+        ]
+    });
+    togglelayers(ViewfinderLayer, true);
+
+    $scope.confirmHistoricDataSelection = function(){
+        var viewseekerBoundaries = $("#mapOverlayUI")[0].getBoundingClientRect();
+        var mapBoundaries = $("#map")[0].getBoundingClientRect();
+        var viewseekerCoordinates = {
+            lt: olMap.getCoordinateFromPixel([viewseekerBoundaries.x - mapBoundaries.x, viewseekerBoundaries.y - mapBoundaries.y]),
+            rt: olMap.getCoordinateFromPixel([viewseekerBoundaries.x - mapBoundaries.x + viewseekerBoundaries.width, viewseekerBoundaries.y - mapBoundaries.y]),
+            lb: olMap.getCoordinateFromPixel([viewseekerBoundaries.x - mapBoundaries.x, viewseekerBoundaries.y - mapBoundaries.y + viewseekerBoundaries.height]),
+            rb: olMap.getCoordinateFromPixel([viewseekerBoundaries.x - mapBoundaries.x + viewseekerBoundaries.width, viewseekerBoundaries.y - mapBoundaries.y + viewseekerBoundaries.height])
+        };
+        $scope.isMapOverlayVisible = false;
+        var feature = new ol.Feature({
+            geometry: new ol.geom.Polygon([[viewseekerCoordinates.lt, viewseekerCoordinates.rt, viewseekerCoordinates.rb, viewseekerCoordinates.lb]])
+        });
+        ViewfinderSource.addFeature(feature);
+        var serverPolygon = feature.getGeometry().transform('EPSG:3857', 'EPSG:4326').getCoordinates()[0];
+        serverPolygon.push(serverPolygon[0]);//close polygon by repeating first point
+        var polygonString = serverPolygon.map(function(coordinates){
+            return coordinates.join(" ");
+        }).join(",")
+        $http.get(getUrl() + "/v1.0/Things?$filter=Datastreams/ObservedProperty/@iot.id eq '" + obsproperty + "' and st_within(HistoricalLocations/Location/location,%20geography%27POLYGON((" + polygonString + "))%27)").then(function (response) {
+            debugger;
+        });
+    }
+
+    $scope.slider = {
+        minValue: 100,
+        options: {
+          floor: 0,
+          ceil: 500,
+          translate: function(value, sliderId, label) {
+            return '$' + value;
+          }
+        }
+      };
+
+      setTimeout(()=>{
+        $scope.$broadcast('rzSliderForceRender');
+      }, 1000);
+
+    /************************************ Obsproperty Selection ******************************/
+    //                  creates the dropdown menu to select a observed property
+    /*****************************************************************************************/
+
+    $http.get(getUrl() + "/v1.0/ObservedProperties").then(function (response) {
+        $scope.obspropertyList = response.data.value;
+    });
+
+    $scope.selectedObsproperty = function(property){
+        observedPropertyHasChanged(property["@iot.id"]);
+    }
+
 });

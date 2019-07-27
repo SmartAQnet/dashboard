@@ -354,7 +354,7 @@ html{
 
 
 .card{
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 #card-body-map{
@@ -1023,13 +1023,6 @@ a:hover, a:focus {
 .top_nav .navbar-right li {
     position: relative;
   }
-}
-.top_nav .dropdown-menu li {
-  width: 100%;
-}
-.top_nav .dropdown-menu li a {
-  width: 100%;
-  padding: 12px 20px;
 }
 .top_nav li a i {
   font-size: 15px
@@ -5434,6 +5427,11 @@ ul.notifications {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
+.sidepanel .obspropertyList-dropdown .dropdown-menu{
+  max-height: 300px;
+  overflow-y: auto;
+}
+
 .sidepanel .refreshbutton:hover {
   background-color: rgba(0,60,136,.5);
   color: #f1f1f1;
@@ -5502,7 +5500,105 @@ ul.notifications {
   flex-shrink: 0;
 }
 
+/* Map Timeline */
+.daterangepicker {
+  display: flex !important;
+  position: relative !important;
+  top: unset !important;
+  left: unset !important;
+  right: unset !important;
+  bottom: unset !important;
+  border: none !important;
+  flex-wrap: wrap !important;
+}
+.daterangepicker::after, .daterangepicker::before{
+  display: none !important;
+}
 
+.drp-calendar {
+  float: unset !important;
+  flex-basis: 50% !important;
+  flex-shrink: 0 !important;
+  max-width: unset !important;
+}
+
+.drp-buttons {
+  flex-basis: 100%;
+  flex-shrink: 0;
+}
+
+#collapseHistoricSelection>.card.card-body {
+  padding: 0;
+}
+
+#mapOverlay{
+  display: none;
+  position: absolute;
+  top: 50px;
+  bottom: 50px;
+  left: 80px;
+  right: 80px;
+  background-color: rgba(45, 72, 127, 0.2);
+  pointer-events: none;
+}
+
+#mapOverlay.active{
+  display: block;
+}
+
+.map-viewfinder {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+}
+
+.map-viewfinder-lt{
+  border-top: 5px solid #2d497f;
+  border-left: 5px solid #2d497f;;
+  top: 0;
+  left: 0;
+}
+.map-viewfinder-rt{
+  border-top: 5px solid #2d497f;;
+  border-right: 5px solid #2d497f;;
+  right: 0;
+  top: 0;
+}
+.map-viewfinder-lb{
+  border-bottom: 5px solid #2d497f;;
+  border-left: 5px solid #2d497f;;
+  left: 0;
+  bottom: 0;
+}
+.map-viewfinder-rb{
+  border-bottom: 5px solid #2d497f;;
+  border-right: 5px solid #2d497f;;
+  right: 0;
+  bottom: 0;
+}
+
+#mapOverlayUI {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+#mapOverlayButtons button {
+  margin: 35px;
+  pointer-events: all;
+}
+
+#mapOverlayButtons {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+#mapOverlayLabel {
+  margin-top: 50px;
+}
 
  /* #map-feature-tooltip {
   z-index: 10;

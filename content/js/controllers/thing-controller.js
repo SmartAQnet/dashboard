@@ -2,6 +2,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
     $scope.id = $routeParams.id;
     $scope.Page.setTitle('THING(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
+    debugger;
 
     $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")").then(function (response) {
         $scope.name = response.data["name"];
