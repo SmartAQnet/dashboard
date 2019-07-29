@@ -1,0 +1,66 @@
+<div class="main">
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs">
+                <li class="nav-item" ng-click="tabPropertiesClicked()"><a class="nav-link active show" data-target="#properties" data-toggle="tab">Properties</a></li>
+                <li class="nav-item" ng-click="tabDatastreamsClicked()"><a class="nav-link" data-target="#datastreams" data-toggle="tab">Datastreams</a></li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
+                <div class="tab-pane active" id="properties">
+                    <div class="entityInfo">
+                        <span class="entityInfoHeader">Name</span> <br />
+                        <pre class="entityInfoInfo">{{name}}</pre>
+                        <span class="entityInfoHeader">Description</span><br />
+                        <pre class="entityInfoInfo">{{description}}</pre>
+                        <span class="entityInfoHeader">Definition</span><br />
+                        <pre class="entityInfoInfo">{{definition}}</pre>
+                        <button class="collapsible">
+                            <span class="entityInfoHeader">Display Conventions</span> <br />
+                        </button>
+                        <div class="collapsible-content">
+                            <pre class="entityInfoInfo">{{conventions | json:4}}</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="datastreams">
+                    <table class="table table-bordered table-hover st-table table-striped table-sm">
+                        <thead class="st-thead">
+                        <tr>
+                    <th ng-click="sortBy('name')"> Name </th>
+                            <!--th>Description</th-->
+                            <th>Unit of Measurement</th>
+                            <th>From</th>
+                            <th>Until</th>
+                            <!--th>Area</th-->
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
+                            <td>
+                                <span title="{{x['name']}}">{{x["name"] | limitTo : 26}}...</span>
+                            </td>
+                            <!--td>{{x["description"]}}</td-->
+                            <td>{{x["unitOfMeasurement"]["name"]}}</td>
+                            <td>{{x["phenomenonTime"] | limitTo : 24 | date:'yyyy-MM-dd HH:mm:ss'}} </td>
+                            <td>{{x["phenomenonTime"] | limitTo : -24 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                            <!--td>{{x["observedArea"]}}</td-->
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row py-2">
+        <div class="col-md-12">
+            <div class="card" >
+                <div class="card-header">Map showing all Sensors which measure {{name}}</div>
+                <div class="map-container" ng-include="$window.dashboardSettings.root + 'views/map.html'">
+                </div>            
+            </div>
+        </div>
+    </div>
+</div>
+    

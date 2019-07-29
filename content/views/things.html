@@ -1,19 +1,20 @@
 <div>
-    <table class="table table-bordered table-hover st-table">
+    <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
             <th>Name</th>
             <th>Description</th>
-            <!--th>Properties</th>
-            <th>Delete</th-->
+            <th>Location</th>
+            <!--th>Delete</th-->
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="x in thingsList" >
             <td ng-click="thingClicked(x['@iot.id'])">{{x["name"]}}</td>
             <td ng-click="thingClicked(x['@iot.id'])">{{x["description"]}}</td>
+            <td ng-click="thingClicked(x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
             <!--td ng-click="thingClicked(x['@iot.id'])">
-		    <table class="table table-bordered table-hover st-table">
+		    <table class="table table-bordered table-hover st-table table-striped table-sm">
 			    <thead class="st-thead">
 				    <tr>
 					    <th>Key</th>
@@ -33,6 +34,7 @@
         </tbody>
     </table>
     <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newThing"><i class="fa fa-plus"></i> New <span class="fa"></span></button>
+    <div style="clear:both;"></div>
     <!-- Modal -->
     <div class="modal fade" id="newThing" role="dialog">
         <div class="modal-dialog">

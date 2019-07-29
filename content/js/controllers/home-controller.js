@@ -1,4 +1,5 @@
-gostApp.controller('HomeCtrl', function ($scope, $http) {
+gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
+	$scope.id = "saqn:home:";
 	$scope.Page.setTitle('smartAQnet');
 	$scope.Page.setHeaderIcon('');
 
@@ -6,10 +7,18 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 		$scope.active_devices = response.data["@iot.count"];
 	});
 
-	var interval=5000;
+	var interval=60000;
 	var lasttime=null;
 	var lastcount;
 	var count=0;
+
+
+
+	// $http.get(getUrl() + "/v1.0/Observations?$top=0&$count=true").then(function (response) {
+	// 	$scope.n_observations=response.data["@iot.count"];
+	// });	
+
+
 
 	$scope.setObservations=function(){
 		if(count==0)
@@ -28,15 +37,29 @@ gostApp.controller('HomeCtrl', function ($scope, $http) {
 				}
 				lasttime=newtime;
 				lastcount=newcount;
+				window.setTimeout($scope.setObservations, interval);
 			});
 		}
 		else
 		{	
 			$scope.n_observations++;
 			count--; 
+			if(interval>0) window.setTimeout($scope.setObservations, interval);
 		}
 		$scope.$apply()
-		window.setTimeout($scope.setObservations, interval);
-	}
+	};
+
 	window.setTimeout($scope.setObservations, 0);
+
+			// $http.get(getUrl() + "/v1.0/Observations?$top=0&$filter=phenomenonTime%20lt%20now()%20sub%20duration%27PT60s%27&$count=true").then(function (response) {
+			// 	count60sago=response.data["@iot.count"]});
+			// $http.get(getUrl() + "/v1.0/Observations?$top=0&$filter=phenomenonTime%20lt%20now()%20sub%20duration%27PT30s%27&$count=true").then(function (response) {
+			// 	count30sago=response.data["@iot.count"]});
+
+	$scope.$on('$destroy',function(){
+		interval=0;
+	});
+
+	$scope.mapVisible = true;
+	
 });
