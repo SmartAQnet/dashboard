@@ -57,7 +57,9 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             controls: new ol.Collection([
                 new ol.control.FullScreen({
                     className: "ol-fullscreen-custom ol-custom-button",
-                    source: 'fullscreen'
+                    source: 'fullscreen',
+                    label: '\uf31e',
+                    labelActive: '\uf78c'
                 }),
                 new ol.control.Zoom({
                     className: "ol-zoom-custom ol-custom-button"
@@ -234,8 +236,11 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
 
     var external_fullscreen = new ol.control.FullScreen({
-        target: document.querySelector(".sidepanel-header"),
-        source: 'fullscreen'
+        target: document.querySelector(".external-fullscreen"),
+        source: 'fullscreen',
+        label: '\uf31e',
+        labelActive: '\uf78c',
+        className: 'btn btn-primary btn-sm'
     });
     olMap.addControl(external_fullscreen);
 
@@ -243,9 +248,20 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     $scope.isControlSidePanelOpen = false;
     $scope.toggleControlSidepanel = function(){
         $scope.isControlSidePanelOpen = !$scope.isControlSidePanelOpen;
+        if($scope.isControlSidePanelOpen){//if panel is opened register event to close it
+            setTimeout(function(){//await next tick to prevent event trigger for now
+                $(document).bind('click', function(evt){
+                    if(!jQuery.contains($("#ControlSidepanel")[0], evt.target)){//if event target is not in control sidepanel => close it
+                        $(document).unbind(evt);
+                        $scope.isControlSidePanelOpen = false;
+                        $scope.safeApply();
+                    }
+                })
+            },0);
+        }
     };
 
-    $scope.isLegendSidePanelOpen = false;
+    $scope.isLegendSidePanelOpen = true;
     $scope.toggleLegendSidepanel = function(){
         $scope.isLegendSidePanelOpen = !$scope.isLegendSidePanelOpen;
     };
@@ -488,8 +504,20 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     };
 
     function updateFeatures(){
-        ColoredMarkerSource.clear();
-        PinSource.clear();
+        ColoredMarkerSource = new ol.source.Vector({
+            format: new ol.format.GeoJSON(),
+            features: ColoredMarkerCollection = new ol.Collection()
+        });
+        var PinSource = new ol.source.Vector({
+            format: new ol.format.GeoJSON(),
+            features: PinCollection = new ol.Collection()
+        });
+        ColoredMarkerLayer.setSource(ColoredMarkerSource);
+        PinLayer.setSource(PinSource);
+        //ColoredMarkerSource.clear();
+        //PinSource.clear();
+        //ColoredMarkerSource.clear();
+        //PinSource.clear();
         getAllLocations();
         getAllObservations();
     }
@@ -1001,7 +1029,9 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     /*****************************************************************************************/
 
     $http.get(getUrl() + "/v1.0/ObservedProperties").then(function (response) {
-        $scope.obspropertyList = response.data.value;
+        $scope.obspropertyList = response.data.value.filter(function(obsprop){
+            return !!obsprop.properties && !!obsprop.properties.conventions && !!obsprop.properties.conventions.fixedPoints;
+        });
     });
 
     $scope.selectedObsproperty = function(property){
