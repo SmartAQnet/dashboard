@@ -5141,11 +5141,16 @@ ul.notifications {
   position: relative;
 }
 
-.fullscreen:fullscreen .card-body{
+#fullscreen:fullscreen #ControlSidepanel{
+  height: 100%;
+  top: 0;
+}
+
+.fullscreen:fullscreen #card-body-map{
   padding: 0;
   height: 80%;
 }
-.fullscreen:fullscreen .card-footer{
+.fullscreen:fullscreen #card-footer-map{
   padding: 0;
   height: 20%;
   overflow-y: auto;
@@ -5184,6 +5189,7 @@ ul.notifications {
 
 .invisible {
   opacity: 0;
+  pointer-events: none;
 }
 
 .fullscreen:fullscreen .sidepanel {
@@ -5193,20 +5199,89 @@ ul.notifications {
 
 
   /* ----------------------------- Sidepanels -----------------------------*/
-.sidepanel#ControlSidepanel {
+#ControlSidepanel {
+  position: absolute;
   height: calc(100% - 40px); 
   width: 250px; 
-  top: 0;
-  right: -250px;
-  padding-left: 24px;
+  top: 20px;
+  right: 0;
+  overflow: visible;
+  transform: translateX(100%) translatex(10px);
+  transition: transform 0.2s;
 }
 
-.sidepanel#LegendSidepanel {
-  /* height: calc(100% - 40px);  */
+#ControlSidepanel.opened{
+  transform: none;
+}
+
+#LegendSidepanel .card-header, #ControlSidepanel .card-header{
+  padding: 10px;
+}
+
+#ControlSidepanel .btn-group .ol-control{
+  position: relative;
+  font-family: "Font Awesome 5 Free";
+  font-size: 13px;
+  font-weight:900;
+}
+
+.bmd-btn-fab, .bmd-btn-fab-sm{
+  border-radius: 50% !important;
+}
+
+#controlPanelButton{
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  z-index: unset !important;
+}
+
+#legendButton{
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  z-index: unset !important;
+}
+
+#control-sidepanel-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#ControlSidepanel #refreshbutton{
+  width: 100%;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+#ControlSidepanel #dropdownMenuButton{
+  width: 100%;
+  text-align: left;
+}
+
+#ControlSidepanel #dropdownMenuButton::after{
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+#ControlSidepanel .dropdown-menu{
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+#LegendSidepanel {
+  position: absolute;
   width: 120px; 
-  bottom: 0;
-  left: -120px;
-  padding-right: 24px;
+  bottom: 20px;
+  transform: translateX(-100%) translatex(-25px);
+  transition: transform 0.2s;
+}
+
+#LegendSidepanel.opened{
+  transform: none;
 }
 
 .sidepanel#InfoSidepanel {
@@ -5223,237 +5298,33 @@ ul.notifications {
 
 
   /* ----------------------------- closed sidepanel -----------------------------*/
-.fullscreen:fullscreen .sidepanel#ControlSidepanel {
-  right: -230px;
+
+.ol-control{
+  background-color: unset !important;
 }
 
-.fullscreen:fullscreen .sidepanel#LegendSidepanel {
-  left: -100px;
-}
-
-/* .fullscreen:fullscreen .sidepanel#InfoSidepanel {
-} */
-
-.sidepanel-body#InfoPanelBody.closed {
-  padding-top: 0px;
-  padding-bottom: 0px;
-  border-top-style: none;
-  height: 0px;
-  overflow: hidden;
-} 
-
-.sidepanel#ControlSidepanel #togglebtn-sidepanel-right::after{
-  content: "«"
-}
-
-.sidepanel#LegendSidepanel #togglebtn-sidepanel-left::after{
-  content: "»"
-}
-
-.sidepanel#InfoSidepanel.closed #togglebtn-sidepanel-bottom::after{
-  content: " "
-}
-
-  /* ----------------------------- opened sidepanel -----------------------------*/
-.sidepanel#ControlSidepanel.opened, .fullscreen:fullscreen .sidepanel#ControlSidepanel.opened {
-  right: 0;
-}
-
-.sidepanel#LegendSidepanel.opened, .fullscreen:fullscreen .sidepanel#LegendSidepanel.opened {
-  left: 0;
-  /* height: calc(85% - 40px);  */
-}
-
-/* .sidepanel#InfoSidepanel.opened, .fullscreen:fullscreen .sidepanel#InfoSidepanel.opened {
-} */
-
-.sidepanel#ControlSidepanel.opened #togglebtn-sidepanel-right::after{
-  content: "»"
-}
-
-.sidepanel#LegendSidepanel.opened #togglebtn-sidepanel-left::after{
-  content: "«"
-}
-
-.sidepanel#InfoSidepanel #togglebtn-sidepanel-bottom::after{
-  content: "x"
-}
-
-  /* ----------------------------- Sidepanel Togglebuttons -----------------------------*/
-/* Position and style the sideboard toggle-button for closed and open sidepanel  */
-.togglebtn-container {
-  position: relative;
-  height: 40px;
-  width: 40px;
-  transition: 0.6s;
-} 
-
-.sidepanel#ControlSidepanel .togglebtn-container {
-  left: -24px;
-  top: -10px;
-  float: left;
-  margin-left: 0px;
-  margin-left: -14px;
-}
-
-.sidepanel#ControlSidepanel.opened .togglebtn-container {
-  margin-left: 0;
-}
-
-.sidepanel#LegendSidepanel .togglebtn-container {
-  right: -24px;
-  bottom: 4px;
-  float: right;
-  margin-right: 0px;
-  margin-right: -14px;
-} 
-
-.sidepanel#LegendSidepanel.opened .togglebtn-container {
-  margin-right: 0;
-}
-
-.sidepanel#InfoSidepanel .togglebtn-container {
-  position: absolute;
-  top: 0;
-  right: 0; 
-}
-
-/* .sidepanel#InfoSidepanel.opened .togglebtn-container {
-} */
-
-
-/*The original fullscreen button*/
-#map.isControlSidePanelOpen .ol-viewport>div>.ol-full-screen {
-  opacity: 0;
-}
-.ol-viewport>div>.ol-full-screen {
-  opacity: 1;
-  transition: 0.3s opacity;
-}
-
-.fullscreen:fullscreen .ol-viewport>div>.ol-full-screen {
-  right: calc(0.5em + 20px);
-}
-
-
-/* The sidepanel checkbox/radio text */
-.sidepanel label {
-  transition: 0.6s;
-}
-
-/* When you mouse checkboxes/radios, change their color */
-.sidepanel label:hover {
-  color: #f1f1f1;
-}
-
-/*Sideboad header body footer, subpanels ...*/
-
-.sidepanel-header{
-  padding-top: 10px;
-  height: 42px;
-}
-
-.sidepanel-header-name{
-  text-align: center;
-  font-size: 1rem;
-  font-weight: bold;
-  position: absolute;
-  left: 25%;
-  right: 25%;
-}
-
-.sidepanel-body {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border-top-width: thin;
-  border-top-style: solid;
-  border-color: #f1f1f1;
-} 
-
-.sidepanel-footer{
-  padding-top: 10px;
-  border-top-width: thin;
-  border-top-style: solid;
-  border-color: #f1f1f1;
-} 
-
-
-.sidepanel-subpanel-right {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  margin-right: 10px;
-  border-radius: 4px;
-  transition: 0.3s;
-}
-
-.sidepanel-subpanel-left {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  margin-left: 10px;
-  border-radius: 4px;
-  transition: 0.3s;
-}
-
-.sidepanel-subpanel-bottom {
-  margin-top: 5px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  transition: 0.3s;
-}
-
-.sidepanel-subpanel-right:hover, .sidepanel-subpanel-left:hover, .sidepanel-subpanel-bottom:hover {
-  background-color: rgba(0,60,136,.3);
-  padding: 5px;
-  border-color: #000000;
-}
-
-.sidepanel .refreshbutton {
-  background-color: rgba(0,60,136,0);  
-  color: black; 
-  border: 2px solid rgba(0,60,136,.5);
-  border-radius: 4px;
-  padding: 16px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 1rem;
-  margin-top: 4px ;
-  margin-right: 2px;
-  margin-left: 24px;
-  margin-bottom: 12px;
-  -webkit-transition-duration: 0.3s; /* Safari */
-  transition-duration: 0.3s;
-  cursor: pointer;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
-
-.sidepanel .obspropertyList-dropdown .dropdown-menu{
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.sidepanel .refreshbutton:hover {
-  background-color: rgba(0,60,136,.5);
-  color: #f1f1f1;
-}
-
-.sidepanel .sidepanel-subtitle{
-  font-size: 1rem;
-  margin-bottom: 5px;
-  margin-left: 20px;
-  margin-right: 20px;
-  border-bottom-width: thin;
-  border-bottom-style: solid;
-  border-color: #f1f1f1;
+#map button.ol-fullscreen-custom {
+    font-family: "Font Awesome 5 Free";
+    font-weight:900;
+    line-height: 22px;
+    font-size: 14px;
+    height: 22px;
+    width: 22px; 
 }
 
 /* Legend */
+
+#legend-sidepanel-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 .legend-container-container {
   overflow: hidden;
   display: flex;
   flex-direction: row;
-  height: 200px;
+  height: 180px;
 }
 
 .legend-container{

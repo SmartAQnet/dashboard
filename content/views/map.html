@@ -18,29 +18,40 @@
         </div>
         <!-- <div id="map-feature-tooltip" ng-style="featureTooltipStyle" ng-class="{nodisplay: isTooltipHidden}">{{featureTooltip}}</div> -->
         <div id="map-feature-tooltip"></div>
-        <div class="sidepanel" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
-            <div class="sidepanel-header" id="control-sidepanel-header">
+        <button id="controlPanelButton" ng-click="toggleControlSidepanel(); $event.stopPropagation();" type="button" class="btn btn-primary bmd-btn-fab">
+            <i class="fas fa-layer-group"></i>
+        </button>
+        <button id="legendButton" ng-click="toggleLegendSidepanel();" type="button" class="btn btn-secondary bmd-btn-fab bmd-btn-fab-sm" ng-class="{invisible: isLegendInvisible}">
+                <i class="fas fa-ruler-vertical"></i>
+            </button>
+        <div class="card" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
+            <div class="card-header" id="control-sidepanel-header">
                 <div class="sidepanel-header-name">Controls</div>
-                <div class="togglebtn-container">
-                    <div class="ol-full-screen ol-unselectable ol-control">
-                        <span title="Toggle control-panel"><button ng-click="toggleControlSidepanel()" id="togglebtn-sidepanel-right"></button></span>
-                    </div>
+                <div class="btn-group" role="group" aria-label="Sidebar buttons">
+                    <div style="display: none;" class="external-fullscreen"></div>
+                    <button ng-click="toggleControlSidepanel()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-times" aria-hidden="true"></i></button>
                 </div>
             </div>
-            <div class="sidepanel-body">
+            <div class="card-body">
                 <div class="sidepanel-subpanel-right" id="Layer-Panel">
                     <div class="sidepanel-subtitle">Layers:</div>
-                    <div class="checkbox-container">
-                        <input type="checkbox" id="Layer-Pins" name="Layer" ng-model="isLayerPinsActive" ng-change="changedLayerPinsActive()">
-                        <label for="Layer-Pins">Pins</label>
+                    <div class="switch">
+                        <label>
+                            <input type="checkbox" id="Layer-Pins" name="Layer" ng-model="isLayerPinsActive" ng-change="changedLayerPinsActive()">
+                            Pins
+                        </label>
                     </div>
-                    <div class="checkbox-container">
-                        <input type="checkbox" id="Layer-ColoredMarkers" name="Layer" ng-model="isColorMarkersActive" ng-change="changedColorMarkersActive()">
-                        <label for="Layer-ColoredMarkers">Colored Markers</label>
+                    <div class="switch">
+                        <label>
+                                <input type="checkbox" id="Layer-ColoredMarkers" name="Layer" ng-model="isColorMarkersActive" ng-change="changedColorMarkersActive()">
+                            Colored Markers
+                        </label>
                     </div>
-                    <div class="checkbox-container" style="display: none">
-                        <input type="checkbox" id="Layer-Kriging" name="Layer" ng-model="isKrigingActive" ng-change="changedKrigingActive()">
-                        <label for="Layer-Kriging">Kriging</label>
+                    <div class="switch" style="display: none">
+                        <label>
+                                <input type="checkbox" id="Layer-Kriging" name="Layer" ng-model="isKrigingActive" ng-change="changedKrigingActive()">
+                            Kriging
+                        </label>
                     </div>
                 </div>
                 <div class="sidepanel-subpanel-right" style="display: none" id="Source-Panel">
@@ -55,29 +66,34 @@
                     </div>
                 </div>
             </div>
-            <div class="sidepanel-footer">
-                    <div class="dropdown obspropertyList-dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              {{obspropertyName}}
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                              <a ng-repeat="property in obspropertyList" ng-click="selectedObsproperty(property)" class="dropdown-item" href="javascript:void(0);">{{property.name}}</a>
-                            </div>
-                          </div>
+            <div class="card-footer">
+                <div class="dropdown obspropertyList-dropdown">
+                    <button class="btn btn-secondary btn-raised dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{obspropertyName}}
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a ng-repeat="property in obspropertyList" ng-click="selectedObsproperty(property)" class="dropdown-item" href="javascript:void(0);">{{property.name}}</a>
+                    </div>
+                </div>
                 <div class="sidepanel-subpanel-right" id="Refresh-Panel">
                     <div>
-                        <button class="refreshbutton" id="refreshbutton" ng-click="UpdateMap()">Refresh Map</button>
+                        <button class="btn btn-primary btn-raised refreshbutton" id="refreshbutton" ng-click="UpdateMap()">Refresh Map</button>
                         <!-- disable for few sec or until loaded-->
                     </div>
-                    <input type="checkbox" id="auto-refresh" name="auto-refresh" ng-model="isAutoRefreshActive" ng-change="changedAutoRefreshActive()">
-                    <label for="auto-refresh">Auto-Refresh</label>
+                    <div class="checkbox">
+                        <label>
+                                <input type="checkbox" id="auto-refresh" name="auto-refresh" ng-model="isAutoRefreshActive" ng-change="changedAutoRefreshActive()"> Auto-Refresh
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="sidepanel" id="LegendSidepanel" ng-class="{opened: isLegendSidePanelOpen, invisible: isLegendInvisible}">
-            <div class="sidepanel-header" id="legend-sidepanel-header"><div class="sidepanel-header-name" id="LegendTitle">Legend</div>
+        <div class="card" id="LegendSidepanel" ng-class="{opened: isLegendSidePanelOpen, invisible: isLegendInvisible}">
+            <div class="card-header" id="legend-sidepanel-header">
+                <div id="LegendTitle">Legend</div>
+                <button ng-click="toggleLegendSidepanel()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-times" aria-hidden="true"></i></button>
             </div>
-            <div class="sidepanel-body">
+            <div class="card-body">
                 <div class="sidepanel-subpanel-left" id="Legend">
                     <div class="legend-container-container">
                         <div class="legend-container">
@@ -97,16 +113,9 @@
                     </div>
                 </div>
             </div>
-            <div class="sidepanel-footer">
-                <div class="togglebtn-container">
-                    <div class="ol-full-screen ol-unselectable ol-control">
-                        <span title="Toggle control-panel"><button ng-click="toggleLegendSidepanel()" id="togglebtn-sidepanel-left"></button></span>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
-    <div class="card-footer">
+    <div class="card-footer" id="card-footer-map">
         <button ng-click="openHistoricDataCollapse()" id="historicDataButton" class="btn btn-secondary dropdown-toggle"  type="button" aria-haspopup="true" aria-expanded="false">Displayed Data: Latest</button>
         <rzslider rz-slider-model="slider.minValue"
             rz-slider-high="slider.maxValue"
