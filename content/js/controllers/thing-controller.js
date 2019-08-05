@@ -15,16 +15,21 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
     $scope.tabPropertiesClicked = function () {
     };
 
-    //display location in another color --> change color of the respective pin (old code, doesnt work anymore, build from scratch)
-    // $scope.tabLocationsClicked = function () {
+    $scope.tabLocationsClicked = function () {
+    };
 
-    //     $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/Locations").then(function (response) {
-    //         $scope.locationsList = response.data.value;
-    //         PinLayer.getSource().clear();
-    //         addGeoJSONFeature($scope.locationsList[0]["location"]);
-    //         setview($scope.locationsList[0]["location"]["coordinates"]);
-    //     });
-    // };
+    //display current thing location in another color --> change color of the respective pin
+
+    /* //not working atm, cant find the functions which are defined in the map controller... maybe add this function to the map controller where the view is centered and check the current scope
+    $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")/Locations").then(function (response) {
+        $scope.locationsList = response.data.value;
+        highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
+        setview($scope.locationsList[0]["location"]["coordinates"]);
+    });
+    */
+
+
+
 
     $scope.tabHistoricalLocationsClicked = function () {
 

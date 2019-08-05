@@ -20,11 +20,12 @@
                     <a class="nav-link" ng-class="{active: $route.current.activetab == 'home'}" href="#/home"><i class="fa fa-home"></i> Home <span class="fa"></span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" ng-class="{active: $route.current.activetab == 'things'}" href="#/things?$expand=Locations"><i class="fa fa-cube"></i> Things <span class="fa"></span></a>
+                    <a class="nav-link" ng-class="{active: $route.current.activetab == 'things'}" href="#/things"><i class="fa fa-cube"></i> Things <span class="fa"></span></a>
+                    <!-- <a class="nav-link" ng-class="{active: $route.current.activetab == 'things'}" href="#/things?$expand=Locations"><i class="fa fa-cube"></i> Things <span class="fa"></span></a> -->
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" ng-class="{active: $route.current.activetab == 'sensors'}" href="#/sensors"><i class="fa fa-tachometer-alt"></i> Sensors <span class="fa"></span></a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a class="nav-link" ng-class="{active: $route.current.activetab == 'properties'}" href="#/observedproperties"><i class="fa fa-list"></i> Observed Properties <span class="fa"></span></a>
                 </li>
@@ -67,10 +68,12 @@
     <script src="js/controllers/observations-controller.js"></script>
     <script src='js/controllers/observed-property-controller.js'></script>
     <script src="js/controllers/observed-properties-controller.js"></script>
+    <script src="js/controllers/sensor-controller.js"></script>
     <script src="js/controllers/sensors-controller.js"></script>
     <script src="js/controllers/thing-controller.js"></script>
     <script src="js/controllers/things-controller.js"></script>
     <script src="js/controllers/mqtt-controller.js"></script>
     <script src='js/controllers/map-controller.js'></script>
+    <script src='js/controllers/create_new-controller.js'></script>
   </body>
 </html>
