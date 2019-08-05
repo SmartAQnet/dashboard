@@ -4,18 +4,13 @@
         <tr>
             <th>Name</th>
             <th>Description</th>
-            <!--th>Encoding</th>
-            <th>Metadata</th>
-            <th>Delete</th-->
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="x in sensorsList">
-            <td>{{x["name"]}}</td>
-            <td>{{x["description"]}}</td>
-            <!--td>{{x["encodingType"]}}</td>
-            <td>{{x["metadata"]}}</td>
-            <td><div class="fa fa-remove delete-entity" ng-click="deleteSensorClicked(x)"></div></td-->
+            <td ng-click="sensorClicked(x['@iot.id'])">{{x["name"]}}</td>
+            <td ng-click="sensorClicked(x['@iot.id'])">{{x["description"]}}</td>
+            <!-- <td><div class="fa fa-remove delete-entity" ng-click="deleteSensorClicked(x)"></div></td> -->
         </tr>
         </tbody>
     </table>

@@ -34,6 +34,7 @@ gostApp.config(function ($routeProvider) {
 		when('/locations', { templateUrl: window.dashboardSettings.root + 'views/locations.html', controller: "LocationsCtrl", activetab: 'things' }).
 		when('/historicallocations', { templateUrl: window.dashboardSettings.root + 'views/historicallocations.html', controller: "HistoricalLocationsCtrl", activetab: 'things' }).
 		when('/sensors', { templateUrl: window.dashboardSettings.root + 'views/sensors.html', controller: "SensorsCtrl", activetab: 'sensors' }).
+		when('/sensor/:id', { templateUrl: window.dashboardSettings.root + 'views/sensor.html', controller: "SensorCtrl", activetab: 'sensors' }).
 		when('/observedproperty/:id', { templateUrl: window.dashboardSettings.root + 'views/observedproperty.html', controller: "ObservedPropertyCtrl", activetab: 'properties' }).
 		when('/:patchthingy/:id/patch', { templateUrl: window.dashboardSettings.root + 'views/observedproperty.html', controller: "ObservedPropertyCtrl", activetab: 'properties' }).
 		when('/observedproperties', { templateUrl: window.dashboardSettings.root + 'views/observedproperties.html', controller: "ObservedPropertiesCtrl", activetab: 'properties' }).
@@ -41,7 +42,8 @@ gostApp.config(function ($routeProvider) {
 		when('/datastreams', { templateUrl: window.dashboardSettings.root + 'views/datastreams.html', controller: "DatastreamsCtrl", activetab: 'sensors' }).
 		when('/observations', { templateUrl: window.dashboardSettings.root + 'views/observations.html', controller: "ObservationsCtrl", activetab: 'sensors' }).
 		when('/featuresofinterest', { templateUrl: window.dashboardSettings.root + 'views/featuresofinterest.html', controller: "FeaturesOfInterestCtrl" }).
-		// when('/patch', { templateUrl: window.dashboardSettings.root + 'views/patch.html', controller: "PatchCtrl" }).
+		when('/create_new', { templateUrl: window.dashboardSettings.root + 'views/create_new.html', controller: "CreateNewCtrl" }).
+		//when('/:type/:id/patch', { templateUrl: window.dashboardSettings.root + 'views/patch.html', controller: "PatchCtrl" }).
 		when('/mqtt', { templateUrl: window.dashboardSettings.root + 'views/mqtt.html', controller: "MqttCtrl" }).
 		otherwise({redirectTo: '/home' });
 });

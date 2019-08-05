@@ -317,7 +317,30 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         })), zIndex: 3
     });
 
-    function interpolateColor(allPoints, value, alpha) {
+    var currentMarkerStyle = new ol.style.Style({
+        image: new ol.style.Icon(({
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            scale: 1.0,
+            color: [255,64,64,1],
+            src: window.dashboardSettings.root + 'assets/img/map_marker.svg'
+        })), zIndex: 3
+    });
+
+
+    function highlightCurrentFeature(coords){
+        var pixel = getPixelFromCoordinate(coords);
+        var feature = olMap.forEachFeatureAtPixel(pixel, function(feature) {return feature});
+        feature.setStyle(currentMarkerStyle);
+    };
+
+    
+
+
+
+
+    function interpolateColor(allPoints, value, alpha){
         var colorLimitsAndValidPoints = getLimitsAndValidPoints(allPoints)
         //Find index of the fixed color point below the given value;
         var belowPoint = 0;
