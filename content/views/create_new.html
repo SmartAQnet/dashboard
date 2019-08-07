@@ -64,6 +64,9 @@
                     </div>
                     </td>
                     <td><div id="thingcreated">right side text</div></td>
+                    <tr ng-repeat="datastream in datastreams"><td> <button ng-click="modifydatastream(datastream)"></button>  </td><td>
+                        {{datastream.name}}
+                    </td></tr>
                     <tr>
                     <td>
                     <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newDatastream" style="float: left"><i class="fa fa-plus"></i> Add Datastream <span class="fa"></span></button>
