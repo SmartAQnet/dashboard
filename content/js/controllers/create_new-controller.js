@@ -7,27 +7,28 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
         $scope.obspropList = response.data.value;
     });
 
+    $scope.newThing = {}
+    $scope.addnewThing = function(newentity) {
+    $scope.newThing = newentity
+    };
+
     
 
-    $scope.addNewThing = function(newThing) {
-        var res = $http.post(getUrl() + '/v1.0/Things', newThing);
-        res.success(function(data, status, headers, config) {
-            alert( "added: " + JSON.stringify({data: data}));
-        });
-        res.error(function(data, status, headers, config) {
-            alert( "failure: " + JSON.stringify({data: data}));
-        });
+    $scope.datastreams = [];
+
+    $scope.addNewDatastream = function(newentity) { 
+        newentity['Thing'] = {'@iot.id': $scope.newThing['@iot.id']};
+        $scope.datastreams.push(newentity);
+        $scope.newDatastream = {};
     };
 
-    $scope.addNewDatastream = function(newDatastream) {
-        var res = $http.post(getUrl() + '/v1.0/Datastreams', newDatastream);
-        res.success(function(data, status, headers, config) {
-            alert( "added: " + JSON.stringify({data: data}));
-        });
-        res.error(function(data, status, headers, config) {
-            alert( "failure: " + JSON.stringify({data: data}));
-        });
-    };
+    $scope.newDatastream = {};
+
+    $scope.modifydatastream = function(datastream){
+        $scope.newDatastream = datastream;
+    }
+
+
 
     //choose from list, if not there, let create
     $scope.addNewSensor = function(newSensor) {
