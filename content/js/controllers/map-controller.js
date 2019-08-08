@@ -906,7 +906,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         let threshold = Date.now() - grace;
         SimulationInvisibleSource.forEachFeature(function (thisfeature) {
             if (thisfeature.getId() < threshold) {
-                SimulationInvisibleSource.removeFeature(thisfeature)
+                //SimulationInvisibleSource.removeFeature(thisfeature)
             }
         })
     };
@@ -1019,15 +1019,16 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     function otherDateSelected(start, end) {
         $scope.startDateMoment = start;
         $scope.endDateMoment = end;
+        $scope.startDate = start.format('YYYY-MM-DD HH:mm:ss');
+        $scope.endDate = end.format('YYYY-MM-DD HH:mm:ss');
         if(moment.duration(start.diff(end)).asMilliseconds() == 0) {
-            $scope.showOnlyLatest = true;
-        } else {
-            $scope.showOnlyLatest = false;
+            loadFeaturesFromServer(true).then(function(){
+                selectPinsAndMarkersBasedOnTimeInterval($scope.showOnlyLatest);
+            });
+            return;
         }
         $scope.slider.options.minRange = oneMinuteToRelative();
         $scope.$broadcast('rzSliderForceRender');
-        $scope.startDate = start.format('YYYY-MM-DD HH:mm:ss');
-        $scope.endDate = end.format('YYYY-MM-DD HH:mm:ss');
         $scope.isMapOverlayVisible = true;
         ViewfinderSource.clear();
         $scope.safeApply();
@@ -1059,6 +1060,10 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
     var timeSortedThings = [];
     var timeSortedObservations = [];
+    var allObservations = [];
+    var allLocations = [];
+    var observationIntervalTree = new IntervalTree(0);
+    var locationIntervalTree = new IntervalTree(0);
 
     $scope.confirmHistoricDataSelection = function () {
         var viewseekerBoundaries = $("#mapOverlayUI")[0].getBoundingClientRect();
@@ -1081,7 +1086,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         var polygonString = serverPolygon.map(function (coordinates) {
             return coordinates.join(" ");
         }).join(",");
-        loadFeaturesFromServer($scope.showOnlyLatest, polygonString);
+        loadFeaturesFromServer(false, polygonString);
     }
 
     function loadFeaturesFromServer(loadLatestOnly, polygonString){
@@ -1090,7 +1095,6 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         var timeIntervalDatastreamFilter = loadLatestOnly ? "and not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27" : "and not (phenomenonTime lt " + $scope.startDateMoment.toISOString() + " or phenomenonTime gt " + $scope.endDateMoment.toISOString() + ")";
         var observationsOptions = loadLatestOnly ? "$top=1;$orderby=phenomenonTime%20desc;" : "$top=999999;";
         var filterLocation = polygonString ? " and st_within(HistoricalLocations/Location/location,%20geography%27POLYGON((" + polygonString + "))%27)" : "";
-
 
         return $http.get(getUrl() + "/v1.0/Things?$expand=" + "HistoricalLocations/Locations," + "Datastreams" +
             "($filter=ObservedProperty/@iot.id eq '" + obsproperty + "' " + timeIntervalDatastreamFilter + ";" +
@@ -1101,59 +1105,48 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             });
             timeSortedThings.length = 0;
             timeSortedObservations.length = 0;
+            allObservations.length = 0;
+            allLocations.length = 0;
+            observationIntervalTree = new IntervalTree(0);
+            //window.observationIntervalTree = observationIntervalTree;
+            locationIntervalTree = new IntervalTree(0);
             thingsPreviouslyInThisRegion.forEach(function (thing) {
-                var historicalLocations = [];
-                thing["HistoricalLocations"].forEach(function (historicalLocation) {
+                for(var i = 0; i < thing["HistoricalLocations"].length; i++) {
+                    var historicalLocation = thing["HistoricalLocations"][i];
                     if (historicalLocation["Locations"].length < 1) return;
                     var featureInfo = transformThingIntoFeatureInfo(thing, historicalLocation.Locations[0].location);
-                    historicalLocations.push({
+                    allLocations.push({
                         time: moment(historicalLocation.time),
                         thing: thing,
                         location: historicalLocation.Locations[0].location,
                         feature:  infoToFeature(featureInfo, defaultMarkerStyle, historicalLocation.Locations[0].location)
                     });
-                });
-                var observations = [];
+                    locationIntervalTree.add(
+                        moment(historicalLocation.time).valueOf(),
+                        (i < thing["HistoricalLocations"].length - 1) ? moment(thing["HistoricalLocations"][i+1].time).valueOf() : moment().valueOf(),
+                        allLocations.length - 1
+                    );
+                }
                 thing.Datastreams.forEach(datastream => {
                     datastream.Observations.forEach(observation => {
                         observation.phenomenonTime.split("/").forEach(time => { //splits time for intervals in observations
+                            var momentTime = moment(time);
                             var featureInfo = transformObservationIntoFeatureInfo(
                                 observation, datastream.ObservedProperty, datastream.unitOfMeasurement);
                                 var observationInfo = {
-                                    time: moment(time),
+                                    time: momentTime,
                                     thing: thing,
                                     datastream: datastream,
                                     originalObservation: observation,
                                     feature: infoToFeature(featureInfo, stylefunction(featureInfo), featureInfo.FeatureOfInterest)
                                 };
-                                observations.push(observationInfo);
-                                timeSortedObservations.push(observationInfo);
+                                allObservations.push(observationInfo);
+                                observationIntervalTree.add(momentTime.valueOf(), momentTime.valueOf() + 1, allObservations.length - 1);
                         });
                     });
                 });
-                
-                historicalLocations.sort(function (a, b) {
-                    return a.time.isBefore(b.time) ? -1 : 1;
-                });
-    
-                observations.sort(function (a, b) {
-                    return a.time.isBefore(b.time) ? -1 : 1;
-                });
-
-                var currentHistoricLocationPointer = 0;
-                observations.forEach(obs => {
-                    while(historicalLocations[currentHistoricLocationPointer+1] && historicalLocations[currentHistoricLocationPointer+1].time.isBefore(obs.time)){
-                        currentHistoricLocationPointer++;
-                    }
-                    timeSortedThings.push(jQuery.extend(historicalLocations[currentHistoricLocationPointer], {time: obs.time}));
-                });
-            });
-            timeSortedObservations.sort(function (a, b) {
-                return a.time.isBefore(b.time) ? -1 : 1;
-            });
-
-            timeSortedThings.sort(function (a, b) {
-                return a.time.isBefore(b.time) ? -1 : 1;
+                $scope.showOnlyLatest = loadLatestOnly;
+                $scope.selectDuration(moment.duration(10, "minutes"));
             });
         });
     }
@@ -1161,13 +1154,13 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     function selectPinsAndMarkersBasedOnTimeInterval(latestOnly){
         var observations = [];
         var thingLocations = [];
-        if(latestOnly || !$scope.selectedRangeStart || ! $scope.selectedRangeEnd){
-            observations = timeSortedObservations;
-            thingLocations = timeSortedThings;
+        if(latestOnly || !$scope.selectedRangeStart || !$scope.selectedRangeEnd){
+            observations = allObservations;
+            thingLocations = allLocations;
         }
         else{
-            observations = subCollectionFromTimeInterval($scope.selectedRangeStart, $scope.selectedRangeEnd, timeSortedObservations);
-            thingLocations = subCollectionFromTimeInterval($scope.selectedRangeStart, $scope.selectedRangeEnd, timeSortedThings);
+            observations = subCollectionFromTimeInterval($scope.selectedRangeStart, $scope.selectedRangeEnd, allObservations, observationIntervalTree);
+            thingLocations = subCollectionFromTimeInterval($scope.selectedRangeStart, $scope.selectedRangeEnd, allLocations, locationIntervalTree);
             thingLocations = distinctThingLocations(thingLocations);
         }
         var colorFeatures = observations.map(observation => observation.feature);
@@ -1189,25 +1182,23 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         //addColorFeature()
     }
 
-    function subCollectionFromTimeInterval(startTime, endTime, array){
-        var start = 0;
-        while(start < array.length && array[start].time.isBefore(startTime)) start++;
-        var end = start;
-        while(end < array.length && array[end].time.isBefore(endTime)) end++;
-        return array.slice(start,end + 1);
+    function subCollectionFromTimeInterval(startTime, endTime, array, tree){
+        var matches = tree.rangeSearch(startTime.valueOf(), endTime.valueOf());
+        return matches.map(match => array[match.id])
     }
 
     function distinctThingLocations(thingLocations){
         var ids = [];
-        var thingLocations = [];
+        var distinctThingLocations = [];
+        thingLocations.sort((a,b) => a.time.isBefore(b.time) ? -1 : 1);
         for(var i = thingLocations.length - 1; i >= 0; i--){
             var currentId = thingLocations[i].thing["@iot.id"];
             if(ids.indexOf(currentId) === -1){
                 ids.push(currentId);
-                thingLocations.push(thingLocations[i]);
+                distinctThingLocations.push(thingLocations[i]);
             }
         }
-        return thingLocations;
+        return distinctThingLocations;
     }
 
     function interpolateDate(position){
@@ -1230,9 +1221,9 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
     $scope.selectDuration = function(duration){
         if(!$scope.startDateMoment || !$scope.endDateMoment) return;
-        var durationTotalMilliseconds = moment.duration($scope.endDateMoment.diff($scope.startDateMoment)).asMilliseconds();
-        var ratioSelectedRange = duration.asMilliseconds() / durationTotalMilliseconds;
-        var midpoint = $scope.slider.minValue + ($scope.slider.maxValue - $scope.slider.minValue) / 2;
+        var durationTotalMilliseconds = moment.duration($scope.endDateMoment.diff($scope.startDateMoment)).asMilliseconds() || 1;
+        var ratioSelectedRange = duration.asMilliseconds() / durationTotalMilliseconds || 1;
+        var midpoint = $scope.slider.minValue + ($scope.slider.maxValue - $scope.slider.minValue) / 2 || 0;
         var newMin = midpoint - ratioSelectedRange/2;
         var newMax = midpoint + ratioSelectedRange/2;
         if(newMin < 0){
@@ -1244,13 +1235,16 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         }
         $scope.slider.minValue = newMin;
         $scope.slider.maxValue = newMax;
+        $scope.$broadcast('rzSliderForceRender');
     }
 
     function applySliderChanges(){
         $scope.timeRange = humanizedDuration($scope.slider.minValue, $scope.slider.maxValue);
         $scope.selectedRangeStart = interpolateDate($scope.slider.minValue);
         $scope.selectedRangeEnd = interpolateDate($scope.slider.maxValue);
-        selectPinsAndMarkersBasedOnTimeInterval();
+        if(!$scope.showOnlyLatest){
+            selectPinsAndMarkersBasedOnTimeInterval();
+        }
     }
 
     $scope.$watch('slider.minValue', function() {
@@ -1261,8 +1255,8 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     }, true);
     $scope.selectableDurations = {
         "1 minute": moment.duration(1, 'minutes'),
-        "10 minute": moment.duration(10, 'minutes'),
-        "30 minute": moment.duration(30, 'minutes'),
+        "10 minutes": moment.duration(10, 'minutes'),
+        "30 minutes": moment.duration(30, 'minutes'),
         "1 hour": moment.duration(1, 'hours')
     };
 

@@ -5525,6 +5525,10 @@ span.rz-pointer {
   cursor: ew-resize !important;
 }
 
+.card-body-slider{
+  border-top: 1px solid rgba(0,0,0,.12);
+}
+
 /*  ***************  End Map Timeline ******************* */
 
  /* #map-feature-tooltip {
