@@ -56,13 +56,16 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             //Set of controls included in maps by default. Unless configured otherwise, this returns a collection containing an instance of controls. Add with extend. 
             controls: new ol.Collection([
                 new ol.control.FullScreen({
-                    className: "ol-fullscreen-custom ol-custom-button",
+                    className: "ol-fullscreen-custom",
                     source: 'fullscreen',
                     label: '\uf31e',
                     labelActive: '\uf78c'
                 }),
                 new ol.control.Zoom({
                     className: "ol-zoom-custom ol-custom-button"
+                }),
+                new ol.control.Attribution({
+                    collapsible: false
                 })
             ]),
 
@@ -168,9 +171,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     //tile layer for the actual map
     var tileLayer = new ol.layer.Tile({
         source: new ol.source.XYZ({
-            attributions: [new ol.Attribution({
-                html: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>"
-            })],
+            attributions: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
             tileSize: [512, 512],
             url: 'https://api.mapbox.com/styles/v1/edenhalperin/cih84uopy000a95m41htugsnm/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWRlbmhhbHBlcmluIiwiYSI6IlFRZG0zMWMifQ.QUNKx4tIMjZfwmrE8SE6Bg'
         })
@@ -247,7 +248,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         source: 'fullscreen',
         label: '\uf31e',
         labelActive: '\uf78c',
-        className: 'btn btn-primary btn-sm'
+        className: 'btn'
     });
     olMap.addControl(external_fullscreen);
 
