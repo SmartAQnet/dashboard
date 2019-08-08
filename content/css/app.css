@@ -392,7 +392,7 @@ html, body, #map {
   top: 7px;
   right: 10px;
 }
-#map .ol-custom-button button{
+#map .ol-custom-button button, #map div.ol-fullscreen-custom button{
   color: #fff;
   background-color: #2d497f;
   border-color: #2d497f;
@@ -406,12 +406,12 @@ html, body, #map {
   user-select: none;
   text-transform: uppercase;
 }
-#map .ol-custom-button button:active{
+#map .ol-custom-button button:active, #map div.ol-fullscreen-custom button:active{
   background-color: #284070;
   border-color: #1d2f52;
   box-shadow: none;
 }
-#map .ol-custom-button button:hover{
+#map .ol-custom-button button:hover, #map div.ol-fullscreen-custom button:hover{
   background-color: #284070;
   border-color: #1d2f52;
   box-shadow: 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12), 0 2px 4px -1px rgba(0,0,0,.2);
@@ -5303,7 +5303,7 @@ ul.notifications {
   background-color: unset !important;
 }
 
-#map button.ol-fullscreen-custom {
+#map button.ol-fullscreen-custom-false, #map button.ol-fullscreen-custom-true {
     font-family: "Font Awesome 5 Free";
     font-weight:900;
     line-height: 22px;
