@@ -115,19 +115,25 @@
             </div>
         </div>
     </div>
-    <div class="card-footer" id="card-footer-map">
-        <button ng-click="openHistoricDataCollapse()" id="historicDataButton" class="btn btn-secondary dropdown-toggle"  type="button" aria-haspopup="true" aria-expanded="false">Displayed Data: Latest</button>
-        <div class="dropdown obspropertyList-dropdown">
-            <button class="btn btn-secondary btn-raised dropdown-toggle" type="button" id="dropdownDurationButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {{timeRange}}
+    <div class="card-body card-body-slider">
+            <rzslider ng-if="!showOnlyLatest" rz-slider-model="slider.minValue"
+            rz-slider-high="slider.maxValue"
+            rz-slider-options="slider.options"></rzslider>
+        <button ng-click="openHistoricDataCollapse()" id="historicDataButton" class="btn btn-raised dropdown-toggle"  type="button" aria-haspopup="true" aria-expanded="false">
+            Loaded data: 
+                <span ng-if="showOnlyLatest">Latest</span>
+                <span ng-if="!showOnlyLatest">{{startDate}} - {{endDate}}</span>
+        </button>
+        <div ng-if="!showOnlyLatest" class="dropdown obspropertyList-dropdown">
+            <button class="btn btn-raised  dropdown-toggle" type="button" id="dropdownDurationButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Displayed data: {{timeRange}}
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownDurationButton">
                 <a ng-repeat="(label, duration) in selectableDurations" ng-click="selectDuration(duration)" class="dropdown-item" href="javascript:void(0);">{{label}}</a>
             </div>
         </div>
-        <rzslider rz-slider-model="slider.minValue"
-            rz-slider-high="slider.maxValue"
-            rz-slider-options="slider.options"></rzslider>
+    </div>
+    <div class="card-footer" id="card-footer-map">
         <div class="sidepanel" id="InfoSidepanel"  ng-class="{closed: isInfoSidePanelClosed}">
             <div class="sidepanel-header" id="info-sidepanel-header">
                 <div class="sidepanel-header-name">Information</div>
