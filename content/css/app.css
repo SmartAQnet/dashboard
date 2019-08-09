@@ -1253,9 +1253,6 @@ footer {
   height: 22px !important;
   text-decoration: none;
 }
-.tooltip {
-  display: block !important;
-}
 .tiles {
   border-top: 1px solid #ccc;
   margin-top: 15px;
@@ -5531,19 +5528,14 @@ span.rz-pointer {
 
 /*  ***************  End Map Timeline ******************* */
 
- /* #map-feature-tooltip {
+ #map-feature-tooltip {
   z-index: 10;
   position: absolute;
-  background: rgba(0,60,136,.2);
-  display: inherit;
-  padding: 4px 8px;
-  border-radius: 4px;
 }
 
 
 .nodisplay{
   display: none; 
-} */
-
+} 
 
 

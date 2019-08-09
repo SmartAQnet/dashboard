@@ -1,4 +1,4 @@
-gostApp.controller('MapCtrl', function ($scope, $http) {
+gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
 
     /************************************ Parameters ************************************/
@@ -117,7 +117,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     //pin layer for locations of things
     var PinSource = new ol.source.Vector({
         format: new ol.format.GeoJSON(),
-        features: PinCollection = new ol.Collection()
+        features: PinCollection = new ol.Collection(),
     });
     var PinLayer = new ol.layer.Vector({
         source: PinSource
@@ -127,10 +127,11 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     //colored markers for latest observations per datastream with feature of interest
     var ColoredMarkerSource = new ol.source.Vector({
         format: new ol.format.GeoJSON(),
-        features: ColoredMarkerCollection = new ol.Collection()
+        features: []
     });
     var ColoredMarkerLayer = new ol.layer.Vector({
-        source: ColoredMarkerSource
+        source: ColoredMarkerSource,
+        renderMode: 'image'
     });
 
     //simulation source and layers
@@ -171,6 +172,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     //tile layer for the actual map
     var tileLayer = new ol.layer.Tile({
         source: new ol.source.XYZ({
+            crossOrigin: 'anonymous',
             attributions: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
             tileSize: [512, 512],
             url: 'https://api.mapbox.com/styles/v1/edenhalperin/cih84uopy000a95m41htugsnm/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWRlbmhhbHBlcmluIiwiYSI6IlFRZG0zMWMifQ.QUNKx4tIMjZfwmrE8SE6Bg'
@@ -368,9 +370,9 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             ((leftRatio * color.left.b) + (rightRatio * color.right.b)) + ", " + alpha + ")";
     }
 
-
+    //var test = null;
     var stylefunction = function (feature) {
-        
+        //if(test) return test;
         var colormarker = new ol.style.Style({
             image: new ol.style.Circle({
                 radius: 10,
@@ -383,7 +385,8 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
                 })
             }),
             zIndex: 2
-        })
+        });
+        //test = colormarker;
         return (colormarker)
     };
 
@@ -515,7 +518,8 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             "resulttime": obsresulttime,
             "@iot.id": obsId,
             "FeatureOfInterest": obsFOI,
-            "tooltip": obspropertyName + " [" + dsUnit["symbol"] + "]: " + obsresult,
+            "tooltip": obspropertyName + " [" + dsUnit["symbol"] + "]: " + obsresult + "<br>" +
+                "~ " + moment.duration(moment().diff(moment(obsresulttime))).humanize() + " ago",
             "colorFixedPoints": obsPropertyColorFixedPoints
         };
         return featureinfo;
@@ -546,7 +550,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
     function updateFeatures() {
         ColoredMarkerSource = new ol.source.Vector({
             format: new ol.format.GeoJSON(),
-            features: ColoredMarkerCollection = new ol.Collection()
+            features: ColoredMarkerCollection = []
         });
         var PinSource = new ol.source.Vector({
             format: new ol.format.GeoJSON(),
@@ -574,28 +578,16 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
     var storedfeature;
     var storedstyle;
+    $scope.isTooltipHidden = true;
 
     var displayFeatureTooltip = function (feature) {
-
-
-        var info = document.getElementById('map-feature-tooltip');
+        //var info = document.getElementById('map-feature-tooltip');
         if (feature) {
             position = olMap.getPixelFromCoordinate(feature.getGeometry().getCoordinates());
-            /*
-            $scope.isTooltipHidden = false;
-            $scope.featureTooltipStyle = {left: position[0] + 40 + "px", top: position[1] + "px"};
-            $scope.featureTooltip = feature.getProperties()["thingname"];
-            */
 
-            info.innerHTML = feature.getProperties()["tooltip"];
-            info.style.left = position[0] + 40 + "px";
-            info.style.top = position[1] + "px";
-            info.style.position = "absolute";
-            info.style.display = "inherit";
-            info.style.background = "rgba(0,60,136,.2)";
-            info.style.borderRadius = "4px";
-            info.style.padding = "4px 8px";
-            info.style.zIndex = "10";
+            $scope.isTooltipHidden = false;
+            $scope.featureTooltipStyle = {left: position[0] + 35 + "px", top: position[1] - 12 + "px"};
+            $scope.featureTooltip = $sce.trustAsHtml(feature.getProperties()["tooltip"]);
 
             if (storedfeature != undefined) { // if a feature is stored
                 if (storedfeature != feature) { // if an old feature is stored (moving from one to the next without clear map inbetween) --> reset old one, change and store new one
@@ -626,10 +618,9 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
                 storedfeature = undefined;
                 storedstyle = undefined;
             };
-            info.style.display = "none";
-            //$scope.isTooltipHidden = true;
-
+            $scope.isTooltipHidden = true;
         }
+        $scope.safeApply();
     };
 
     olMap.on('pointermove', function (evt) {
@@ -1139,6 +1130,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
                                     thing: thing,
                                     datastream: datastream,
                                     originalObservation: observation,
+                                    foi: featureInfo.FeatureOfInterest,
                                     feature: infoToFeature(featureInfo, stylefunction(featureInfo), featureInfo.FeatureOfInterest)
                                 };
                                 allObservations.push(observationInfo);
@@ -1152,6 +1144,69 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         });
     }
 
+    var currentMarkerPointer = 0;
+    var currentObservationList = [];
+    var markerAddingInterval = null;
+
+    function startAddingMarkers(){
+        stopAddingMarkers();
+        var colorFeatures = ColoredMarkerSource.getFeatures();
+        markerAddingInterval = setInterval(() => {
+            if(currentMarkerPointer >= currentObservationList.length && currentMarkerPointer >= colorFeatures.length){
+                stopAddingMarkers();
+                return;
+            }
+            for(var colorFeaturesPointer = currentMarkerPointer; colorFeaturesPointer < colorFeatures.length &&
+                colorFeaturesPointer < currentObservationList.length &&
+                colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++){
+                    colorFeatures[colorFeaturesPointer].setGeometry(currentObservationList[colorFeaturesPointer].getGeometry());
+                    colorFeatures[colorFeaturesPointer].setStyle(currentObservationList[colorFeaturesPointer].getStyle());
+                    colorFeatures[colorFeaturesPointer].setProperties(currentObservationList[colorFeaturesPointer].getProperties());
+            }
+            if(colorFeaturesPointer < colorFeatures.length){
+                for(; colorFeaturesPointer < colorFeatures.length && colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++){
+                    ColoredMarkerSource.removeFeature(colorFeatures[colorFeaturesPointer]);
+                }
+            } else {
+                for(; colorFeaturesPointer < currentObservationList.length && colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++){
+                    var newFeature = new ol.Feature();
+                    newFeature.setGeometry(currentObservationList[colorFeaturesPointer].getGeometry());
+                    newFeature.setStyle(currentObservationList[colorFeaturesPointer].getStyle());
+                    newFeature.setProperties(currentObservationList[colorFeaturesPointer].getProperties());
+                    ColoredMarkerSource.addFeature(newFeature);
+                }
+            }
+            currentMarkerPointer += 2000;
+        }, 17);
+    }
+
+    function stopAddingMarkers(){
+        if(markerAddingInterval != null){
+            clearInterval(markerAddingInterval);
+            markerAddingInterval = null;
+        }
+    }
+
+    function shuffle(array) {
+        var currentIndex = array.length, temporaryValue, randomIndex;
+      
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+      
+          // Pick a remaining element...
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex -= 1;
+      
+          // And swap it with the current element.
+          temporaryValue = array[currentIndex];
+          array[currentIndex] = array[randomIndex];
+          array[randomIndex] = temporaryValue;
+        }
+      
+        return array;
+      }
+      
+
     function selectPinsAndMarkersBasedOnTimeInterval(latestOnly){
         var observations = [];
         var thingLocations = [];
@@ -1164,13 +1219,47 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
             thingLocations = subCollectionFromTimeInterval($scope.selectedRangeStart, $scope.selectedRangeEnd, allLocations, locationIntervalTree);
             thingLocations = distinctThingLocations(thingLocations);
         }
-        var colorFeatures = observations.map(observation => observation.feature);
-        var CloredMarkerCollection = new ol.Collection(colorFeatures);
-        var ColoredMarkerSource = new ol.source.Vector({
-            format: new ol.format.GeoJSON(),
-            features: CloredMarkerCollection
+
+        var thingLocationDict = {};
+        for(var i = 0; i < observations.length; i++){
+            var observation = observations[i];
+            var locationMap = thingLocationDict[observation.thing.id];
+            if(!locationMap){
+                locationMap = {};
+                thingLocationDict[observation.thing.id] = locationMap;
+            }
+            var location = observation.foi.coordinates[0]+"-"+observation.foi.coordinates[1];
+            if(!locationMap[location]){
+                locationMap[location] = observation;
+            }
+            else if(locationMap[location].time.isBefore(observation.time)){
+                locationMap[location] = observation;
+            }
+        }
+        observations.length = 0;
+        var things = Object.keys(thingLocationDict);
+        for(var i = 0; i < things.length; i++){
+            var thingLocationDictEntry = thingLocationDict[things[i]];
+            var locations = Object.keys(thingLocationDictEntry);
+            for(var j = 0; j < locations.length; j++){
+                var location = thingLocationDictEntry[locations[j]];
+                observations.push(location);
+            }
+        }
+
+        currentObservationList = observations.map(observation => observation.feature);
+        shuffle(currentObservationList);
+        currentMarkerPointer = 0;
+        startAddingMarkers();
+
+        //var CloredMarkerCollection = new ol.Collection(colorFeatures);
+        /*ColoredMarkerSource = new ol.source.Vector({
+            features: []
         });
-        ColoredMarkerLayer.setSource(ColoredMarkerSource);
+        ColoredMarkerLayer.setSource(ColoredMarkerSource);*/
+        //ColoredMarkerSource.clear();
+        //ColoredMarkerSource.addFeatures(colorFeatures);
+
 
         var pinFeatures = thingLocations.map(thing => thing.feature);
         var PinCollection = new ol.Collection(pinFeatures);
@@ -1185,6 +1274,7 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
 
     function subCollectionFromTimeInterval(startTime, endTime, array, tree){
         var matches = tree.rangeSearch(startTime.valueOf(), endTime.valueOf());
+        debugger;
         return matches.map(match => array[match.id])
     }
 
@@ -1239,12 +1329,24 @@ gostApp.controller('MapCtrl', function ($scope, $http) {
         $scope.$broadcast('rzSliderForceRender');
     }
 
+    var callback = null;
+
     function applySliderChanges(){
-        $scope.timeRange = humanizedDuration($scope.slider.minValue, $scope.slider.maxValue);
-        $scope.selectedRangeStart = interpolateDate($scope.slider.minValue);
-        $scope.selectedRangeEnd = interpolateDate($scope.slider.maxValue);
-        if(!$scope.showOnlyLatest){
-            selectPinsAndMarkersBasedOnTimeInterval();
+        var localCallback = () => {
+            callback = null;
+            $scope.timeRange = humanizedDuration($scope.slider.minValue, $scope.slider.maxValue);
+            $scope.selectedRangeStart = interpolateDate($scope.slider.minValue);
+            $scope.selectedRangeEnd = interpolateDate($scope.slider.maxValue);
+            if(!$scope.showOnlyLatest){
+                selectPinsAndMarkersBasedOnTimeInterval();
+            }
+        };
+        if(!callback){
+            callback = localCallback;
+            requestAnimationFrame(() => callback());
+        }
+        else{
+            callback = localCallback;
         }
     }
 
