@@ -2,17 +2,17 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
     $scope.id = $routeParams.id;
     $scope.Page.setTitle('THING(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
-    debugger;
 
-    $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")").then(function (response) {
+    $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")?$expand=Locations").then(function (response) {
         $scope.name = response.data["name"];
         $scope.description = response.data["description"];
         $scope.properties = response.data["properties"];
         $scope.Page.selectedThing = response.data;
+        $scope.location = response.data["Locations"][0]["location"]["coordinates"];
+        $scope.showMap = true;
     });
-
     $scope.mapVisible = true;
-
+    
     $scope.tabPropertiesClicked = function () {
     };
 

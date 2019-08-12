@@ -1,7 +1,6 @@
 gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams) {
     $scope.Page.setTitle('THINGS');
     $scope.Page.setHeaderIcon(iconThing);
-    debugger;
     if(!("$orderby" in $routeParams)) $routeParams["$orderby"]="name asc";
 
     var query=getUrl() + "/v1.0/Things"+ Object.keys($routeParams).reduce(
