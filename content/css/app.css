@@ -352,13 +352,9 @@ html{
 
 /*Observations tab pane end*/
 
-
-.card{
-  overflow-x: hidden;
-}
-
 #card-body-map{
   position: relative;
+  overflow-x: hidden;
 }
 
 #observations .card-header{
@@ -5129,16 +5125,25 @@ ul.notifications {
 
 /* ****************************   Map Fullscreen  **************************** */
 
-.fullscreen:fullscreen #map {
+#sensor-map:fullscreen>.card-header{
+  display: none;
+}
+
+#sensor-map:fullscreen #map {
   height: 100%;
 }
 
-#fullscreen:fullscreen{
+#sensor-map:fullscreen #card-body-map {
+  padding: 0;
+  height: 70%;
+}
+
+#sensor-map:fullscreen{
   height: 100%;
   position: relative;
 }
 
-#fullscreen:fullscreen #ControlSidepanel{
+#sensor-map:fullscreen #ControlSidepanel{
   height: 100%;
   top: 0;
 }
@@ -5280,20 +5285,6 @@ ul.notifications {
 #LegendSidepanel.opened{
   transform: none;
 }
-
-.sidepanel#InfoSidepanel {
-  position: relative;
-  top: 0;
-  padding: 4px 24px;
-  margin-top: 8px;
-  margin-bottom: 20px;
-  margin-left: 0px;
-  margin-right: 0px;
-  overflow: hidden;
-}
-
-
-
   /* ----------------------------- closed sidepanel -----------------------------*/
 
 .ol-control{
@@ -5368,33 +5359,22 @@ ul.notifications {
   flex-shrink: 0;
 }
 
+#InfoSidepanel .list-group-item-text{
+  max-height: unset;
+}
+
+#InfoSidepanel .bmd-list-group-col>ul{
+  list-style-type: none;
+  line-height: 1.2rem;
+}
+
+#info-sidepanel-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 /*  ***************  Start Map Timeline ******************* */
-
-.daterangepicker {
-  display: flex !important;
-  position: relative !important;
-  top: unset !important;
-  left: unset !important;
-  right: unset !important;
-  bottom: unset !important;
-  border: none !important;
-  flex-wrap: wrap !important;
-}
-.daterangepicker::after, .daterangepicker::before{
-  display: none !important;
-}
-
-.drp-calendar {
-  float: unset !important;
-  flex-basis: 50% !important;
-  flex-shrink: 0 !important;
-  max-width: unset !important;
-}
-
-.drp-buttons {
-  flex-basis: 100%;
-  flex-shrink: 0;
-}
 
 #collapseHistoricSelection>.card.card-body {
   padding: 0;
@@ -5406,7 +5386,7 @@ ul.notifications {
   top: 50px;
   bottom: 50px;
   left: 80px;
-  right: 80px;
+  right: 100px;
   background-color: rgba(45, 72, 127, 0.2);
   pointer-events: none;
 }
@@ -5524,6 +5504,14 @@ span.rz-pointer {
 
 .card-body-slider{
   border-top: 1px solid rgba(0,0,0,.12);
+}
+
+@media screen and(max-width: 1240px){
+  #calendarHost .daterangepicker{
+    max-height: 400px;
+    overflow-y: scroll;
+    max-width: 278px;
+  }
 }
 
 /*  ***************  End Map Timeline ******************* */

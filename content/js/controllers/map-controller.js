@@ -57,7 +57,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             controls: new ol.Collection([
                 new ol.control.FullScreen({
                     className: "ol-fullscreen-custom",
-                    source: 'fullscreen',
+                    source: 'sensor-map',
                     label: '\uf31e',
                     labelActive: '\uf78c'
                 }),
@@ -231,7 +231,6 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     }
 
     function enableLegendSidepanel() {
-        var element = document.getElementById("LegendSidepanel");
         if (($scope.isColorMarkersActive || $scope.isKrigingActive) == false) {
             $scope.isLegendInvisible = true;
         } else if ($scope.isColorMarkersActive || $scope.isKrigingActive) {
@@ -518,6 +517,9 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             "resulttime": obsresulttime,
             "@iot.id": obsId,
             "FeatureOfInterest": obsFOI,
+            "obspropertyName": obspropertyName,
+            "dsUnit": dsUnit,
+            "obsresult": obsresult,
             "tooltip": obspropertyName + " [" + dsUnit["symbol"] + "]: " + obsresult + "<br>" +
                 "~ " + moment.duration(moment().diff(moment(obsresulttime))).humanize() + " ago",
             "colorFixedPoints": obsPropertyColorFixedPoints
@@ -582,7 +584,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
     var displayFeatureTooltip = function (feature) {
         //var info = document.getElementById('map-feature-tooltip');
-        if (feature) {
+        if (feature && feature.getProperties()["tooltip"]) {
             position = olMap.getPixelFromCoordinate(feature.getGeometry().getCoordinates());
 
             $scope.isTooltipHidden = false;
@@ -652,13 +654,24 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             var info = document.getElementById('map-detailed-tooltip');
             var crosslinks = document.getElementById('map-crosslinks');
             // feature.setStyle({stroke: 'rgba(255,255,255,1.0)'});
-
-
-            info.innerHTML = feature.getProperties()['tooltip'] + "<br />" + 'Phenomenon Time (UTC): ' + observationInfo['phenomenonTime'];
+            var featureInfo = feature.getProperties();
+            $scope.information = {
+                observation: featureInfo.obspropertyName + " [" + featureInfo.dsUnit["symbol"] + "]: " + featureInfo.obsresult,
+                phenomenonTime: observationInfo['phenomenonTime'],
+                thingLink: "#/thing/" + observationInfo['Datastream']['Thing']['@iot.id'] + "?$expand=Locations",
+                thingLinkName: observationInfo['Datastream']['Thing']['name'],
+                datastreamLink: "#/datastream/" + observationInfo['Datastream']['@iot.id'],
+                datastreamLinkName: observationInfo['Datastream']['name'],
+                observedPropertyLink: "#/observedproperty/" + observationInfo['Datastream']['ObservedProperty']['@iot.id'],
+                observedPropertyLinkName: observationInfo['Datastream']['ObservedProperty']['name'],
+                datastreamLinkName: observationInfo['Datastream']['name'],
+                sensorLink: "#/sensor/" + observationInfo['Datastream']['Sensor']['@iot.id'],
+                sensorLinkName: observationInfo['Datastream']['Sensor']['name']
+            }  /*+ "<br />" + 'Phenomenon Time (UTC): ' + observationInfo['phenomenonTime'];
             crosslinks.innerHTML = 'Thing: <a href="#/thing/' + observationInfo['Datastream']['Thing']['@iot.id'] + '?$expand=Locations" target="_blank">' + observationInfo['Datastream']['Thing']['name'] + '</a><br /> ' +
                 'Datastream: <a href="#/datastream/' + observationInfo['Datastream']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['name'] + '</a><br /> ' +
                 'Observed Property: <a href="#/observedproperty/' + observationInfo['Datastream']['ObservedProperty']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['ObservedProperty']['name'] + '</a><br /> ' +
-                'Sensor: <a href="#/sensor/' + observationInfo['Datastream']['Sensor']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['Sensor']['name'] + '</a>';
+                'Sensor: <a href="#/sensor/' + observationInfo['Datastream']['Sensor']['@iot.id'] + '" target="_blank">' + observationInfo['Datastream']['Sensor']['name'] + '</a>';*/
         });
     };
 
@@ -667,13 +680,24 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         $http.get(getUrl() + "/v1.0/Things('" + thingId + "')?$expand=Locations,Datastreams").then(function (response) {
             ThingInfo = response.data;
 
-            var info = document.getElementById('map-detailed-tooltip');
-            var crosslinks = document.getElementById('map-crosslinks');
+            $scope.information = {
+                locationname: ThingInfo['Locations'][0]['name'],
+                coordinates:
+                    {
+                        lat: ThingInfo['Locations'][0]['location']['coordinates']["1"],
+                        long: ThingInfo['Locations'][0]['location']['coordinates']["0"]
+                    },
+                thingLink: "#/thing/" + ThingInfo['@iot.id'] + "?$expand=Locations",
+                thingLinkName:  ThingInfo['name']
+            } 
+
+            //var info = document.getElementById('map-detailed-tooltip');
+            //var crosslinks = document.getElementById('map-crosslinks');
             // feature.setStyle({color: 'rgba(255,64,64,1.0)'});
 
 
-            info.innerHTML = 'Location Name: ' + ThingInfo['Locations'][0]['name'] + "<br />" + "<p>" + 'GPS Coordinates: ' + "<br />" + '&emsp; - Latitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["1"] + "<br />" + '&emsp; - Longitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["0"] + "</p>";
-            crosslinks.innerHTML = 'Thing: <a href="#/thing/' + ThingInfo['@iot.id'] + '?$expand=Locations" target="_blank">' + ThingInfo['name'] + '</a>';
+            //info.innerHTML = 'Location Name: ' + ThingInfo['Locations'][0]['name'] + "<br />" + "<p>" + 'GPS Coordinates: ' + "<br />" + '&emsp; - Latitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["1"] + "<br />" + '&emsp; - Longitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["0"] + "</p>";
+            //crosslinks.innerHTML = 'Thing: <a href="#/thing/' + ThingInfo['@iot.id'] + '?$expand=Locations" target="_blank">' + ThingInfo['name'] + '</a>';
         });
     };
 
@@ -984,35 +1008,49 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     //                  create Timeline / Historic Data Selection
     /************************************************************************************/
 
-    $scope.openHistoricDataCollapse = function () {
-
-    }
-    var nowMoment = moment();
-    $('#historicDataButton').daterangepicker({
-        //parentEl: $("#collapseHistoricSelection .card"),
-        timePicker: true,
-        timePicker24Hour: true,
-        ranges: {
-            'Latest': [nowMoment, nowMoment],
-            'Last Hour': [moment().subtract(1, 'hours'), moment()],
-            'Last 3 Hours': [moment().subtract(3, 'hours'), moment()],
-            'Last 6 Hours': [moment().subtract(6, 'hours'), moment()],
-            'Last 12 Hours': [moment().subtract(12, 'hours'), moment()],
-            'Last 24 Hours': [moment().subtract(24, 'hours'), moment()],
-            'Last 3 Days': [moment().subtract(3, 'days'), moment()]
-        },
-        startDate: moment().subtract(1, 'hours'),
-        endDate: moment(),
-        locale: {
-            format: 'YYYY-MM-DD HH:mm:ss'
+    $scope.$watch('isLoadingData', function() {
+        if(!$scope.isLoadingData){
+            setTimeout(function(){
+                var nowMoment = moment();
+                $('#historicDataButton').daterangepicker({
+                    //parentEl: $("#collapseHistoricSelection .card"),
+                    timePicker: true,
+                    timePicker24Hour: true,
+                    parentEl:"#calendarHost",
+                    drops: "up",
+                    ranges: {
+                        'Latest': [nowMoment, nowMoment],
+                        'Last Hour': [moment().subtract(1, 'hours'), moment()],
+                        'Last 3 Hours': [moment().subtract(3, 'hours'), moment()],
+                        'Last 6 Hours': [moment().subtract(6, 'hours'), moment()],
+                        'Last 12 Hours': [moment().subtract(12, 'hours'), moment()],
+                        'Last 24 Hours': [moment().subtract(24, 'hours'), moment()],
+                        'Last 3 Days': [moment().subtract(3, 'days'), moment()]
+                    },
+                    autoUpdateInput: false,
+                    maxSpan: moment.duration(3, 'days'),
+                    locale: {
+                        format: 'YYYY-MM-DD HH:mm:ss'
+                    }
+                }, otherDateSelected);
+                $('#historicDataButton').on('show.daterangepicker', function(ev, picker) {
+                    $scope.isMapOverlayVisible = false;
+                    $scope.safeApply();
+                });
+                $('#historicDataButton').on('hide.daterangepicker', function(ev, picker) {
+                    $('#historicDataButton').data('daterangepicker').setStartDate(moment());
+                    $('#historicDataButton').data('daterangepicker').setEndDate(moment());
+                });
+            },0);
         }
-    }, otherDateSelected);
+    }, true);
 
     function otherDateSelected(start, end) {
         $scope.startDateMoment = start;
         $scope.endDateMoment = end;
         $scope.startDate = start.format('YYYY-MM-DD HH:mm:ss');
         $scope.endDate = end.format('YYYY-MM-DD HH:mm:ss');
+        ViewfinderSource.clear();
         if(moment.duration(start.diff(end)).asMilliseconds() == 0) {
             loadFeaturesFromServer(true).then(function(){
                 selectPinsAndMarkersBasedOnTimeInterval($scope.showOnlyLatest);
@@ -1022,7 +1060,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         $scope.slider.options.minRange = oneMinuteToRelative();
         $scope.$broadcast('rzSliderForceRender');
         $scope.isMapOverlayVisible = true;
-        ViewfinderSource.clear();
+        $scope.isLegendSidePanelOpen = false;
         $scope.safeApply();
         try {
             $("#map")[0].scrollIntoView();
@@ -1038,24 +1076,18 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         wrapX: false,
     });
     var ViewfinderLayer = new ol.layer.Vector({
-        source: ViewfinderSource,
-        style: [
-            new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: '#2d497f55',
-                    width: 3
-                })
-            })
-        ]
+        source: ViewfinderSource
     });
     togglelayers(ViewfinderLayer, true);
 
-    var timeSortedThings = [];
-    var timeSortedObservations = [];
+    var rawObservationPointer = 0;
+    var rawObservations = [];
+    var rawObservationInterval = null;
+
     var allObservations = [];
     var allLocations = [];
-    var observationIntervalTree = new IntervalTree(0);
-    var locationIntervalTree = new IntervalTree(0);
+    var observationIntervalTree = new NodeIntervalTree.IntervalTree();
+    var locationIntervalTree =  new NodeIntervalTree.IntervalTree();
 
     $scope.confirmHistoricDataSelection = function () {
         var viewseekerBoundaries = $("#mapOverlayUI")[0].getBoundingClientRect();
@@ -1067,13 +1099,23 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             rb: olMap.getCoordinateFromPixel([viewseekerBoundaries.x - mapBoundaries.x + viewseekerBoundaries.width, viewseekerBoundaries.y - mapBoundaries.y + viewseekerBoundaries.height])
         };
         $scope.isMapOverlayVisible = false;
+        var polygon = new ol.geom.Polygon([
+            [viewseekerCoordinates.lt, viewseekerCoordinates.rt, viewseekerCoordinates.rb, viewseekerCoordinates.lb]
+        ]);
         var feature = new ol.Feature({
-            geometry: new ol.geom.Polygon([
-                [viewseekerCoordinates.lt, viewseekerCoordinates.rt, viewseekerCoordinates.rb, viewseekerCoordinates.lb]
-            ])
+            geometry: polygon
         });
+        feature.setStyle(new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: '#2d497f',
+                width: 3
+            })
+        }));
         ViewfinderSource.addFeature(feature);
-        var serverPolygon = feature.getGeometry().transform('EPSG:3857', 'EPSG:4326').getCoordinates()[0];
+        var serverPolygon = new ol.geom.Polygon([
+            [viewseekerCoordinates.lt, viewseekerCoordinates.rt, viewseekerCoordinates.rb, viewseekerCoordinates.lb]
+        ]).transform('EPSG:3857', 'EPSG:4326').getCoordinates()[0];
+        //feature.setGeometry(serverPolygon);
         serverPolygon.push(serverPolygon[0]); //close polygon by repeating first point
         var polygonString = serverPolygon.map(function (coordinates) {
             return coordinates.join(" ");
@@ -1082,7 +1124,13 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     }
 
     function loadFeaturesFromServer(loadLatestOnly, polygonString){
+        $scope.isLoadingData = true;
+        $scope.loadedPercent = 0;
+        if(!loadLatestOnly){
+            $scope.isAutoRefreshActive = false;
+            $scope.changedAutoRefreshActive();
 
+        }
         var timeIntervalObservationsFilter = loadLatestOnly ? "" : "$filter=not (phenomenonTime lt " + $scope.startDateMoment.toISOString() + " or phenomenonTime gt " + $scope.endDateMoment.toISOString() + ");";
         var timeIntervalDatastreamFilter = loadLatestOnly ? "and not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27" : "and not (phenomenonTime lt " + $scope.startDateMoment.toISOString() + " or phenomenonTime gt " + $scope.endDateMoment.toISOString() + ")";
         var observationsOptions = loadLatestOnly ? "$top=1;$orderby=phenomenonTime%20desc;" : "$top=999999;";
@@ -1095,13 +1143,12 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             var thingsPreviouslyInThisRegion = response.data.value.filter(function (thing) {
                 return thing.Datastreams.length > 0;
             });
-            timeSortedThings.length = 0;
-            timeSortedObservations.length = 0;
             allObservations.length = 0;
             allLocations.length = 0;
-            observationIntervalTree = new IntervalTree(0);
+            rawObservations.length = 0;
+            observationIntervalTree = new NodeIntervalTree.IntervalTree();
             //window.observationIntervalTree = observationIntervalTree;
-            locationIntervalTree = new IntervalTree(0);
+            locationIntervalTree = new NodeIntervalTree.IntervalTree();
             thingsPreviouslyInThisRegion.forEach(function (thing) {
                 for(var i = 0; i < thing["HistoricalLocations"].length; i++) {
                     var historicalLocation = thing["HistoricalLocations"][i];
@@ -1113,35 +1160,69 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                         location: historicalLocation.Locations[0].location,
                         feature:  infoToFeature(featureInfo, defaultMarkerStyle, historicalLocation.Locations[0].location)
                     });
-                    locationIntervalTree.add(
-                        moment(historicalLocation.time).valueOf(),
-                        (i < thing["HistoricalLocations"].length - 1) ? moment(thing["HistoricalLocations"][i+1].time).valueOf() : moment().valueOf(),
-                        allLocations.length - 1
-                    );
+                    locationIntervalTree.insert({
+                        low: moment(historicalLocation.time).valueOf(),
+                        high: (i < thing["HistoricalLocations"].length - 1) ? moment(thing["HistoricalLocations"][i+1].time).valueOf() : moment().valueOf(),
+                        id: allLocations.length - 1
+                    });
                 }
                 thing.Datastreams.forEach(datastream => {
                     datastream.Observations.forEach(observation => {
-                        observation.phenomenonTime.split("/").forEach(time => { //splits time for intervals in observations
-                            var momentTime = moment(time);
-                            var featureInfo = transformObservationIntoFeatureInfo(
-                                observation, datastream.ObservedProperty, datastream.unitOfMeasurement);
-                                var observationInfo = {
-                                    time: momentTime,
-                                    thing: thing,
-                                    datastream: datastream,
-                                    originalObservation: observation,
-                                    foi: featureInfo.FeatureOfInterest,
-                                    feature: infoToFeature(featureInfo, stylefunction(featureInfo), featureInfo.FeatureOfInterest)
-                                };
-                                allObservations.push(observationInfo);
-                                observationIntervalTree.add(momentTime.valueOf(), momentTime.valueOf() + 1, allObservations.length - 1);
-                        });
+                        rawObservations.push({datastream: datastream, observation: observation, thing: thing});
                     });
                 });
+                startMakingColorFeatures();
                 $scope.showOnlyLatest = loadLatestOnly;
                 $scope.selectDuration(moment.duration(10, "minutes"));
             });
         });
+    }
+
+    function makeColorFeatures(){
+        for (var currentRawObservationPointer = rawObservationPointer; currentRawObservationPointer < rawObservationPointer + 100 && currentRawObservationPointer < rawObservations.length; currentRawObservationPointer++) {
+            var observation = rawObservations[currentRawObservationPointer].observation;
+            var datastream = rawObservations[currentRawObservationPointer].datastream;
+            var thing = rawObservations[currentRawObservationPointer].thing;
+            observation.phenomenonTime.split("/").forEach(time => { //splits time for intervals in observations
+                var momentTime = moment(time);
+                var featureInfo = transformObservationIntoFeatureInfo(
+                    observation, datastream.ObservedProperty, datastream.unitOfMeasurement);
+                var observationInfo = {
+                    time: momentTime,
+                    thing: thing,
+                    datastream: datastream,
+                    originalObservation: observation,
+                    foi: featureInfo.FeatureOfInterest,
+                    feature: infoToFeature(featureInfo, stylefunction(featureInfo), featureInfo.FeatureOfInterest)
+                };
+                allObservations.push(observationInfo);
+                observationIntervalTree.insert({
+                    low: momentTime.valueOf(),
+                    high: momentTime.valueOf() + 1,
+                    id: allObservations.length - 1
+                });
+            });
+        }
+        $scope.loadedPercent = Math.round((currentRawObservationPointer / (rawObservations.length || 1)) * 100);
+        if(rawObservationPointer >= rawObservations.length){
+            stopMakingColorFeatures();
+            selectPinsAndMarkersBasedOnTimeInterval($scope.showOnlyLatest);
+            $scope.isLoadingData = false;
+        }
+        rawObservationPointer = currentRawObservationPointer;
+        $scope.safeApply();
+    }
+
+    function startMakingColorFeatures(){
+        rawObservationPointer = 0;
+        stopMakingColorFeatures();
+        rawObservationInterval = setInterval(makeColorFeatures, 0);
+    }
+
+    function stopMakingColorFeatures(){
+        rawObservationPointer = 0;
+        clearInterval(rawObservationInterval);
+        rawObservationInterval = null;
     }
 
     var currentMarkerPointer = 0;
@@ -1218,15 +1299,20 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             observations = subCollectionFromTimeInterval($scope.selectedRangeStart, $scope.selectedRangeEnd, allObservations, observationIntervalTree);
             thingLocations = subCollectionFromTimeInterval($scope.selectedRangeStart, $scope.selectedRangeEnd, allLocations, locationIntervalTree);
             thingLocations = distinctThingLocations(thingLocations);
+            if(!$scope.isColorMarkersActive){
+                $scope.isColorMarkersActive = true;
+                togglelayers(ColoredMarkerLayer, $scope.isColorMarkersActive);
+                enableLegendSidepanel();
+            }
         }
 
         var thingLocationDict = {};
         for(var i = 0; i < observations.length; i++){
             var observation = observations[i];
-            var locationMap = thingLocationDict[observation.thing.id];
+            var locationMap = thingLocationDict[observation.thing["@iot.id"]];
             if(!locationMap){
                 locationMap = {};
-                thingLocationDict[observation.thing.id] = locationMap;
+                thingLocationDict[observation.thing["@iot.id"]] = locationMap;
             }
             var location = observation.foi.coordinates[0]+"-"+observation.foi.coordinates[1];
             if(!locationMap[location]){
@@ -1273,7 +1359,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     }
 
     function subCollectionFromTimeInterval(startTime, endTime, array, tree){
-        var matches = tree.rangeSearch(startTime.valueOf(), endTime.valueOf());
+        var matches = tree.search(startTime.valueOf(), endTime.valueOf());
         debugger;
         return matches.map(match => array[match.id])
     }
