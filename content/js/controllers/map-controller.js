@@ -1046,6 +1046,12 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         }
     }, true);
 
+    $scope.$watchGroup(['showOnlyLatest', 'isInfoSidePanelClosed', 'isLoadingData'], function () {
+        setTimeout(function () {
+            olMap.updateSize();
+        }, 20);
+    });
+
     function otherDateSelected(start, end) {
         $scope.startDateMoment = start;
         $scope.endDateMoment = end;
