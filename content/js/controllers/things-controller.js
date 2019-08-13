@@ -1,8 +1,7 @@
 gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams) {
     $scope.Page.setTitle('THINGS');
     $scope.Page.setHeaderIcon(iconThing);
-
-    if(! "$orderby" in $routeParams) $routeParams["$orderby"]="name asc";
+    if(!("$orderby" in $routeParams)) $routeParams["$orderby"]="name asc";
 
 
     //Implement Server Query Language in Static urls

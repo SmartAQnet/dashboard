@@ -1,8 +1,20 @@
 //First line should be empty or a comment (this comment). Line is overwritten by the docker-entrypoint script
-var gostApp = angular.module('gostApp', ['ngRoute', 'vs-repeat']);
+var gostApp = angular.module('gostApp', ['ngRoute', 'vs-repeat', 'rzSlider']);
 
 gostApp.run(function($rootScope, $window) {
-  $rootScope.$window = $window;
+	$rootScope.$window = $window;
+	/* This function allows to trigger AngularJS' recalculation if the scope was externally changed */
+	$rootScope.safeApply = function(fn) {
+		if(!this.$root) return;
+		var phase = this.$root.$$phase;
+		if(phase == '$apply' || phase == '$digest') {
+			if(fn && (typeof(fn) === 'function')) {
+				fn();
+			}
+		} else {
+			this.$apply(fn);
+		}
+	};
 });
 
 gostApp.factory('Page', function () {
@@ -24,6 +36,7 @@ gostApp.config(function ($routeProvider) {
 		when('/sensors', { templateUrl: window.dashboardSettings.root + 'views/sensors.html', controller: "SensorsCtrl", activetab: 'sensors' }).
 		when('/sensor/:id', { templateUrl: window.dashboardSettings.root + 'views/sensor.html', controller: "SensorCtrl", activetab: 'sensors' }).
 		when('/observedproperty/:id', { templateUrl: window.dashboardSettings.root + 'views/observedproperty.html', controller: "ObservedPropertyCtrl", activetab: 'properties' }).
+		when('/:patchthingy/:id/patch', { templateUrl: window.dashboardSettings.root + 'views/observedproperty.html', controller: "ObservedPropertyCtrl", activetab: 'properties' }).
 		when('/observedproperties', { templateUrl: window.dashboardSettings.root + 'views/observedproperties.html', controller: "ObservedPropertiesCtrl", activetab: 'properties' }).
 		when('/datastream/:id', { templateUrl: window.dashboardSettings.root + 'views/datastream.html', controller: "DatastreamCtrl", activetab: 'things' }).
 		when('/datastreams', { templateUrl: window.dashboardSettings.root + 'views/datastreams.html', controller: "DatastreamsCtrl", activetab: 'sensors' }).

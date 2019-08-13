@@ -10,27 +10,6 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         $scope.latestFoI = response.data.value[0]["FeatureOfInterest"]["feature"];
     });
 */
-    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/ObservedProperty").then(function (response) {
-        $scope.observedPropertyId = response.data["@iot.id"];
-        $scope.observedPropertyName = response.data["name"];
-        $scope.observedPropertyDescription = response.data["description"];
-        $scope.observedPropertyDefinition = response.data["definition"];
-        $scope.showMap = true;
-    });
-
-    
-
-
-    $scope.safeApply = function(fn) {
-        var phase = this.$root.$$phase;
-        if(phase == '$apply' || phase == '$digest') {
-          if(fn && (typeof(fn) === 'function')) {
-            fn();
-          }
-        } else {
-          this.$apply(fn);
-        }
-      };
 
     var datastreams = new Datastreams($http);
     $scope.datastreams = datastreams;
@@ -123,17 +102,23 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     //     $scope.thingId = response.data["@iot.id"];
     //     $scope.thingName = response.data["name"];
     // });
-
-    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")?$expand=Thing").then(function (response) {
+    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")?$expand=Thing($expand=Locations),ObservedProperty").then(function (response) {
         $scope.thingId = response.data["Thing"]["@iot.id"];
         $scope.thingName = response.data["Thing"]["name"];
+        $scope.location = response.data["Thing"]["Locations"][0]["location"]["coordinates"];
         $scope.name = response.data["name"];
         $scope.description = response.data["description"];
         $scope.unitOfMeasurement = response.data["unitOfMeasurement"];
         $scope.observedArea = response.data["observedArea"];
         $scope.Page.selectedDatastream = response.data;
-    });
 
+        $scope.observedPropertyId = response.data["ObservedProperty"]["@iot.id"];
+        $scope.observedPropertyName = response.data["ObservedProperty"]["name"];
+        $scope.observedPropertyDescription = response.data["ObservedProperty"]["description"];
+        $scope.observedPropertyDefinition = response.data["ObservedProperty"]["definition"];
+
+        $scope.showMap = true;
+    });
 
     $scope.mapVisible = true;
 
