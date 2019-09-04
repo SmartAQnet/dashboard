@@ -317,6 +317,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         })), zIndex: 3
     });
 
+    /*
     var currentMarkerStyle = new ol.style.Style({
         image: new ol.style.Icon(({
             anchor: [0.5, 1],
@@ -334,7 +335,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         var feature = olMap.forEachFeatureAtPixel(pixel, function(feature) {return feature});
         feature.setStyle(currentMarkerStyle);
     };
-
+    */
     
 
 
