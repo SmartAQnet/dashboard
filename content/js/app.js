@@ -1,4 +1,4 @@
-//First line should be empty or a comment (this comment). Line is overwritten by the docker-entrypoint script
+var wsURL = "";
 var gostApp = angular.module('gostApp', ['ngRoute', 'vs-repeat', 'rzSlider']);
 
 gostApp.run(function($rootScope, $window) {

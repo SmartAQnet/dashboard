@@ -43,6 +43,9 @@ html{
   flex-basis: 200px;
   flex-shrink: 0;
 }
+.dashboard-menu .nav-item{
+  flex: 0 1 auto;
+}
 
 .dashboard-menu a{
   color: white;
@@ -371,6 +374,10 @@ html{
 html, body, #map {
   padding: 0;
   margin: 0;
+}
+
+.map-container .card{
+  background: white;
 }
 
 #map {
@@ -870,7 +877,8 @@ body .container.body .right_col {
 .container {
   height: 100%;
   width: 100%;
-  padding: 0
+  padding: 0;
+  max-width: unset;
 }
 .navbar-nav>li>a, .navbar-brand, .navbar-nav>li>a {
   color: #fff !important;
@@ -5205,8 +5213,8 @@ ul.notifications {
   position: absolute;
   height: calc(100% - 40px); 
   width: 250px; 
-  top: 20px;
-  right: 0;
+  top: 10px;
+  right: 10px;
   overflow: visible;
   transform: translateX(100%) translatex(10px);
   transition: transform 0.2s;
@@ -5235,13 +5243,18 @@ ul.notifications {
   position: absolute;
   bottom: 30px;
   right: 30px;
+  width: 60px;
+  height: 60px;
   z-index: unset !important;
+  background-color: #2d497f;
 }
 
 #legendButton{
   position: absolute;
   bottom: 30px;
   left: 30px;
+  width: 40px;
+  height: 40px;
   z-index: unset !important;
 }
 

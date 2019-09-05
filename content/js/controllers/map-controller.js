@@ -626,9 +626,10 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         $scope.safeApply();
     };
 
-    olMap.on('pointermove', function (evt) {
+    olMap.on(['pointermove', 'click'], function (evt) {
         if (evt.dragging) {
-            return
+            displayFeatureTooltip(null);
+            return;
         };
 
         var pixel = olMap.getEventPixel(evt.originalEvent);
