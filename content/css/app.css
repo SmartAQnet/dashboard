@@ -22,9 +22,11 @@ html{
   padding: 0;
 }
 
+/* //shows scrollbar at 100% width
 .tab-pane{
   overflow-x: auto;
 }
+*/
 
 @media (min-width: 768px) {
 .bs-glyphicons {
@@ -127,6 +129,7 @@ html{
 .entityInfo{
     margin-top: 20px;
     margin-left: 10px;
+    margin-right: 10px;
 }
 
 .entityInfoHeader{
@@ -5016,7 +5019,7 @@ ul.notifications {
   color: #000000; 
   cursor: pointer;
   padding: 18px;
-  width: 99%;
+  width: 100%;
   border: none;
   text-align: left;
   outline: none;
