@@ -63,7 +63,7 @@ function getUrl() {
 	if (typeof stURL !== 'undefined') {
 		return stURL   
 	} else if (window.location.protocol.localeCompare("file:"  !== '0')) {
-		return "https://api.smartaq.net"
+		return "http://localhost"
 		//return "https://smartaqnet-dev.dmz.teco.edu"
 	}
 	return "";

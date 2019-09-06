@@ -63,7 +63,7 @@ echo "
     index index.html;
 	
 	location /v1.0 {
-		proxy_pass http://api.smartaq.net/v1.0;
+		proxy_pass http://frost:8080/FROST-Server/v1.0;
 
 		if (\$request_method = 'OPTIONS') {
 		   add_header 'Access-Control-Allow-Origin' '*' always;
