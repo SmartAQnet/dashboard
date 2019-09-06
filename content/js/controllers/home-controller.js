@@ -19,7 +19,7 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	// });	
 
 
-
+/*
 	$scope.setObservations=function(){
 		if(count==0)
 		{
@@ -41,8 +41,35 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 			});
 		}
 		else
-		{	
+		{
 			$scope.n_observations++;
+			$scope.obs_string = $scope.n_observations.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+			count--; 
+			if(interval>0) window.setTimeout($scope.setObservations, interval);
+		}
+		$scope.$apply()
+	};
+*/
+
+$http.get(getUrl() + "/v1.0/Observations?$top=0&$filter=phenomenonTime%20lt%20now()%20sub%20duration%27PT60s%27&$count=true").then(function (response) {
+	count60sago=response.data["@iot.count"]
+	$scope.n_observations=count60sago;
+
+	$scope.setObservations=function(){
+		if(count==0)
+		{
+				$http.get(getUrl() + "/v1.0/Observations?$top=0&$filter=phenomenonTime%20lt%20now()%20sub%20duration%27PT30s%27&$count=true").then(function (response) {
+					count30sago=response.data["@iot.count"]
+					count = count30sago - $scope.n_observations;
+					interval = 30000/count;
+					window.setTimeout($scope.setObservations, 0);
+				});
+			
+		}
+		else
+		{
+			$scope.n_observations++;
+			$scope.obs_string = $scope.n_observations.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 			count--; 
 			if(interval>0) window.setTimeout($scope.setObservations, interval);
 		}
@@ -50,6 +77,7 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	};
 
 	window.setTimeout($scope.setObservations, 0);
+});
 
 			// $http.get(getUrl() + "/v1.0/Observations?$top=0&$filter=phenomenonTime%20lt%20now()%20sub%20duration%27PT60s%27&$count=true").then(function (response) {
 			// 	count60sago=response.data["@iot.count"]});

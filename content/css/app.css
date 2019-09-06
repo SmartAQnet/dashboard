@@ -5529,6 +5529,12 @@ span.rz-pointer {
   display: none; 
 } 
 
+.gradient-border {
+  border: 2px solid transparent !important;
+  border-image: linear-gradient(to bottom right, #2d497f 0%, white 20%, white 80%, #2d497f 100%) !important;
+  border-image-slice: 1 !important;
+}
+
 
 .indent-inputlines{
   padding-left: 10%;
