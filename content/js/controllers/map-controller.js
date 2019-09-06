@@ -455,6 +455,14 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         collection.push(feature);
     };
 
+    /**
+     * Creates an OpenLayers feature attached with the given properties in the allinfo object, style and location
+     *
+     * @param {*} allinfo information attached to the feature
+     * @param {*} style style f the feature
+     * @param {*} location GeoJSON location
+     * @returns OL feature
+     */
     function infoToFeature(allinfo, style, location) {
         var defaultGeoJSONProjection = 'EPSG:4326';
         var mapProjection = olMap.getView().getProjection();
@@ -525,15 +533,18 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         return featureinfo;
     }
 
+    /**
+     * Get an object that contains all information to display a thing feature
+     *
+     * @param {*} thing as returned by API
+     * @param {*} location GeoJSON location as returned by API
+     * @returns {location, locationname, @iot.id, thingname, tooltip}
+     */
     function transformThingIntoFeatureInfo(thing, location) {
         var thinglocation = location["location"];
         var thinglocationname = location["name"];
         var thingid = thing["@iot.id"]
         var thingname = thing["name"]
-        /*if (!$scope.wasAlreadyCentered && $scope.id == thingid) {
-            $scope.$emit("centerOn", thinglocation);
-            $scope.wasAlreadyCentered = true;
-        }*/
 
         featureinfo = {
             "location": thinglocation,
@@ -1014,11 +1025,15 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         if (!$scope.isLoadingData) {
             setTimeout(function () {
                 var nowMoment = moment();
+                /*
+                    reinitialize Daterangepicker. Allows picking the same date range again.
+                    Usually the callback is not called if a user selects the same interval twice.
+                */
                 $('#historicDataButton').daterangepicker({
                     //parentEl: $("#collapseHistoricSelection .card"),
                     timePicker: true,
                     timePicker24Hour: true,
-                    parentEl: "#calendarHost",
+                    parentEl: "#calendarHost", //default parent (body) is not visible in fullscreen mode
                     drops: "up",
                     ranges: {
                         'Latest': [nowMoment, nowMoment],
@@ -1048,6 +1063,11 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     }, true);
 
     $scope.$watchGroup(['showOnlyLatest', 'isInfoSidePanelClosed', 'isLoadingData'], function () {
+        /*
+            All events that could lead to a change of size in a child container
+            (e.g. selecting a new feature might expand the detailed info panel)
+            require the map to update its size to prevent a stretched map.
+        */
         setTimeout(function () {
             olMap.updateSize();
         }, 20);
@@ -1058,8 +1078,10 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         $scope.endDateMoment = end;
         $scope.startDate = start.format('YYYY-MM-DD HH:mm:ss');
         $scope.endDate = end.format('YYYY-MM-DD HH:mm:ss');
+        //Remove the rectangle that visualized the previous area of loaded data
         ViewfinderSource.clear();
         if (moment.duration(start.diff(end)).asMilliseconds() == 0) {
+            //An empty interval signals that only latest data points should be loaded
             loadFeaturesFromServer(true).then(function () {
                 selectPinsAndMarkersBasedOnTimeInterval($scope.showOnlyLatest);
             });
@@ -1067,6 +1089,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         }
         $scope.slider.options.minRange = oneMinuteToRelative();
         $scope.$broadcast('rzSliderForceRender');
+        //activates the overlay which enables users to select an area on the map
         $scope.isMapOverlayVisible = true;
         $scope.isLegendSidePanelOpen = false;
         $scope.safeApply();
@@ -1088,15 +1111,22 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     });
     togglelayers(ViewfinderLayer, true);
 
+    // Points to the observation to create a feature for in the next round. See makeColorFeatures()
     var rawObservationPointer = 0;
+    // Array of {datastream, thing, observation}
     var rawObservations = [];
+    //Interval that creates new observation features. See startMakingColorFeatures()
     var rawObservationInterval = null;
 
+    //Array of {time, thing, datastream, originalObservation, foi, feature}
     var allObservations = [];
+    // Array of {time, thing, location, feature}
     var allLocations = [];
     var observationIntervalTree = new NodeIntervalTree.IntervalTree();
     var locationIntervalTree = new NodeIntervalTree.IntervalTree();
-
+    /*
+        Adds a ractangle to the map that signals area to load data from and loads data from server
+    */
     $scope.confirmHistoricDataSelection = function () {
         var viewseekerBoundaries = $("#mapOverlayUI")[0].getBoundingClientRect();
         var mapBoundaries = $("#map")[0].getBoundingClientRect();
@@ -1120,6 +1150,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             })
         }));
         ViewfinderSource.addFeature(feature);
+        //Polygon in the projection used by the server
         var serverPolygon = new ol.geom.Polygon([
             [viewseekerCoordinates.lt, viewseekerCoordinates.rt, viewseekerCoordinates.rb, viewseekerCoordinates.lb]
         ]).transform('EPSG:3857', 'EPSG:4326').getCoordinates()[0];
@@ -1131,6 +1162,17 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         loadFeaturesFromServer(false, polygonString);
     }
 
+    /**
+     *  Starts a Http Get Request that loads things and observations of datastreams which fit the selected ObservedProperty
+     *  The function loads either a time interval specified by $scope.startDateMoment/$scope.endDateMoment
+     *  or only the latest data point in each datastream.
+     *  If a polgon is passed to the function, the query is further constrained to the area of the polygon.
+     *  
+     *
+     * @param {*} loadLatestOnly if set, only latest observation of datastreams not longer inactive than one day are loaded
+     * @param {*} polygonString string of form "ALong ALat,BLong BLat,CLong CLat,DLong DLat,ALong ALat". Constraints query
+     * @returns the angular HTTP Promise
+     */
     function loadFeaturesFromServer(loadLatestOnly, polygonString) {
         $scope.isLoadingData = true;
         $scope.loadedPercent = 0;
@@ -1139,25 +1181,40 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             $scope.changedAutoRefreshActive();
 
         }
-        var timeIntervalObservationsFilter = loadLatestOnly ? "" : "$filter=not (phenomenonTime lt " + $scope.startDateMoment.toISOString() + " or phenomenonTime gt " + $scope.endDateMoment.toISOString() + ");";
-        var timeIntervalDatastreamFilter = loadLatestOnly ? "and not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27" : "and not (phenomenonTime lt " + $scope.startDateMoment.toISOString() + " or phenomenonTime gt " + $scope.endDateMoment.toISOString() + ")";
-        var observationsOptions = loadLatestOnly ? "$top=1;$orderby=phenomenonTime%20desc;" : "$top=999999;";
+        var timeIntervalObservationsFilter = loadLatestOnly ?
+            //no observation time constraint
+            "" : 
+            //only observations not before $scope.startDateMoment and not after $scope.endDateMoment
+            "$filter=not (phenomenonTime lt " + $scope.startDateMoment.toISOString() + " or phenomenonTime gt " + $scope.endDateMoment.toISOString() + ");";
+        var timeIntervalDatastreamFilter = loadLatestOnly ?
+            //only datastreams not older than one day
+            "and not%20Datastream/PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27" :
+            //only datastreams not before $scope.startDateMoment and not after $scope.endDateMoment
+            "and not (phenomenonTime lt " + $scope.startDateMoment.toISOString() + " or phenomenonTime gt " + $scope.endDateMoment.toISOString() + ")";
+        var observationsOptions = loadLatestOnly ?
+            //only latest observation
+            "$top=1;$orderby=phenomenonTime%20desc;" :
+            //all observations (sorting not necessary, done implicitly when building interval tree)
+            "$top=999999;";
         var filterLocation = polygonString ? " and st_within(HistoricalLocations/Location/location,%20geography%27POLYGON((" + polygonString + "))%27)" : "";
 
         return $http.get(getUrl() + "/v1.0/Things?$expand=" + "HistoricalLocations/Locations," + "Datastreams" +
             "($filter=ObservedProperty/@iot.id eq '" + obsproperty + "' " + timeIntervalDatastreamFilter + ";" +
             "$expand=ObservedProperty,Observations(" + timeIntervalObservationsFilter + observationsOptions + "$expand=FeatureOfInterest))" +
             "&$filter=Datastreams/ObservedProperty/@iot.id eq '" + obsproperty + "'" + filterLocation).then(function (response) {
+                //all returned things with at least one datastream
             var thingsPreviouslyInThisRegion = response.data.value.filter(function (thing) {
                 return thing.Datastreams.length > 0;
             });
+            //Clear arrays
             allObservations.length = 0;
             allLocations.length = 0;
             rawObservations.length = 0;
             observationIntervalTree = new NodeIntervalTree.IntervalTree();
-            //window.observationIntervalTree = observationIntervalTree;
+
             locationIntervalTree = new NodeIntervalTree.IntervalTree();
             thingsPreviouslyInThisRegion.forEach(function (thing) {
+                //Create a feature for every HistoricalLocation of the thing and add it to the location interval tree
                 for (var i = 0; i < thing["HistoricalLocations"].length; i++) {
                     var historicalLocation = thing["HistoricalLocations"][i];
                     if (historicalLocation["Locations"].length < 1) return;
@@ -1168,12 +1225,17 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                         location: historicalLocation.Locations[0].location,
                         feature: infoToFeature(featureInfo, defaultMarkerStyle, historicalLocation.Locations[0].location)
                     });
+                    //Add entry to interval tree. Contains indices to elements in allLocations.
                     locationIntervalTree.insert({
                         low: moment(historicalLocation.time).valueOf(),
-                        high: (i < thing["HistoricalLocations"].length - 1) ? moment(thing["HistoricalLocations"][i + 1].time).valueOf() : moment().valueOf(),
-                        id: allLocations.length - 1
+                        high: (i < thing["HistoricalLocations"].length - 1) ? moment(thing["HistoricalLocations"][i + 1].time).valueOf() : moment().valueOf(), //interval ends at next location or now
+                        id: allLocations.length - 1 //index of elements in allLocations
                     });
                 }
+                /*
+                    Builds the rawObservations array.
+                    Observation features are not created now but asynchronly to prevent hangs
+                */
                 thing.Datastreams.forEach(function (datastream) {
                     return datastream.Observations.forEach(function (observation) {
                         return rawObservations.push({
@@ -1183,6 +1245,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                         });
                     });
                 });
+                //Start feature generation for observations
                 startMakingColorFeatures();
                 $scope.showOnlyLatest = loadLatestOnly;
                 $scope.selectDuration(moment.duration(10, "minutes"));
@@ -1190,6 +1253,9 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         });
     }
 
+    /**
+     * Create a feature for an observation and add it to the observation interval tree
+     */
     function makeColorFeatures() {
         for (var currentRawObservationPointer = rawObservationPointer; currentRawObservationPointer < rawObservationPointer + 100 && currentRawObservationPointer < rawObservations.length; currentRawObservationPointer++) {
             var observation = rawObservations[currentRawObservationPointer].observation;
@@ -1225,30 +1291,43 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         $scope.safeApply();
     }
 
+    /**
+     * Starts the process of creating observation features
+     */
     function startMakingColorFeatures() {
         rawObservationPointer = 0;
         stopMakingColorFeatures();
         rawObservationInterval = setInterval(makeColorFeatures, 0);
     }
 
+    /**
+     * Stops the process of creating observation features
+     */
     function stopMakingColorFeatures() {
         rawObservationPointer = 0;
         clearInterval(rawObservationInterval);
         rawObservationInterval = null;
     }
 
+    //Points to the feature to be added in the next round. See startAddingMarkers/markerAddingInterval
     var currentMarkerPointer = 0;
+    //Array of ol features for display
     var currentObservationList = [];
     var markerAddingInterval = null;
 
+    /**
+     * Adds observation features to the map
+     */
     function startAddingMarkers() {
         stopAddingMarkers();
         var colorFeatures = ColoredMarkerSource.getFeatures();
+        //Add 2000 at a time, then wait 17ms
         markerAddingInterval = setInterval(function () {
             if (currentMarkerPointer >= currentObservationList.length && currentMarkerPointer >= colorFeatures.length) {
                 stopAddingMarkers();
                 return;
             }
+            //While there are features in the map from last interval, reuse old features
             for (var colorFeaturesPointer = currentMarkerPointer; colorFeaturesPointer < colorFeatures.length &&
                 colorFeaturesPointer < currentObservationList.length &&
                 colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++) {
@@ -1256,11 +1335,14 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                 colorFeatures[colorFeaturesPointer].setStyle(currentObservationList[colorFeaturesPointer].getStyle());
                 colorFeatures[colorFeaturesPointer].setProperties(currentObservationList[colorFeaturesPointer].getProperties());
             }
+            //If there were more features in the old map, delete unused old features
             if (colorFeaturesPointer < colorFeatures.length) {
                 for (; colorFeaturesPointer < colorFeatures.length && colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++) {
                     ColoredMarkerSource.removeFeature(colorFeatures[colorFeaturesPointer]);
                 }
-            } else {
+            }
+            //If there were less features in the old map, create new ones
+            else {
                 for (; colorFeaturesPointer < currentObservationList.length && colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++) {
                     var newFeature = new ol.Feature();
                     newFeature.setGeometry(currentObservationList[colorFeaturesPointer].getGeometry());
@@ -1273,6 +1355,9 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         }, 17);
     }
 
+    /**
+     * Stopps the current process of adding markers
+     */
     function stopAddingMarkers() {
         if (markerAddingInterval != null) {
             clearInterval(markerAddingInterval);
@@ -1280,7 +1365,14 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         }
     }
 
-    function shuffle(array) {
+    
+        /**
+         * Shuffles an array in-place: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+         *
+         * @param {*} array to be shuffled (is mutated)
+         * @returns shuffled array
+         */
+        function shuffle(array) {
         var currentIndex = array.length,
             temporaryValue, randomIndex;
 
@@ -1300,7 +1392,12 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         return array;
     }
 
-
+    /**
+     * Displays observations and locations on map.
+     * If not latestOnly, feature's time must be within $scope.selectedRangeStart and $scope.selectedRangeEnd
+     *
+     * @param {*} latestOnly only display latest features
+     */
     function selectPinsAndMarkersBasedOnTimeInterval(latestOnly) {
         var observations = [];
         var thingLocations = [];
@@ -1318,6 +1415,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             }
         }
 
+        //Dictionary( ThingId -> Dictionary (Location -> feature)), is used to get only latest feature if features of one thing overlap
         var thingLocationDict = {};
         for (var i = 0; i < observations.length; i++) {
             var observation = observations[i];
@@ -1373,6 +1471,16 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         //addColorFeature()
     }
 
+    /**
+     * Searches in interval tree for features.
+     * the tree nodes contain ids of elements in array.
+     * 
+     * @param {*} startTime
+     * @param {*} endTime
+     * @param {*} array
+     * @param {*} tree
+     * @returns
+     */
     function subCollectionFromTimeInterval(startTime, endTime, array, tree) {
         var matches = tree.search(startTime.valueOf(), endTime.valueOf());
         return matches.map(function (match) {
@@ -1380,6 +1488,12 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         })
     }
 
+    /**
+     * Get array of thing Locations if locations do not overlap
+     *
+     * @param {*} thingLocations
+     * @returns
+     */
     function distinctThingLocations(thingLocations) {
         var ids = [];
         var distinctThingLocations = [];
