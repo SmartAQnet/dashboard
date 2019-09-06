@@ -16,12 +16,78 @@
                         <pre class="entityInfoInfo">{{name}}</pre>
                         <span class="entityInfoHeader">Description</span><br />
                         <pre class="entityInfoInfo">{{description}}</pre>
+
+                        <!-- Collapsible -->
                         <button class="collapsible">
                             <span class="entityInfoHeader">Properties</span> <br />
                         </button>
                         <div class="collapsible-content">
                             <pre class="entityInfoInfo">{{properties | json:4}}</pre>
                         </div>
+
+                        <!-- Patch modal -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#patchThing">Patch</button>
+                        <div class="modal fade" id="patchThing" role="dialog">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header p-3 mb-2 bg-primary text-white">
+                                        <h2 class="modal-title"><i class="fa fa-cube"></i>PATCH THING</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div>
+                                            <h3 class="modal-title">Thing</h3>
+                                            <div class="input-group">
+                                                <span class="input-group-addon" >Name: </span>
+                                                <input class="form-control" type="text" ng-model="patchThing.name" aria-describedby="thingnamehelpblock" />
+                                                <small id="thingnamehelpblock" class="form-text text-muted">Human readable name of the thing. </small>
+                                            </div>
+                                            <div class="input-group">
+                                                <span class="input-group-addon" >Description: </span>
+                                                <input class="form-control" type="text" ng-model="patchThing.description" aria-describedby="thingdescriptionhelpblock"/>
+                                                <small id="thingdescriptionhelpblock" class="form-text text-muted">Human readable description of the thing. </small>
+                                            </div>
+                                            <h5 class="modal-title">Properties: </h5>
+                                            <div class="indent-inputlines">
+                                                <div class="form-group">
+                                                    <label for="deviceidInput">Device ID: </label>
+                                                    <input class="form-control" id="deviceidInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="patchThing.properties['device_id']" aria-describedby="thingpropertiesdeviceidhelpblock">
+                                                    <small id="thingpropertiesdeviceidhelpblock" class="form-text text-muted">Some Identifier of the Thing. <span class="text-warning">Necessary for ID generation. Only Lowercase Letters. </span></small>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="commissioningdateInput">Device Commissioning Date: </label>
+                                                    <input class="form-control" id="commissioningdateInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="patchThing.properties['commissioning_date']" aria-describedby="thingpropertiescommissioningdatehelpblock">
+                                                    <small id="thingpropertiescommissioningdatehelpblock" class="form-text text-muted">Commissioning Date of the Thing. <span class="text-warning">Necessary for ID generation. Only Lowercase Letters. </span></small>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="devicenameInput">Device Name: </label>
+                                                    <input class="form-control" id="devicenameInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="patchThing.properties['device_name']" aria-describedby="thingpropertiesdevicenamehelpblock"> 
+                                                    <small id="thingpropertiesdevicenamehelpblock" class="form-text text-muted">Short Name of the Thing. <span class="text-warning">Necessary for ID generation. Only Lowercase Letters. </span></small>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="operatorurlInput">Device Operator URL: </label>
+                                                    <input class="form-control" id="operatorurlInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="patchThing.properties['operator_url']" aria-describedby="thingpropertiesoperatorurlhelpblock">
+                                                    <small id="thingpropertiesoperatorurlhelpblock" class="form-text text-muted">Operator URL of the Thing. <span class="text-warning">Necessary for ID generation. Only Lowercase Letters. </span></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <form class="form-inline">
+                                            <div class="form-group" id="patchpwcontainer">
+                                                <label for="inputpatchpw">Input patch password</label>
+                                                <input ng-model="patchpw" type="password" id="inputpatchpw" class="form-control mx-sm-3">
+                                                <small id="patchpwHelpInline"> 
+                                                    {{pwvalid}}
+                                                </small>
+                                            </div>
+                                        </form>
+                                        <input type="submit" class="btn btn-default" ng-click="pathEntity(patchThing)" value="Save" />
+                                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Patch modal end -->
                     </div>
                 </div>
                 <div class="tab-pane" id="locations">

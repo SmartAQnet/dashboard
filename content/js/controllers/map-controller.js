@@ -1161,7 +1161,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                 for (var i = 0; i < thing["HistoricalLocations"].length; i++) {
                     var historicalLocation = thing["HistoricalLocations"][i];
                     if (historicalLocation["Locations"].length < 1) return;
-                    var featureInfo = transformThingIntoFeatureInfo(thing, historicalLocation.Locations[0]);
+                    var featureInfo = transformThingIntoFeatureInfo(thing, historicalLocation.Locations[0]); //no .location after Locations[0] otherwise we cant get the name
                     allLocations.push({
                         time: moment(historicalLocation.time),
                         thing: thing,
