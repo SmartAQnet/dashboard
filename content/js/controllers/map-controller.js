@@ -542,6 +542,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             "thingname": thingname,
             "tooltip": "Located at: " + thinglocationname
         };
+        console.log(featureinfo)
         return featureinfo;
     }
 
@@ -1160,7 +1161,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                 for (var i = 0; i < thing["HistoricalLocations"].length; i++) {
                     var historicalLocation = thing["HistoricalLocations"][i];
                     if (historicalLocation["Locations"].length < 1) return;
-                    var featureInfo = transformThingIntoFeatureInfo(thing, historicalLocation.Locations[0].location);
+                    var featureInfo = transformThingIntoFeatureInfo(thing, historicalLocation.Locations[0]);
                     allLocations.push({
                         time: moment(historicalLocation.time),
                         thing: thing,
