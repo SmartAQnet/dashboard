@@ -719,7 +719,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
             return feature
         });
-        if (feature) {
+        if (feature && ViewfinderSource.getFeatures().indexOf(feature) == -1) {
             $scope.isInfoSidePanelClosed = false;
             $scope.toggleInfoSidepanel;
             if (feature.getProperties()['result']) {
