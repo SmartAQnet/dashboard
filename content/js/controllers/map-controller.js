@@ -575,7 +575,6 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             "thingname": thingname,
             "tooltip": "Located at: " + thinglocationname
         };
-        console.log(featureinfo)
         return featureinfo;
     }
 
