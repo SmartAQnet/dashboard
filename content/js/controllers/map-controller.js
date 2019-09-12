@@ -1,4 +1,4 @@
-gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
+gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
 
 
     /************************************ Parameters ************************************/
@@ -1322,7 +1322,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         stopAddingMarkers();
         var colorFeatures = ColoredMarkerSource.getFeatures();
         //Add 2000 at a time, then wait 17ms
-        markerAddingInterval = setInterval(function () {
+        markerAddingInterval = setTimeout(function addMarker() {
             if (currentMarkerPointer >= currentObservationList.length && currentMarkerPointer >= colorFeatures.length) {
                 stopAddingMarkers();
                 return;
@@ -1330,20 +1330,20 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             //While there are features in the map from last interval, reuse old features
             for (var colorFeaturesPointer = currentMarkerPointer; colorFeaturesPointer < colorFeatures.length &&
                 colorFeaturesPointer < currentObservationList.length &&
-                colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++) {
+                colorFeaturesPointer < currentMarkerPointer + 1000; colorFeaturesPointer++) {
                 colorFeatures[colorFeaturesPointer].setGeometry(currentObservationList[colorFeaturesPointer].getGeometry());
                 colorFeatures[colorFeaturesPointer].setStyle(currentObservationList[colorFeaturesPointer].getStyle());
                 colorFeatures[colorFeaturesPointer].setProperties(currentObservationList[colorFeaturesPointer].getProperties());
             }
             //If there were more features in the old map, delete unused old features
             if (colorFeaturesPointer < colorFeatures.length) {
-                for (; colorFeaturesPointer < colorFeatures.length && colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++) {
+                for (; colorFeaturesPointer < colorFeatures.length && colorFeaturesPointer < currentMarkerPointer + 1000; colorFeaturesPointer++) {
                     ColoredMarkerSource.removeFeature(colorFeatures[colorFeaturesPointer]);
                 }
             }
             //If there were less features in the old map, create new ones
             else {
-                for (; colorFeaturesPointer < currentObservationList.length && colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++) {
+                for (; colorFeaturesPointer < currentObservationList.length && colorFeaturesPointer < currentMarkerPointer + 1000; colorFeaturesPointer++) {
                     var newFeature = new ol.Feature();
                     newFeature.setGeometry(currentObservationList[colorFeaturesPointer].getGeometry());
                     newFeature.setStyle(currentObservationList[colorFeaturesPointer].getStyle());
@@ -1351,8 +1351,9 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                     ColoredMarkerSource.addFeature(newFeature);
                 }
             }
-            currentMarkerPointer += 2000;
-        }, 17);
+            currentMarkerPointer += 1000;
+            markerAddingInterval = setTimeout(addMarker, 1);
+        }, 1);
     }
 
     /**
@@ -1360,7 +1361,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
      */
     function stopAddingMarkers() {
         if (markerAddingInterval != null) {
-            clearInterval(markerAddingInterval);
+            clearTimeout(markerAddingInterval);
             markerAddingInterval = null;
         }
     }
@@ -1587,6 +1588,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         options: {
             floor: 0,
             ceil: 1,
+            interval:30,
             step: 0.000001,
             precision: 10,
             draggableRange: true,
@@ -1603,6 +1605,26 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     setTimeout(function () {
         return $scope.$broadcast('rzSliderForceRender');;
     }, 1000);
+
+    $scope.isAutoPlayActive = false;
+    var intervalAutoPlay = null;
+    $scope.toggleAutoPlay = function(){
+        $scope.isAutoPlayActive = !$scope.isAutoPlayActive;
+        if($scope.isAutoPlayActive){
+            intervalAutoPlay = $interval(function(){
+                if($scope.slider.maxValue + 0.001 < 1){
+                    $scope.slider.minValue += 0.001;
+                    $scope.slider.maxValue += 0.001;
+                } else {
+                    $scope.slider.maxValue = $scope.slider.maxValue - $scope.slider.minValue;
+                    $scope.slider.minValue = 0;
+                }
+                $scope.$broadcast('rzSliderForceRender');
+            }, 30);
+        } else if(intervalAutoPlay) {
+            $interval.cancel(intervalAutoPlay);
+        }
+    }
 
     /************************************ Obsproperty Selection ******************************/
     //                  creates the dropdown menu to select a observed property

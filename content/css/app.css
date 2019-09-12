@@ -5506,6 +5506,21 @@ span.rz-pointer {
   border-top: 1px solid rgba(0,0,0,.12);
 }
 
+#slider-container{
+  display: flex;
+  align-items: flex-end;
+}
+
+#slider-container .rzslider{
+  flex-grow: 1;
+}
+
+#slider-container button{
+  flex-shrink: 0;
+}
+#slider-container.isAutoPlayActive *{
+  transition: none !important;
+}
 @media screen and(max-width: 1240px){
   #calendarHost .daterangepicker{
     max-height: 400px;
