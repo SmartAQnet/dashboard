@@ -320,14 +320,17 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     });
 
     function interpolateColor(allPoints, value, alpha) {
+        value = Number.parseFloat(value);
         var colorLimitsAndValidPoints = getLimitsAndValidPoints(allPoints)
         //Find index of the fixed color point below the given value;
         var belowPoint = 0;
         //var validPoints = colorLimitsAndValidPoints.validPoints;
-        var validColorFixedPoints = colorLimitsAndValidPoints.validPoints;
+        var validColorFixedPoints = colorLimitsAndValidPoints.validPoints.map(function(num){
+            return Number.parseFloat(num);
+        });
         var wholeRange = validColorFixedPoints[validColorFixedPoints.length - 1] - validColorFixedPoints[0];
 
-        while (validColorFixedPoints[belowPoint] && value > validColorFixedPoints[belowPoint]) {
+        while (typeof validColorFixedPoints[belowPoint] !== "undefined" && value > validColorFixedPoints[belowPoint]) {
             belowPoint++;
         }
         var color;
@@ -347,7 +350,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         } else if (belowPoint == validColorFixedPoints.length) {
             if (colorLimitsAndValidPoints.limits.end) {
                 return interpolateBetween2Color(allPoints[validColorFixedPoints[validColorFixedPoints.length - 1]], colorLimitsAndValidPoints.limits.end,
-                    Math.min(1, (value - (validColorFixedPoints[validColorFixedPoints.length - 1] + wholeRange)) / wholeRange), alpha); // values one whole scale above the end limit have the color of the limit
+                    Math.min(1, (value - (validColorFixedPoints[validColorFixedPoints.length - 1] - wholeRange)) / wholeRange), alpha); // values one whole scale above the end limit have the color of the limit
             }
             return allPoints[validColorFixedPoints[belowPoint - 1]];
         }
