@@ -5342,6 +5342,7 @@ ul.notifications {
   flex-direction: column-reverse;
   justify-content: space-between;
   flex-grow: 1;
+  min-height: 0;
 }
 
 #scaleCaption{
