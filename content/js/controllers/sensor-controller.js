@@ -1,19 +1,13 @@
-gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams, Page) {
+gostApp.controller('SensorCtrl', function ($scope, $http, $routeParams, Page) {
     $scope.id = $routeParams.id;
-
-    //Set default observed property for the map. The map sub-controller inherits the variable:
-    $scope.observedPropertyId = $scope.id;
-    $scope.observedPropertyName = $scope.name;
-    
-    $scope.Page.setTitle('OBSERVED PROPERTY(' + $scope.id + ')');
+    $scope.Page.setTitle('SENSOR(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
 
-    $http.get(getUrl() + "/v1.0/ObservedProperties(" + getId($scope.id) + ")").then(function (response) {
+    $http.get(getUrl() + "/v1.0/Sensors(" + getId($scope.id) + ")").then(function (response) {
         $scope.name = response.data["name"];
         $scope.description = response.data["description"];
-        $scope.definition = response.data["definition"];
-        $scope.conventions = response.data["properties"]["conventions"];
-        $scope.Page.selectedThing = response.data;
+        $scope.properties = response.data["properties"];
+        $scope.Page.selectedSensor = response.data;
     });
 
 
@@ -21,7 +15,7 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
 
     $scope.tabPropertiesClicked = function () {
 
-        $http.get(getUrl() + "/v1.0/ObservedProperties(" + getId($scope.id) + ")/Datastreams?$expand=Observations($top=1;$orderby=phenomenonTime%20desc),Observations/FeatureOfInterest").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Sensors(" + getId($scope.id) + ")/Datastreams?$expand=Observations($top=1;$orderby=phenomenonTime%20desc),Observations/FeatureOfInterest").then(function (response) {
             $scope.allObsProps = response.data.value
             angular.forEach($scope.observedproperties, function (value, key) {
                 $scope.thisResultValue = response.data.value["Observation"]["result"];
@@ -39,7 +33,7 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
     $scope.tabDatastreamsClicked = function () {
         
 
-        $http.get(getUrl() + "/v1.0/ObservedProperties(" + getId($scope.id) + ")/Datastreams").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Sensors(" + getId($scope.id) + ")/Datastreams").then(function (response) {
     
             $scope.datastreamsList = response.data.value;
         });
@@ -67,9 +61,4 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
         });
         $scope.Page.go("datastream/" + datastreamID);
     };
-    console.log($scope)
-//   $scope.sortBy = function(propertyName) {
-//     $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;
-//     $scope.propertyName = propertyName;
-//   };
 });

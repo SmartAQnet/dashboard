@@ -303,8 +303,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             scale: 1.0,
             //color: [127,127,0,0.1],
             src: window.dashboardSettings.root + 'assets/img/map_marker.svg'
-        })),
-        zIndex: 2
+        })), zIndex: 2
     });
 
     var selectedMarkerStyle = new ol.style.Style({
@@ -315,12 +314,39 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             scale: 1.2,
             //color: [255,64,64,1],
             src: window.dashboardSettings.root + 'assets/img/map_marker_emph.svg'
-        })),
-        zIndex: 3
+        })), zIndex: 3
     });
 
+<<<<<<< HEAD
     function interpolateColor(allPoints, value, alpha) {
         value = Number.parseFloat(value);
+=======
+    /*
+    var currentMarkerStyle = new ol.style.Style({
+        image: new ol.style.Icon(({
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            scale: 1.0,
+            color: [255,64,64,1],
+            src: window.dashboardSettings.root + 'assets/img/map_marker.svg'
+        })), zIndex: 3
+    });
+
+
+    function highlightCurrentFeature(coords){
+        var pixel = getPixelFromCoordinate(coords);
+        var feature = olMap.forEachFeatureAtPixel(pixel, function(feature) {return feature});
+        feature.setStyle(currentMarkerStyle);
+    };
+    */
+    
+
+
+
+
+    function interpolateColor(allPoints, value, alpha){
+>>>>>>> fakultätsfeier-demo
         var colorLimitsAndValidPoints = getLimitsAndValidPoints(allPoints)
         //Find index of the fixed color point below the given value;
         var belowPoint = 0;
@@ -1220,8 +1246,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                 for (var i = 0; i < thing["HistoricalLocations"].length; i++) {
                     var historicalLocation = thing["HistoricalLocations"][i];
                     if (historicalLocation["Locations"].length < 1) return;
-                    var featureInfo = transformThingIntoFeatureInfo(thing, historicalLocation.Locations[0].location);
-                    //Add object containing feature to array allLocations
+                    var featureInfo = transformThingIntoFeatureInfo(thing, historicalLocation.Locations[0]);
                     allLocations.push({
                         time: moment(historicalLocation.time),
                         thing: thing,
