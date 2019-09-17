@@ -185,8 +185,8 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
     //views anpassen funktioniert nicht, obwohl console.log($scope) anzeigt, dass die da sein sollten
     if ($scope.id.match(/:home:/)) {
-        $scope.isLayerPinsActive = true
-        $scope.isColorMarkersActive = false
+        $scope.isLayerPinsActive = false
+        $scope.isColorMarkersActive = true
     } else if ($scope.id.match(/:t:/)) {
         $scope.isLayerPinsActive = true
         $scope.isColorMarkersActive = false
@@ -478,7 +478,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         return feature;
     }
 
-    var obsproperty = $scope.observedPropertyId || "saqn:op:mcpm10"; //Reads observedPropertyId first, possibly from a parent controller. "saqn:op:mcpm10" is the fallback.
+    var obsproperty = $scope.observedPropertyId || "saqn:op:mcpm2p5"; //Reads observedPropertyId first, possibly from a parent controller. "saqn:op:mcpm2p5" is the fallback.
 
     function observedPropertyHasChanged(obsprop) {
         obsproperty = obsprop;
