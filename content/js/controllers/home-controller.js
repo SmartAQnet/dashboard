@@ -3,6 +3,7 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	$scope.Page.setTitle('smartAQnet');
 	$scope.Page.setHeaderIcon('');
 
+<<<<<<< HEAD
 	// fastest but least accurate: get number of observations and count with fixed +1 per 0.5sec up
 	$http.get(getUrl() + "/v1.0/Observations?$top=1&$count=true").then(function (response) {
 	$scope.n_observations=response.data["@iot.count"];
@@ -16,6 +17,9 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	};
 	window.setTimeout($scope.setObservations, 0);
 	});
+=======
+
+>>>>>>> 750610a... minor bugfixes
 
 
 
