@@ -3,6 +3,8 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams) {
     $scope.Page.setHeaderIcon(iconThing);
     if(!("$orderby" in $routeParams)) $routeParams["$orderby"]="name asc";
 
+
+    //Implement Server Query Language in Static urls
     var query=getUrl() + "/v1.0/Things"+ Object.keys($routeParams).reduce(
 	    (a, i) => a + i + "=" + $routeParams[i] + "&","?").slice(0,-1) 
 
@@ -10,6 +12,13 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams) {
         $scope.thingsList = response.data.value;
     });
 
+    //Without Query Language
+    /*
+    $http.get(getUrl() + "/v1.0/Sensors").then(function (response) {
+        $scope.sensorsList = response.data.value;
+    });
+    */
+    
     $scope.thingClicked = function (thingID) {
         angular.forEach($scope.things, function (value, key) {
             if (value["@iot.id"] == thingID) {
@@ -30,7 +39,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams) {
         });
     };
 
-     $scope.deleteThingClicked = function (entity) {
+    $scope.deleteThingClicked = function (entity) {
         var res = $http.delete(getUrl() + '/v1.0/Things(' + getId(entity["@iot.id"]) + ')');
         res.success(function(data, status, headers, config) {
             var index = $scope.thingsList.indexOf(entity);
@@ -39,5 +48,5 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams) {
         res.error(function(data, status, headers, config) {
             alert( "failure: " + JSON.stringify({data: data}));
         });
-     };
+    };
 });

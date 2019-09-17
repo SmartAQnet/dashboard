@@ -303,8 +303,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             scale: 1.0,
             //color: [127,127,0,0.1],
             src: window.dashboardSettings.root + 'assets/img/map_marker.svg'
-        })),
-        zIndex: 2
+        })), zIndex: 2
     });
 
     var selectedMarkerStyle = new ol.style.Style({
@@ -315,8 +314,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             scale: 1.2,
             //color: [255,64,64,1],
             src: window.dashboardSettings.root + 'assets/img/map_marker_emph.svg'
-        })),
-        zIndex: 3
+        })), zIndex: 3
     });
 
     function interpolateColor(allPoints, value, alpha) {
@@ -1220,8 +1218,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                 for (var i = 0; i < thing["HistoricalLocations"].length; i++) {
                     var historicalLocation = thing["HistoricalLocations"][i];
                     if (historicalLocation["Locations"].length < 1) return;
-                    var featureInfo = transformThingIntoFeatureInfo(thing, historicalLocation.Locations[0].location);
-                    //Add object containing feature to array allLocations
+                    var featureInfo = transformThingIntoFeatureInfo(thing, historicalLocation.Locations[0]);
                     allLocations.push({
                         time: moment(historicalLocation.time),
                         thing: thing,

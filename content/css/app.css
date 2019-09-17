@@ -22,9 +22,11 @@ html{
   padding: 0;
 }
 
+/* //shows scrollbar at 100% width
 .tab-pane{
   overflow-x: auto;
 }
+*/
 
 @media (min-width: 768px) {
 .bs-glyphicons {
@@ -127,6 +129,7 @@ html{
 .entityInfo{
     margin-top: 20px;
     margin-left: 10px;
+    margin-right: 10px;
 }
 
 .entityInfoHeader{
@@ -5016,7 +5019,7 @@ ul.notifications {
   color: #000000; 
   cursor: pointer;
   padding: 18px;
-  width: 99%;
+  width: 100%;
   border: none;
   text-align: left;
   outline: none;
@@ -5527,4 +5530,31 @@ span.rz-pointer {
   display: none; 
 } 
 
+.gradient-border {
+  border: 2px solid transparent !important;
+  border-image: linear-gradient(to bottom right, #2d497f 0%, white 20%, white 80%, #2d497f 100%) !important;
+  border-image-slice: 1 !important;
+}
 
+
+.pulse-button:hover {
+  box-shadow: 0 0 0 0 rgba(45,73,127,.7);
+  cursor: pointer;
+  -webkit-animation: pulse 1.25s cubic-bezier(0.66, 0, 0, 1);
+  -moz-animation: pulse 1.25s cubic-bezier(0.66, 0, 0, 1);
+  -ms-animation: pulse 1.25s cubic-bezier(0.66, 0, 0, 1);
+  animation: pulse 1.25s cubic-bezier(0.66, 0, 0, 1);
+}
+.pulse-button
+{
+  -webkit-animation: none;-moz-animation: none;-ms-animation: none;animation: none;
+}
+
+@-webkit-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(45,73,127,0);}}
+@-moz-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(45,73,127,0);}}
+@-ms-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(45,73,127,0);}}
+@keyframes pulse {to {box-shadow: 0 0 0 45px rgba(45,73,127,0);}}
+
+.indent-inputlines{
+  padding-left: 10%;
+}
