@@ -4,10 +4,27 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	$scope.Page.setHeaderIcon('');
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c3d73cf... faster but less accurate calculation of total observations
 	// fastest but least accurate: get number of observations and count with fixed +1 per 0.5sec up
 	$http.get(getUrl() + "/v1.0/Observations?$top=1&$count=true").then(function (response) {
 	$scope.n_observations=response.data["@iot.count"];
 	interval=500;
+<<<<<<< HEAD
+=======
+
+	$scope.setObservations=function(){
+		$scope.n_observations++
+		$scope.obs_string = $scope.n_observations.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+		$scope.$apply()
+		window.setTimeout($scope.setObservations, interval);
+	};
+	window.setTimeout($scope.setObservations, 0);
+	});
+
+
+>>>>>>> c3d73cf... faster but less accurate calculation of total observations
 
 	$scope.setObservations=function(){
 		$scope.n_observations++
@@ -19,6 +36,7 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	});
 =======
 
+<<<<<<< HEAD
 >>>>>>> 750610a... minor bugfixes
 
 
@@ -31,6 +49,15 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	var count=0;
 	*/
 
+=======
+	/*	
+	var interval=60000;
+	var lasttime=null;
+	var lastcount;
+	var count=0;
+	*/
+
+>>>>>>> c3d73cf... faster but less accurate calculation of total observations
 	/*
 	//slow: get count right now, wait a little, calculate frequency and count and check back occasionally
 	$scope.setObservations=function(){
