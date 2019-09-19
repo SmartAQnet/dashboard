@@ -553,10 +553,10 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
         featureinfo = {
             "location": thinglocation,
-            "locationname": thinglocationname,
+            "locationname": FixUTF8(thinglocationname),
             "@iot.id": thingid,
             "thingname": thingname,
-            "tooltip": "Located at: " + thinglocationname
+            "tooltip": "Located at: " + FixUTF8(thinglocationname)
         };
         return featureinfo;
     }
@@ -699,7 +699,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             ThingInfo = response.data;
 
             $scope.information = {
-                locationname: ThingInfo['Locations'][0]['name'],
+                locationname: FixUTF8(ThingInfo['Locations'][0]['name']),
                 coordinates: {
                     lat: ThingInfo['Locations'][0]['location']['coordinates']["1"],
                     long: ThingInfo['Locations'][0]['location']['coordinates']["0"]
