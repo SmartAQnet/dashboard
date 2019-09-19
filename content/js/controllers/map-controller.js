@@ -4,8 +4,12 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     /************************************ Parameters ************************************/
     //                        set parameters for map and functions
     /************************************************************************************/
+    
+    $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$count=true&$top=0").then(function (response) {
+        $scope.active_devices = response.data["@iot.count"];
+    });
 
-
+    
     var augsburg = [10.8986971, 48.3668041];
     var karlsruhe = [8.4, 49];
 
