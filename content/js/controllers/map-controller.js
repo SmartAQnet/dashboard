@@ -1218,6 +1218,10 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
             locationIntervalTree = new NodeIntervalTree.IntervalTree();
             thingsPreviouslyInThisRegion.forEach(function (thing) {
+                // Guarantee ascending order by date
+                thing["HistoricalLocations"] = thing["HistoricalLocations"].sort(function (a, b) {
+                    return moment(a.time).isBefore(moment(b.time)) ? -1 : 1;
+                });
                 //Create a feature for every HistoricalLocation of the thing and add it to the location interval tree
                 for (var i = 0; i < thing["HistoricalLocations"].length; i++) {
                     var historicalLocation = thing["HistoricalLocations"][i];
