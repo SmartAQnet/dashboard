@@ -106,6 +106,13 @@ echo "
 		}
     }
 
+	location = /mqtt {
+		proxy_pass http://frost:9876/mqtt;
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade \$http_upgrade;
+		proxy_set_header Connection \"Upgrade\";
+	}
+
     location = /favicon.ico { access_log off; log_not_found off; }
 }" >> /etc/nginx/conf.d/default.conf
 
