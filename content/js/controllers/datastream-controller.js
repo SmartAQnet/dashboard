@@ -216,4 +216,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
             datastreams.removeStream(secondaryStream, true);
         }
     }
+
+    //automatically go to observations
+    $scope.tabObservationsClicked();
 });
