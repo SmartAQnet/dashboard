@@ -1,0 +1,65 @@
+#number-observation-box{
+    position: fixed;
+    left: 10px;
+    bottom: 10px;
+    width: 280px;
+    transform: scale(0.7);
+    transform-origin: bottom left;
+}
+
+#number-observation-box .card-body {
+    font-size: 3.5em;
+}
+
+#sensor-map .card-header .btn{
+    border: none !important;
+    box-shadow: none !important;
+    color: #004085 !important;
+    background-color: #cce5ff !important;
+}
+
+.main, .main>.row:not(#number-observation-box), .main>.row:not(#number-observation-box)>.col-md-12, .map-container, #sensor-map, #card-body-map{
+    height:100%;
+}
+
+html, body, .nav-md, .container.body, .main_container, .right_col{
+    height: 100% !important;
+}
+
+.right_col>div{
+    height: calc(100% - 20px)
+}
+
+#map{
+    height: 100%;
+}
+
+body{
+    /*zoom: 0.8;*/
+}
+
+#sensor-map>.card-header{
+    position: fixed;
+    left: 0;
+    width:200px;
+    bottom: 200px;
+}
+
+#controlPanelButton{
+    border: none;
+}
+
+#card-body-map{
+    padding: 0;
+}
+
+#ControlSidepanel{
+    height: 100%;
+    right: 0;
+    top: 0;
+    margin: 0;
+}
+
+#InfoPanelBody li>a{
+    padding: 3px 0;
+}

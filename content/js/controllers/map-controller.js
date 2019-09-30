@@ -596,16 +596,22 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
     var storedstyle;
     $scope.isTooltipHidden = true;
 
+    function setTooltipPosition(){
+        var feature = $scope.currentFeatureTooltip;
+        if(!feature) return;
+        position = olMap.getPixelFromCoordinate(feature.getGeometry().getCoordinates());
+        $scope.featureTooltipStyle = {
+            left: position[0] + 35 + "px",
+            top: position[1] - 12 + "px"
+        };
+    }
+
     var displayFeatureTooltip = function (feature) {
+        $scope.currentFeatureTooltip = feature;
         //var info = document.getElementById('map-feature-tooltip');
         if (feature && feature.getProperties()["tooltip"]) {
-            position = olMap.getPixelFromCoordinate(feature.getGeometry().getCoordinates());
-
             $scope.isTooltipHidden = false;
-            $scope.featureTooltipStyle = {
-                left: position[0] + 35 + "px",
-                top: position[1] - 12 + "px"
-            };
+            setTooltipPosition();
             $scope.featureTooltip = $sce.trustAsHtml(feature.getProperties()["tooltip"]);
 
             if (storedfeature != undefined) { // if a feature is stored
@@ -643,10 +649,10 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
     };
 
     olMap.on(['pointermove', 'click'], function (evt) {
-        if (evt.dragging) {
+        /*if (evt.dragging) {
             displayFeatureTooltip(null);
             return;
-        };
+        };*/
 
         var pixel = olMap.getEventPixel(evt.originalEvent);
         var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
@@ -723,6 +729,8 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
     olMap.on('click', function (evt) {
         var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
             return feature
+        }, {
+            hitTolerance: 10
         });
         if (feature && ViewfinderSource.getFeatures().indexOf(feature) == -1) {
             $scope.isInfoSidePanelClosed = false;
@@ -1075,7 +1083,10 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
         */
         setTimeout(function () {
             olMap.updateSize();
-        }, 20);
+            setTimeout(function () {
+                setTooltipPosition();
+            }, 10);
+        }, 40);
     });
 
     function otherDateSelected(start, end) {
