@@ -4,10 +4,12 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     /************************************ Parameters ************************************/
     //                        set parameters for map and functions
     /************************************************************************************/
-	$http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$count=true&$top=0").then(function (response) {
-		$scope.active_devices = response.data["@iot.count"];
-	});
+    
+    $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$count=true&$top=0").then(function (response) {
+        $scope.active_devices = response.data["@iot.count"];
+    });
 
+    
     var augsburg = [10.8986971, 48.3668041];
     var karlsruhe = [8.4, 49];
 
@@ -187,8 +189,8 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
     //views anpassen funktioniert nicht, obwohl console.log($scope) anzeigt, dass die da sein sollten
     if ($scope.id.match(/:home:/)) {
-        $scope.isLayerPinsActive = true
-        $scope.isColorMarkersActive = false
+        $scope.isLayerPinsActive = false
+        $scope.isColorMarkersActive = true
     } else if ($scope.id.match(/:t:/)) {
         $scope.isLayerPinsActive = true
         $scope.isColorMarkersActive = false
@@ -319,39 +321,18 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         })), zIndex: 3
     });
 
-    /*
-    var currentMarkerStyle = new ol.style.Style({
-        image: new ol.style.Icon(({
-            anchor: [0.5, 1],
-            anchorXUnits: 'fraction',
-            anchorYUnits: 'fraction',
-            scale: 1.0,
-            color: [255,64,64,1],
-            src: window.dashboardSettings.root + 'assets/img/map_marker.svg'
-        })), zIndex: 3
-    });
-
-
-    function highlightCurrentFeature(coords){
-        var pixel = getPixelFromCoordinate(coords);
-        var feature = olMap.forEachFeatureAtPixel(pixel, function(feature) {return feature});
-        feature.setStyle(currentMarkerStyle);
-    };
-    */
-    
-
-
-
-
-    function interpolateColor(allPoints, value, alpha){
+    function interpolateColor(allPoints, value, alpha) {
+        value = Number.parseFloat(value);
         var colorLimitsAndValidPoints = getLimitsAndValidPoints(allPoints)
         //Find index of the fixed color point below the given value;
         var belowPoint = 0;
         //var validPoints = colorLimitsAndValidPoints.validPoints;
-        var validColorFixedPoints = colorLimitsAndValidPoints.validPoints;
+        var validColorFixedPoints = colorLimitsAndValidPoints.validPoints.map(function(num){
+            return Number.parseFloat(num);
+        });
         var wholeRange = validColorFixedPoints[validColorFixedPoints.length - 1] - validColorFixedPoints[0];
 
-        while (validColorFixedPoints[belowPoint] && value > validColorFixedPoints[belowPoint]) {
+        while (typeof validColorFixedPoints[belowPoint] !== "undefined" && value > validColorFixedPoints[belowPoint]) {
             belowPoint++;
         }
         var color;
@@ -371,7 +352,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         } else if (belowPoint == validColorFixedPoints.length) {
             if (colorLimitsAndValidPoints.limits.end) {
                 return interpolateBetween2Color(allPoints[validColorFixedPoints[validColorFixedPoints.length - 1]], colorLimitsAndValidPoints.limits.end,
-                    Math.min(1, (value - (validColorFixedPoints[validColorFixedPoints.length - 1] + wholeRange)) / wholeRange), alpha); // values one whole scale above the end limit have the color of the limit
+                    Math.min(1, (value - (validColorFixedPoints[validColorFixedPoints.length - 1] - wholeRange)) / wholeRange), alpha); // values one whole scale above the end limit have the color of the limit
             }
             return allPoints[validColorFixedPoints[belowPoint - 1]];
         }
@@ -501,7 +482,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         return feature;
     }
 
-    var obsproperty = $scope.observedPropertyId || "saqn:op:mcpm10"; //Reads observedPropertyId first, possibly from a parent controller. "saqn:op:mcpm10" is the fallback.
+    var obsproperty = $scope.observedPropertyId || "saqn:op:mcpm2p5"; //Reads observedPropertyId first, possibly from a parent controller. "saqn:op:mcpm2p5" is the fallback.
 
     function observedPropertyHasChanged(obsprop) {
         obsproperty = obsprop;
@@ -572,10 +553,10 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
         featureinfo = {
             "location": thinglocation,
-            "locationname": thinglocationname,
+            "locationname": FixUTF8(thinglocationname),
             "@iot.id": thingid,
             "thingname": thingname,
-            "tooltip": "Located at: " + thinglocationname
+            "tooltip": "Located at: " + FixUTF8(thinglocationname)
         };
         return featureinfo;
     }
@@ -718,7 +699,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             ThingInfo = response.data;
 
             $scope.information = {
-                locationname: ThingInfo['Locations'][0]['name'],
+                locationname: FixUTF8(ThingInfo['Locations'][0]['name']),
                 coordinates: {
                     lat: ThingInfo['Locations'][0]['location']['coordinates']["1"],
                     long: ThingInfo['Locations'][0]['location']['coordinates']["0"]
@@ -1237,6 +1218,10 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
             locationIntervalTree = new NodeIntervalTree.IntervalTree();
             thingsPreviouslyInThisRegion.forEach(function (thing) {
+                // Guarantee ascending order by date
+                thing["HistoricalLocations"] = thing["HistoricalLocations"].sort(function (a, b) {
+                    return moment(a.time).isBefore(moment(b.time)) ? -1 : 1;
+                });
                 //Create a feature for every HistoricalLocation of the thing and add it to the location interval tree
                 for (var i = 0; i < thing["HistoricalLocations"].length; i++) {
                     var historicalLocation = thing["HistoricalLocations"][i];
