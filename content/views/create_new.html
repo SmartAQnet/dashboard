@@ -1,15 +1,24 @@
-<div class="main">
+<div class="main container">
     <div class="row py-2">
         <div class="col-md-12">
             <div class="card" >
-                <div class="card-header">Create a Database Entry for a new Device</div>
+                <div class="card-header">Create a Database Entry for a new Thing or add Sensors/Datastreams to an existing Thing</div>
                 <div class="card-body">
-                    <table width="100%">
-                    <tr>
-                    <td>
-                    <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newThing" style="float: left"><i class="fa fa-cube"></i> Create New Thing <span class="fa"></span></button>
-                    <div style="clear:both;"></div>
-                    <!-- Modal -->
+
+                    
+                    <div class="input-group">
+                        <div class="input-group-prepend mx-2" style="margin-top:auto;margin-bottom:auto;">
+                            <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newThing" style="float: left"><i class="fa fa-cube"></i> Create New Thing <span class="fa"></span></button>
+                        </div>
+
+                        <select class="custom-select mx-2" id="thing-select" ng-model="newThing" ng-options="x.name for x in thingsList track by x['@iot.id']"></select>
+
+                        <div class="input-group-append mx-2" id="thingcreated" style="margin-top:auto;margin-bottom:auto;" size="20">
+                            {{ newThing.name }}
+                        </div>
+                    </div>
+
+                    <!-- Create Thing Modal -->
                     <div class="modal fade" id="newThing" role="dialog">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
@@ -34,44 +43,77 @@
                                         <div class="indent-inputlines">
                                             <div class="form-group">
                                                 <label for="deviceidInput">Device ID: </label>
-                                                <input class="form-control" id="deviceidInput" type="text" onkeyup="this.value = this.value.toLowerCase();" placeholder="Example: 180232" ng-model="newThing.properties['device_id']" aria-describedby="thingpropertiesdeviceidhelpblock">
+                                                <input class="form-control" id="deviceidInput" type="text" onkeyup="this.value = this.value.toLowerCase().replace(/ /g, '_');" placeholder="Example: 180232" ng-model="newThing.properties['device_id']" aria-describedby="thingpropertiesdeviceidhelpblock">
                                                 <small id="thingpropertiesdeviceidhelpblock" class="form-text text-muted">Some Identifier of the Thing. <span class="text-warning">Necessary for ID generation. Only Lowercase Letters. </span></small>
                                             </div>
                                             <div class="form-group">
-                                                <label for="commissioningdateInput">Device Commissioning Date: </label>
-                                                <input class="form-control" id="commissioningdateInput" type="text" onkeyup="this.value = this.value.toLowerCase();" placeholder="Example: 2019-03" ng-model="newThing.properties['commissioning_date']" aria-describedby="thingpropertiescommissioningdatehelpblock">
-                                                <small id="thingpropertiescommissioningdatehelpblock" class="form-text text-muted">Commissioning Date of the Thing. <span class="text-warning">Necessary for ID generation. Only Lowercase Letters. </span></small>
-                                            </div>
-                                            <div class="form-group">
                                                 <label for="devicenameInput">Device Name: </label>
-                                                <input class="form-control" id="devicenameInput" type="text" onkeyup="this.value = this.value.toLowerCase();" placeholder="Example: crowdsensor" ng-model="newThing.properties['device_name']" aria-describedby="thingpropertiesdevicenamehelpblock"> 
+                                                <input class="form-control" id="devicenameInput" type="text" onkeyup="this.value = this.value.toLowerCase().replace(/ /g, '_');" placeholder="Example: crowdsensor" ng-model="newThing.properties['device_name']" aria-describedby="thingpropertiesdevicenamehelpblock"> 
                                                 <small id="thingpropertiesdevicenamehelpblock" class="form-text text-muted">Short Name of the Thing. <span class="text-warning">Necessary for ID generation. Only Lowercase Letters. </span></small>
                                             </div>
                                             <div class="form-group">
                                                 <label for="operatorurlInput">Device Operator URL: </label>
-                                                <input class="form-control" id="operatorurlInput" type="text" onkeyup="this.value = this.value.toLowerCase();" placeholder="Example: teco.edu" ng-model="newThing.properties['operator_url']" aria-describedby="thingpropertiesoperatorurlhelpblock">
+                                                <input class="form-control" id="operatorurlInput" type="text" onkeyup="this.value = this.value.toLowerCase().replace(/ /g, '_');" placeholder="Example: teco.edu" ng-model="newThing.properties['operator_url']" aria-describedby="thingpropertiesoperatorurlhelpblock">
                                                 <small id="thingpropertiesoperatorurlhelpblock" class="form-text text-muted">Operator URL of the Thing. <span class="text-warning">Necessary for ID generation. Only Lowercase Letters. </span></small>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <input type="submit" class="btn btn-default" ng-click="addNewThing(newThing)" value="Save" />
+                                    <input type="submit" class="btn btn-default" ng-click="pushToServer(newThing)" value="Push to Server" />
                                     <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
                                 </div>
                             </div>
                         </div>
                     </div>
-                    </td>
-                    <td><div id="thingcreated">right side text</div></td>
-                    <tr ng-repeat="datastream in datastreams"><td> <button ng-click="modifydatastream(datastream)"></button>  </td><td>
-                        {{datastream.name}}
-                    </td></tr>
-                    <tr>
-                    <td>
-                    <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newDatastream" style="float: left"><i class="fa fa-plus"></i> Add Datastream <span class="fa"></span></button>
-                    <div style="clear:both;"></div>
-                    <!-- Modal -->
+                    <!-- Modal end -->
+                    
+
+                
+                    <hr>
+
+                    <div class="row" ng-repeat="sensor in sensors">
+                        <div class="col-1"></div>
+                        <div class="col-7">
+                            <button ng-click="modifysensor(sensor)"></button>
+                        </div>
+                        <div class="col-4">{{sensor.name}}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-1"></div>
+                        <div class="col-3">
+                        <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newSensor" style="float: left"><i class="fa fa-plus"></i> Add a Sensor type<span class="fa"></span></button>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="thing-select">or select an existing Sensor type to add Datastreams to:</label>
+                                <select class="custom-select" id="sensor-select" ng-model="newSensor" ng-options="x.name for x in sensorsList track by x['@iot.id']">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-4">{{ newSensor.name }}</div>
+                    </div>
+
+
+                    <div class="row" ng-repeat="datastream in datastreams">
+                        <div class="col-1"></div>
+                        <div class="col-7">
+                        <button ng-click="modifydatastream(datastream)"></button>
+                        </div>
+                        <div class="col-4">{{datastream.name}}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-1"></div>
+                        <div class="col-7">
+                        <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newDatastream" style="float: left"><i class="fa fa-plus"></i> Add a Datastream using this type of sensor<span class="fa"></span></button>
+                        </div>
+                        <div class="col-4">right side text</div>
+                    </div>
+                
+                    <!-- Create Datastream Modal -->
                     <div class="modal fade" id="newDatastream" role="dialog">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
@@ -129,22 +171,21 @@
                             </div>
                         </div>
                     </div>
-                    </td>
-                    <td><div>right side text</div></td>
-                    <tr>
-                    <td colspan="2">
-                    <div>
-                        <div class="form-group">
-                            <label for="obsprop-select">Select Observed Property:</label>
-                            <select class="custom-select" id="obsprop-select">
-                                <option selected> -- None Selected --</option>
-                                <option ng-repeat="x in obspropList" value="{{x['@iot.id']}}"> {{x["name"]}}</option>
-                            </select>
+                    <!-- Modal end -->
+
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="obsprop-select">Select Observed Property:</label>
+                                <select class="custom-select" id="obsprop-select">
+                                    <option selected> -- None Selected --</option>
+                                    <option ng-repeat="x in obspropList" value="{{x['@iot.id']}}"> {{x["name"]}}</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    </td>
-                    </tr>
-                </table>
+
                 </div>
             </div>
         </div>

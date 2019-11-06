@@ -7,12 +7,34 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
         $scope.obspropList = response.data.value;
     });
 
-    $scope.newThing = {}
-    $scope.addnewThing = function(newentity) {
-    $scope.newThing = newentity
+    $http.get(getUrl() + '/v1.0/Things').then(function (response) {
+        $scope.thingsList = response.data.value;
+    });
+
+    $http.get(getUrl() + '/v1.0/Sensors').then(function (response) {
+        $scope.sensorsList = response.data.value;
+    });
+
+    //$scope.newThing = {}
+    $scope.pushToServer = function(newentity) {
+        console.log("not implemented yet")
     };
 
     
+
+    $scope.sensors = [];
+
+    $scope.addNewSensor = function(newentity) { 
+        $scope.sensors.push(newentity);
+        $scope.newSensor = {};
+    };
+
+    $scope.newSensor = {};
+
+    $scope.modifysensor = function(sensor){
+        $scope.newSensor = sensor;
+    }
+
 
     $scope.datastreams = [];
 
