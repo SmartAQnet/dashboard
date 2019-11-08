@@ -1,8 +1,21 @@
-gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, Page) {
+gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location, Page) {
     $scope.id = $routeParams.id;
     $scope.Page.setTitle('THING(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
 
+
+    //pagination example for ng-repeat tables
+    //http://jsfiddle.net/2ZzZB/56/
+
+    //also add and remove columns by defining all of them, then display none for those not listed in the route params. does not work for those that dont need expanding
+    // better: add all of them and let user enable with checkboxes and if necessary then add the route params?
+
+    //tabs of the entity (properties, location, ...) should then follow the scheme by taking the same query and add like things(saqn:t:...)/historicallocations
+    // --> thing/saqn:t:.../historicallocations ?
+    // also, why distinguish things and thing here? frost server doesnt. treat as new page things/saqn:t:... 
+
+    //remove query params
+    $location.search({})
 
     $scope.patchThing = {}
 

@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{	"name": "SmartAQnet Dashboard",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"js/vendor": true
+		}
+	}
+}

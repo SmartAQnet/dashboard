@@ -28,15 +28,14 @@ gostApp.factory('Page', function () {
 // Set routes
 gostApp.config(function ($routeProvider) {
 	$routeProvider.
-		when("/home", { templateUrl: window.dashboardSettings.root + 'views/home.html', controller: "HomeCtrl", activetab: 'home' }).
+		when('/home', { templateUrl: window.dashboardSettings.root + 'views/home.html', controller: "HomeCtrl", activetab: 'home' }).
 		when('/thing/:id', { templateUrl: window.dashboardSettings.root + 'views/thing.html', controller: "ThingCtrl", activetab: 'things' }).
-		when("/things", { templateUrl: window.dashboardSettings.root + 'views/things.html', controller: "ThingsCtrl", activetab: 'things' }).
+		when('/things', { templateUrl: window.dashboardSettings.root + 'views/things.html', controller: "ThingsCtrl", activetab: 'things' }).
 		when('/locations', { templateUrl: window.dashboardSettings.root + 'views/locations.html', controller: "LocationsCtrl", activetab: 'things' }).
 		when('/historicallocations', { templateUrl: window.dashboardSettings.root + 'views/historicallocations.html', controller: "HistoricalLocationsCtrl", activetab: 'things' }).
 		when('/sensors', { templateUrl: window.dashboardSettings.root + 'views/sensors.html', controller: "SensorsCtrl", activetab: 'sensors' }).
 		when('/sensor/:id', { templateUrl: window.dashboardSettings.root + 'views/sensor.html', controller: "SensorCtrl", activetab: 'sensors' }).
 		when('/observedproperty/:id', { templateUrl: window.dashboardSettings.root + 'views/observedproperty.html', controller: "ObservedPropertyCtrl", activetab: 'properties' }).
-		when('/:patchthingy/:id/patch', { templateUrl: window.dashboardSettings.root + 'views/observedproperty.html', controller: "ObservedPropertyCtrl", activetab: 'properties' }).
 		when('/observedproperties', { templateUrl: window.dashboardSettings.root + 'views/observedproperties.html', controller: "ObservedPropertiesCtrl", activetab: 'properties' }).
 		when('/datastream/:id', { templateUrl: window.dashboardSettings.root + 'views/datastream.html', controller: "DatastreamCtrl", activetab: 'things' }).
 		when('/datastreams', { templateUrl: window.dashboardSettings.root + 'views/datastreams.html', controller: "DatastreamsCtrl", activetab: 'sensors' }).
@@ -77,7 +76,7 @@ function getId(id) {
 }
 
 function guid() {
-	function s4() {
+	function s4() { 
 		return Math.floor((1 + Math.random()) * 0x10000)
 			.toString(16)
 			.substring(1);
