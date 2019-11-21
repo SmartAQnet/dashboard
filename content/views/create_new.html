@@ -2,19 +2,33 @@
     <div class="row py-2">
         <div class="col-md-12">
             <div class="card" >
-                <div class="card-header">Create a Database Entry for a new Thing or add Sensors/Datastreams to an existing Thing</div>
+                <div class="card-header">
+                    <h2>Create a Database Entry for a new Thing or add Sensors/Datastreams to an existing Thing</h3>
+                </div>
                 <div class="card-body">
 
-                    
+                    <h3>Thing</h3>
+
                     <div class="input-group">
-                        <div class="input-group-prepend mx-2" style="margin-top:auto;margin-bottom:auto;">
-                            <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newThing" style="float: left"><i class="fa fa-cube"></i> Create New Thing <span class="fa"></span></button>
+                        <div class="input-group-prepend">
+                            <button type="button" class="btn btn-primary btn-sm btn-add-entity m-0" data-toggle="modal" data-target="#newThing"><i class="fa fa-cube"></i> Create a new Thing <span class="fa"></span></button>
                         </div>
+                        <span class="input-group-text mx-5">or</span>
+                        <select class="custom-select" id="thing-select" ng-model="newThing" ng-options="x.name for x in thingsList track by x['@iot.id']" ng-change="getSensors()">
+                            <option value="" disabled selected>select an existing Thing</option>
+                        </select>
+                    </div>
 
-                        <select class="custom-select mx-2" id="thing-select" ng-model="newThing" ng-options="x.name for x in thingsList track by x['@iot.id']"></select>
 
-                        <div class="input-group-append mx-2" id="thingcreated" style="margin-top:auto;margin-bottom:auto;" size="20">
-                            {{ newThing.name }}
+                    to add Sensors and/or Datastreams to.
+
+                    <div class="row">
+                        <div class="col">
+                            <h4>
+                                <div class="badge badge-success" style="float: right">
+                                    ID: {{ newThing['@iot.id'] }}
+                                </div>
+                            </h4>
                         </div>
                     </div>
 
@@ -67,35 +81,39 @@
                         </div>
                     </div>
                     <!-- Modal end -->
-                    
-
                 
                     <hr>
 
-                    <div class="row" ng-repeat="sensor in sensors">
-                        <div class="col-1"></div>
-                        <div class="col-7">
-                            <button ng-click="modifysensor(sensor)"></button>
+                    <h3>Sensors</h3> <!-- make angular display this only when a thing is chosen, otherwise a message that no thing was chosen-->
+
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <button type="button" class="btn btn-primary btn-sm btn-add-entity m-0" data-toggle="modal" data-target="#newSensor"><i class="fa fa-plus"></i> Create a new Sensor (type)<span class="fa"></span></button>
                         </div>
-                        <div class="col-4">{{sensor.name}}</div>
+                        <span class="input-group-text mx-5">or</span>
+                        <select class="custom-select" id="sensor-select" ng-model="newSensor" ng-options="x.name for x in sensorsList track by x['@iot.id']">
+                            <option value="" disabled selected>select an existing Sensor (type)</option>
+                        </select>
                     </div>
+
+
+                    to add tie to this Thing. 
 
                     <div class="row">
-                        <div class="col-1"></div>
-                        <div class="col-3">
-                        <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newSensor" style="float: left"><i class="fa fa-plus"></i> Add a Sensor type<span class="fa"></span></button>
-                        </div>
-                        <div class="col-4">
-                            <div class="form-group">
-                                <label for="thing-select">or select an existing Sensor type to add Datastreams to:</label>
-                                <select class="custom-select" id="sensor-select" ng-model="newSensor" ng-options="x.name for x in sensorsList track by x['@iot.id']">
-                                </select>
+                            <div class="col">
+                                <h4>
+                                    <div class="badge badge-success" style="float: right">
+                                        ID: {{ newSensor['@iot.id'] }}
+                                    </div>
+                                </h4>
                             </div>
                         </div>
+    
 
-                        <div class="col-4">{{ newSensor.name }}</div>
-                    </div>
 
+                    <hr>
+
+                    <h3>Datastreams</h3> <!-- make angular display this only when at least one sensor is chosen, otherwise a message that no sensor/thing was chosen-->
 
                     <div class="row" ng-repeat="datastream in datastreams">
                         <div class="col-1"></div>
@@ -173,7 +191,7 @@
                     </div>
                     <!-- Modal end -->
 
-
+                    <!-- abfrage observed property in das datastream modal rein zur auswahl. falls nicht vorhanden inline anlegen?-->
                     <div class="row">
                         <div class="col">
                             <div class="form-group">

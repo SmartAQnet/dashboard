@@ -20,7 +20,21 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
         console.log("not implemented yet")
     };
 
+    // Array.prototype.uniqueByID = function(){
+
+    // }
+
+    $scope.getSensors = function(){
+        $http.get(getUrl() + "/v1.0/Things('" + $scope.newThing['@iot.id'] + "')/Datastreams?$expand=sensor&$select=sensor").then(function (response) {
+            
+            $scope.sensorsList = Array.from(new Set(response.data.value.map(ds => ds.Sensor)));
+        });
+    };
+
     
+     
+
+
 
     $scope.sensors = [];
 
