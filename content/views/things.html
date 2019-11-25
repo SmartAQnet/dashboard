@@ -5,6 +5,7 @@
             <th>Name</th>
             <th>Description</th>
             <th>Location</th>
+            <th>Export</th>
             <!--th>Delete</th-->
         </tr>
         </thead>
@@ -13,6 +14,7 @@
             <td ng-click="thingClicked(x['@iot.id'])">{{x["name"]}}</td>
             <td ng-click="thingClicked(x['@iot.id'])">{{x["description"]}}</td>
             <td ng-click="thingClicked(x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
+            <td class="export-cell"><exportBtn thingid="x['@iot.id']"></exportBtn></td>
             <!--td ng-click="thingClicked(x['@iot.id'])">
 		    <table class="table table-bordered table-hover st-table table-striped table-sm">
 			    <thead class="st-thead">
