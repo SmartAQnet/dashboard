@@ -15,26 +15,63 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
         $scope.sensorsList = response.data.value;
     });
 
-    //$scope.newThing = {}
     $scope.pushToServer = function(newentity) {
         console.log("not implemented yet")
     };
 
-    // Array.prototype.uniqueByID = function(){
+    
+    function remove(arrOriginal, elementToRemove){
+        return arrOriginal.filter(function(el){return el !== elementToRemove});
+    };
 
-    // }
+    var uniqueByID = function(arr){
+        
+        let ids = [];
+        let res = [];
 
-    $scope.getSensors = function(){
-        $http.get(getUrl() + "/v1.0/Things('" + $scope.newThing['@iot.id'] + "')/Datastreams?$expand=sensor&$select=sensor").then(function (response) {
-            
-            $scope.sensorsList = Array.from(new Set(response.data.value.map(ds => ds.Sensor)));
+        arr.forEach(element => {
+            if(!(ids.includes(element['@iot.id']))){
+                ids.push(element['@iot.id']);
+                res.push(element);
+            }
+        });
+        return res
+    };
+    
+
+
+
+    //Things
+
+
+    $scope.getSensorsofThing = function(thingid){
+        $http.get(getUrl() + "/v1.0/Things('" + thingid + "')/Datastreams?$expand=sensor&$select=sensor").then(function (response) {
+            $scope.thisThingsSensorsList = uniqueByID(Array.from(response.data.value.map(th => th.Sensor)));
+            $scope.originalSensorList = uniqueByID(Array.from(response.data.value.map(th => th.Sensor)));
         });
     };
 
+    $scope.addSensortoThing = function(sensor){
+        $scope.thisThingsSensorsList.push(sensor);
+        $scope.newSensor = undefined;
+    }; 
+
+     $scope.removeSensorfromThing = function(sensor){
+            $scope.thisThingsSensorsList=remove($scope.thisThingsSensorsList,sensor)
+    };
+
+
+
+
+
+
+
+
+    //...
+
+
+
     
-     
-
-
 
     $scope.sensors = [];
 
@@ -53,14 +90,14 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
     $scope.datastreams = [];
 
     $scope.addNewDatastream = function(newentity) { 
-        newentity['Thing'] = {'@iot.id': $scope.newThing['@iot.id']};
+        //newentity['Thing'] = {'@iot.id': $scope.newThing['@iot.id']};
         $scope.datastreams.push(newentity);
         $scope.newDatastream = {};
     };
 
     $scope.newDatastream = {};
 
-    $scope.modifydatastream = function(datastream){
+    $scope.modifyDatastream = function(datastream){
         $scope.newDatastream = datastream;
     }
 
