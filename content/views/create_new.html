@@ -3,7 +3,7 @@
         <div class="col-md-12">
             <div class="card" >
                 <div class="card-header">
-                    <h2>Create a Database Entry for a new Thing or add Sensors/Datastreams to an existing Thing</h3>
+                    <h2>Create a Database Entry for a new Thing or add Sensor (types)/Datastreams to an existing Thing</h2>
                 </div>
                 <div class="card-body">
 
@@ -14,13 +14,13 @@
                             <button type="button" class="btn btn-primary btn-sm btn-add-entity m-0" data-toggle="modal" data-target="#newThing"><i class="fa fa-cube"></i> Create a new Thing <span class="fa"></span></button>
                         </div>
                         <span class="input-group-text mx-5">or</span>
-                        <select class="custom-select" id="thing-select" ng-model="newThing" ng-options="x.name for x in thingsList track by x['@iot.id']" ng-change="getSensorsofThing(newThing['@iot.id'])">
+                        <select class="custom-select" id="thing-select" ng-model="newThing" ng-options="x.name for x in thingsList track by x['@iot.id']" ng-change="getSensorsofThing(newThing['@iot.id']);getDatastreamsofThing(newThing['@iot.id'])">
                             <option value="" disabled selected>select an existing Thing</option>
                         </select>
                     </div>
 
 
-                    to add Sensors and/or Datastreams to.
+                    to add Sensor (types) and/or Datastreams to.
 
                     <div class="row">
                         <div class="col">
@@ -84,65 +84,69 @@
                 
                     <hr>
 
-                    <h3>Sensors</h3> <!-- make angular display this only when a thing is chosen, otherwise a message that no thing was chosen-->
-
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <button type="button" class="btn btn-primary btn-sm btn-add-entity m-0" data-toggle="modal" data-target="#newSensor"><i class="fa fa-plus"></i> Create a new Sensor (type)<span class="fa"></span></button>
+                    <h3>Sensor (types)</h3> <!-- make angular display this only when a thing is chosen, otherwise a message that no thing was chosen-->
+                    <div ng-if="newThing">
+                        <h5 class="ml-3">Add a Sensor (type) to the Thing</h5>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-primary btn-sm btn-add-entity m-0" data-toggle="modal" data-target="#newSensor"><i class="fa fa-plus"></i> Create a new Sensor (type)<span class="fa"></span></button>
+                            </div>
+                            <span class="input-group-text mx-5">or</span>
+                            <select class="custom-select" id="sensor-select" ng-model="newSensor" ng-init="newSensor = undefined" ng-options="x.name for x in sensorsList track by x['@iot.id']">
+                                <option value="" selected>select an existing Sensor (type)</option>
+                            </select>
                         </div>
-                        <span class="input-group-text mx-5">or</span>
-                        <select class="custom-select" id="sensor-select" ng-model="newSensor" ng-options="x.name for x in sensorsList track by x['@iot.id']">
-                            <option value="" disabled selected>select an existing Sensor (type)</option>
-                        </select>
+
+                        <div ng-if="newSensor">
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>ID</th>
+                                    <th style="text-align: center; width:66px">Add</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td ng-click="sensorClicked(x['@iot.id'])">{{newSensor["name"]}}</td>
+                                    <td ng-click="sensorClicked(x['@iot.id'])">{{newSensor["@iot.id"]}}</td>
+                                    <td style="text-align: center;"><button type="button" class="btn btn-primary btn-sm m-0" ng-click="addSensortoThing(newSensor)" ng-disabled="originalSensorList.includes(newSensor)"><i class="fa fa-plus"></i><span class="fa"></span></button></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                        <h5 class="ml-3">Sensor (types) attached to the Thing</h5>
+
+                        <div>
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>ID</th>
+                                    <th style="text-align: center; width:66px">Remove</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="x in thisThingsSensorList">
+                                    <td ng-click="sensorClicked(x['@iot.id'])">{{x["name"]}}</td>
+                                    <td ng-click="sensorClicked(x['@iot.id'])">{{x["@iot.id"]}}</td>
+                                    <td style="text-align: center;"><button type="button" class="btn btn-primary btn-sm m-0" ng-click="removeSensorfromThing(x)" ng-disabled="originalSensorList.includes(x)"><i class="fa fa-minus"></i> <span class="fa"></span></button></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                     </div>
-
-                    <!-- remove button inactive (grau) wenn er schon serverseitig angelegt ist -->
-                    <!-- add button functionality: wenn schon angehängt, werfe fehlermeldung (ID vergleich) -->
-
-
-                    <div>
-                        <table class="table table-bordered table-hover st-table table-striped table-sm">
-                            <thead class="st-thead">
-                            <tr>
-                                <th>Name</th>
-                                <th>ID</th>
-                                <th style="text-align: center; width:66px">Add</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td ng-click="sensorClicked(x['@iot.id'])" ng-if="newSensor">{{newSensor["name"]}}</td>
-                                <td ng-click="sensorClicked(x['@iot.id'])" ng-if="newSensor">{{newSensor["@iot.id"]}}</td>
-                                <td style="text-align: center;" ng-if="newSensor" ng-init="newSensor = undefined"><button type="button" class="btn btn-primary btn-sm m-0" ng-click="addSensortoThing(newSensor)" ng-disabled="originalSensorList.includes(newSensor)"><i class="fa fa-plus"></i><span class="fa"></span></button></td>
-                            </tr>
-                            </tbody>
-                        </table>
+                    <div ng-if="!newThing">
+                        please choose a Thing to attach Sensors to
                     </div>
-
-                    <div>
-                        <table class="table table-bordered table-hover st-table table-striped table-sm">
-                            <thead class="st-thead">
-                            <tr>
-                                <th>Name</th>
-                                <th>ID</th>
-                                <th style="text-align: center; width:66px">Remove</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="x in thisThingsSensorsList">
-                                <td ng-click="sensorClicked(x['@iot.id'])">{{x["name"]}}</td>
-                                <td ng-click="sensorClicked(x['@iot.id'])">{{x["@iot.id"]}}</td>
-                                <td style="text-align: center;"><button type="button" class="btn btn-primary btn-sm m-0" ng-click="removeSensorfromThing(x)" ng-disabled="originalSensorList.includes(x)"><i class="fa fa-minus"></i> <span class="fa"></span></button></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-
                     <hr>
 
                     <h3>Datastreams</h3> <!-- make angular display this only when at least one sensor is chosen, otherwise a message that no sensor/thing was chosen-->
-
+                    <div ng-if="newThing && thisThingsSensorList">
+                        <h5 class="ml-3">Add a Datastream to the Thing</h5>
 
                     <div class="row">
                         <button type="button" class="btn btn-primary btn-sm btn-add-entity m-0" data-toggle="modal" data-target="#newDatastream"><i class="fa fa-plus"></i> Create a new Datastream<span class="fa"></span></button>
@@ -162,9 +166,28 @@
                         </div>
                     </div>
 
-                    <!-- <select class="custom-select" id="sensor-select" ng-model="newSensor" ng-options="x.name for x in thisThingsSensorsList track by x['@iot.id']">
-                        <option value="" disabled selected>select an existing Sensor (type)</option>
-                    </select> -->
+                    <h5 class="ml-3">Datastreams attached to the Thing</h5>
+
+                    <div>
+                        <table class="table table-bordered table-hover st-table table-striped table-sm">
+                            <thead class="st-thead">
+                            <tr>
+                                <th>Name</th>
+                                <th>ID</th>
+                                <th style="text-align: center; width:66px">Remove</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="x in thisThingsDatastreamList">
+                                <td ng-click="datastreamClicked(x['@iot.id'])">{{x["name"]}}</td>
+                                <td ng-click="datastreamClicked(x['@iot.id'])">{{x["@iot.id"]}}</td>
+                                <td style="text-align: center;"><button type="button" class="btn btn-primary btn-sm m-0" ng-click="removeDatastreamfromThing(x)" ng-disabled="originalDatastreamList.includes(x)"><i class="fa fa-minus"></i> <span class="fa"></span></button></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
 
 
                     <!-- Create Datastream Modal -->
@@ -179,43 +202,91 @@
                                     <div>
                                         <h3 class="modal-title">Datastream</h3>
                                         <div class="input-group">
-                                            <span class="input-group-addon" >Name: </span>
-                                            <input class="form-control" type="text" placeholder="Example: PM10 Datastream of Crowdsensing Node (SDS011, 180232)" ng-model="newDatastream.name" />
+                                            <span class="input-group-addon" >Datastream Name: </span>
+                                            <input class="form-control" type="text" placeholder="Example: PM10 Measurements of Crowdsensor 180232" ng-model="newDatastream.name" />
                                         </div>
                                         <div class="input-group">
-                                            <span class="input-group-addon" >Description: </span>
-                                            <input class="form-control" type="text" placeholder="Example: Datastream for recording Particulate Matter" ng-model="newDatastream.description" />
+                                            <span class="input-group-addon" >Datastream Description: </span>
+                                            <input class="form-control" type="text" placeholder="Example: Datastream for Particulate Matter" ng-model="newDatastream.description" />
+                                        </div>
+                                        <div class="input-group">
+                                            <div class="input-group-text mr-3">
+                                                Sensor (type): 
+                                            </div>
+                                            <select class="custom-select" ng-model="newDatastream.sensor" ng-options="x.name for x in thisThingsSensorList track by x['@iot.id']">
+                                                <option value="" selected>select the Sensor (type) this Datastream belongs to</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-group">
+                                            <div class="input-group-text mr-3">
+                                                Observed Property: 
+                                            </div>
+                                            <select class="custom-select" ng-model="newDatastream.observedproperty" ng-options="x.name for x in obspropList track by x['@iot.id']"  ng-change="getUnitOfMeasurement(x['@iot.id'])">
+                                                <option value="" selected>select the Observed Property this Datastream measures</option>
+                                            </select>
+                                        </div>
+                                        <hr>
+                                        <h6 class="modal-title">Unit of Measurement: </h6>
+                                        <div class="indent-inputlines mb-4">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">Unit Name: </span>
+                                                <input class="form-control" type="text" placeholder="Example: Microgram per Cubic Meter" ng-model="newDatastream.unitOfMeasurement.name" />
+                                                <span class="input-group-addon">Symbol: </span>
+                                                <input class="form-control" type="text" placeholder="Example: ug/m3" ng-model="newDatastream.unitOfMeasurement.symbol" />
+                                                <span class="input-group-addon">Definition: </span>
+                                                <input class="form-control" type="text" placeholder="Example: http://unitsofmeasure.org/ucum.html" ng-model="newDatastream.unitOfMeasurement.definition" />
+                                            </div>
                                         </div>
                                         <h5 class="modal-title">Properties: </h5>
-                                        <div class="indent-inputlines">
+                                        <div class="indent-inputlines mb-4">
+                                            <h6 class="modal-title">Software Version: </h6>
+                                            <div class="indent-inputlines mb-4">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">Version Number: </span>
+                                                    <input class="form-control" type="text" placeholder="Example: v0.8.5" ng-model="newDatastream.properties.softwareversion.nr" />
+                                                    <span class="input-group-addon">Installation Date: </span>
+                                                    <input class="form-control" type="text" placeholder="Example: 2019-05-26T14:21:44.382Z" ng-model="newDatastream.properties.softwareversion.date" />
+                                                </div>
+                                            </div>
+                                            <div class="input-group">
+                                                <span class="input-group-addon" >Hardware Serial Number: </span>
+                                                <input class="form-control" type="text" placeholder="Example: 5002-6666" ng-model="newDatastream.properties['hardware.serial_number']">
+                                            </div>
                                             <h6 class="modal-title">License: </h6>
-                                            <div class="indent-inputlines">
-                                                <div class="form-group">
-                                                    <label for="licensetypeInput">Type: </label>
-                                                    <input class="form-control" id="licensetypeInput" type="text" placeholder="Example: CC BY 4.0" ng-model="newDatastream.properties['device_id']">
+                                            <div class="indent-inputlines mb-4">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon" >Name: </span>
+                                                    <input class="form-control"type="text" placeholder="Example: CC BY 4.0" ng-model="newDatastream.properties.license.name">
                                                 </div>
-                                                <div class="form-group">
-                                                    <label for="licenseownerInput">Owner: </label>
-                                                    <input class="form-control" id="licenseownerInput" type="text" placeholder="Example: Max Musterfrau" ng-model="newDatastream.properties['license']['owner']">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon" >Legal Notice: </span>
+                                                    <input class="form-control" type="text" placeholder="Example: Max Musterfrau" ng-model="newDatastream.properties.license.legalnotice">
                                                 </div>
-                                                <div class="form-group">
-                                                    <label for="licensemetadataInput">Metadata: </label>
-                                                    <input class="form-control" id="licensemetadataInput" type="text" placeholder="Example: https://creativecommons.org/licenses/by/4.0/deed.de" ng-model="newDatastream.properties['license']['metadata']">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon" >URL: </span>
+                                                    <input class="form-control" type="text" placeholder="Example: https://creativecommons.org/licenses/by/4.0/deed.de" ng-model="newDatastream.properties.license.url">
                                                 </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="sensorserialnumberInput">Sensor Serial Number: </label>
-                                                <input class="form-control" id="sensorserialnumberInput" type="text" placeholder="Example: 5002-6666" ng-model="newDatastream.properties['sensor_serial_number']">
-                                            </div>
-                                            <div class="form-group">
-                                                    <label for="sensorameInput">Sensor Name: </label>
-                                                    <input class="form-control" id="sensorameInput" type="text" placeholder="Example: sds011" ng-model="newDatastream.properties['sensor_name']">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="datastreamopertorurlInput">Datastream Operator URL: </label>
-                                                <input class="form-control" id="datastreamopertorurlInput" type="text" placeholder="Example: teco.edu" ng-model="newDatastream.properties['operator_url']">
                                             </div>
                                         </div>
+
+                                        <hr>
+                                        <ul class="list-group">
+                                        <li ng-if="!newThing" class="list-group-item">Thing id: </li>
+                                        <li ng-if="newThing" class="list-group-item list-group-item-success">Thing id: {{ newThing["@iot.id"] }}</li>
+
+                                        <li ng-if="!newDatastream.sensor" class="list-group-item">Sensor id:&nbsp;<span class="text-danger">Please Select a Sensor</span></li>
+                                        <li ng-if="newDatastream.sensor" class="list-group-item list-group-item-success">Sensor id: {{ newDatastream.sensor["@iot.id"] }}</li>
+
+                                        <li ng-if="!newDatastream.observedproperty" class="list-group-item">Observed Property id:&nbsp;<span class="text-danger">Please select an Observed Property</span></li>
+                                        <li ng-if="newDatastream.observedproperty" class="list-group-item list-group-item-success">Observed Property id: {{ newDatastream.observedproperty["@iot.id"] }}</li>
+                                        
+                                        <li class="list-group-item">unhashed Datastream id: {{ generateDatastreamid()["unhashed"] }}</li>
+
+                                        <li class="list-group-item">Datastream id: {{ generateDatastreamid()["@iot.id"] }}</li>
+
+                                        </ul>
+
+
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -227,21 +298,18 @@
                     </div>
                     <!-- Modal end -->
 
-                    <!-- abfrage observed property in das datastream modal rein zur auswahl. falls nicht vorhanden inline anlegen?-->
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="obsprop-select">Select Observed Property:</label>
-                                <select class="custom-select" id="obsprop-select">
-                                    <option selected> -- None Selected --</option>
-                                    <option ng-repeat="x in obspropList" value="{{x['@iot.id']}}"> {{x["name"]}}</option>
-                                </select>
-                            </div>
-                        </div>
                     </div>
-
+                    <div ng-if="!newThing">
+                        please choose a Thing to attach Datastreams to
+                    </div>
+                    <div ng-if="newThing && !thisThingsSensorList">
+                        Thing does not have any Sensor (types) attached to it. Please add at least one Sensor (type)
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- sha1 library, MIT license -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/js-sha1/0.6.0/sha1.js"></script>
