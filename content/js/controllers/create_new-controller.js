@@ -99,7 +99,7 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
     };
 
 
-    //can try and catch for all components to give feedback on the error if necessary
+    //can try and catch for all components individually to give feedback on the error if necessary
     $scope.generateDatastreamid = function(){
         try{
         unhashedid="saqn:ds:" + $scope.newThing.properties["operator.domain"] + ":" + $scope.newThing.properties["shortname"] + ":" + $scope.newThing.properties["operator.domain"] + ":"
