@@ -2,6 +2,9 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
     $scope.Page.setTitle('CREATE NEW DEVICE');
     $scope.Page.setHeaderIcon(iconThing);
 
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();   
+      });
 
     $http.get(getUrl() + '/v1.0/ObservedProperties').then(function (response) {
         $scope.obspropList = response.data.value;

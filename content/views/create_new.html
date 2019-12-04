@@ -242,28 +242,30 @@
                                             <h6 class="modal-title">Software Version: </h6>
                                             <div class="indent-inputlines mb-4">
                                                 <div class="input-group">
-                                                    <span class="input-group-addon">Version Number: </span>
+                                                    <span class="input-group-addon">Version Number:<button type="button" class="input-group-text badge badge-info infobadge" title="Please provide a reference to the version of the installed Software.&#013;&#010;You can either provide a direct link to the software or just give the version number."><i class="fas fa-question-circle"></i></button></span>
                                                     <input class="form-control" type="text" placeholder="Example: v0.8.5" ng-model="newDatastream.properties.softwareversion.nr" />
-                                                    <span class="input-group-addon">Installation Date: </span>
-                                                    <input class="form-control" type="text" placeholder="Example: 2019-05-26T14:21:44.382Z" ng-model="newDatastream.properties.softwareversion.date" />
+                                                </div>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">Installation Date:<button type="button" class="input-group-text badge badge-info infobadge" title="Please provide the Installation date of the Software.&#013;&#010;Please use the ISO8601 Time Format without milliseconds. The Format consists of:&#013;&#010;- Year-Month-Day followed by a 'T' separator followed by Hour:Minute:Second followed by a Timezone&#013;&#010;- Please provide hours in 24 hours format&#013;&#010;- The Timezone may be provided with + or - Hours:Minutes deviation from GMT&#013;&#010;Example: 2019-11-01T22:00:00+01:00 is November the 1st, 10pm in UTC+1 Timezone (Central European)"><i class="fas fa-question-circle"></i></button></span>
+                                                    <input class="form-control" type="text" placeholder="Example: 2019-05-26T14:21:44Z" ng-model="newDatastream.properties.softwareversion.date" pattern="^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)$"/>
                                                 </div>
                                             </div>
                                             <div class="input-group">
-                                                <span class="input-group-addon" >Hardware Serial Number: </span>
+                                                <span class="input-group-addon" >Hardware Serial Number:<button type="button" class="input-group-text badge badge-info infobadge" title="The Hardware Serial Number is what differentiates the individual elements of a product series.&#013;&#010;It is usually a number printed somewhere on the hardware component. "><i class="fas fa-question-circle"></i></button></span>
                                                 <input class="form-control" type="text" placeholder="Example: 5002-6666" ng-model="newDatastream.properties['hardware.serial_number']">
                                             </div>
                                             <h6 class="modal-title">License: </h6>
                                             <div class="indent-inputlines mb-4">
                                                 <div class="input-group">
-                                                    <span class="input-group-addon" >Name: </span>
+                                                    <span class="input-group-addon" >Name:<button type="button" class="input-group-text badge badge-info infobadge" title="Please provide the name of the license used"><i class="fas fa-question-circle"></i></button></span>
                                                     <input class="form-control"type="text" placeholder="Example: CC BY 4.0" ng-model="newDatastream.properties.license.name">
                                                 </div>
                                                 <div class="input-group">
-                                                    <span class="input-group-addon" >Legal Notice:<button type="button" class="input-group-text badge badge-info infobadge" title="'Legal Notice' is a free text field that may contain any legal information from e.g. Attribution to full texts that"><i class="fas fa-question-circle"></i></button></span>
-                                                    <input class="form-control" type="text" placeholder="Example: Max Musterfrau" ng-model="newDatastream.properties.license.legalnotice">
+                                                    <span class="input-group-addon" >Legal Notice:<button type="button" class="input-group-text badge badge-info infobadge" title="'Legal Notice' is a free text field that may contain any legal information from e.g. Attribution up to full texts that completely define the terms of use"><i class="fas fa-question-circle"></i></button></span>
+                                                    <textarea class="form-control" rows="1" placeholder="Example: Max Musterfrau" ng-model="newDatastream.properties.license.legalnotice"></textarea>
                                                 </div>
                                                 <div class="input-group">
-                                                    <span class="input-group-addon" >URL: </span>
+                                                    <span class="input-group-addon" >URL:<button type="button" class="input-group-text badge badge-info infobadge" title="please provide a link to a definition of the license, unless the 'Legal Notice'-field already fully defines the license."><i class="fas fa-question-circle"></i></button></span>
                                                     <input class="form-control" type="text" placeholder="Example: https://creativecommons.org/licenses/by/4.0/deed.de" ng-model="newDatastream.properties.license.url">
                                                 </div>
                                             </div>

@@ -5566,4 +5566,5 @@ span.rz-pointer {
   margin-top: auto;
   margin-bottom: auto;
   border-radius: 10rem;
+  white-space: pre-wrap;
 }
