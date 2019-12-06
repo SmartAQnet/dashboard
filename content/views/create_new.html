@@ -202,16 +202,16 @@
                                     <div>
                                         <h3 class="modal-title">Datastream</h3>
                                         <div class="input-group">
-                                            <span class="input-group-addon" >Datastream Name: </span>
+                                            <span class="input-group-addon" >Datastream Name:<button type="button" class="input-group-text badge badge-info infobadge" title="Please provide a human readable name for the Datastream"><i class="fas fa-question-circle"></i></button></span>
                                             <input class="form-control" type="text" placeholder="Example: PM10 Measurements of Crowdsensor 180232" ng-model="newDatastream.name" />
                                         </div>
                                         <div class="input-group">
-                                            <span class="input-group-addon" >Datastream Description: </span>
+                                            <span class="input-group-addon" >Datastream Description:<button type="button" class="input-group-text badge badge-info infobadge" title="Please provide a human readable description for the Datastream"><i class="fas fa-question-circle"></i></button></span>
                                             <input class="form-control" type="text" placeholder="Example: Datastream for Particulate Matter" ng-model="newDatastream.description" />
                                         </div>
                                         <div class="input-group">
                                             <div class="input-group-text mr-3">
-                                                Sensor (type): 
+                                                Sensor (type):<button type="button" class="input-group-text badge badge-info infobadge" title="Select the Sensor type from the list of Sensor types attached to the Thing which this Datastream belongs to.&#013;&#010;If you can't find the required Sensor, you need to add it to the Thing first before creating a Datastream for it"><i class="fas fa-question-circle"></i></button>
                                             </div>
                                             <select class="custom-select" ng-model="newDatastream.sensor" ng-options="x.name for x in thisThingsSensorList track by x['@iot.id']">
                                                 <option value="" selected>select the Sensor (type) this Datastream belongs to</option>
@@ -219,7 +219,7 @@
                                         </div>
                                         <div class="input-group">
                                             <div class="input-group-text mr-3">
-                                                Observed Property: 
+                                                Observed Property:<button type="button" class="input-group-text badge badge-info infobadge" title="Select the Observed Property from the list.&#013;&#010;If you can't find the corresponding Observed Property, you need to create it.&#013;&#010;Should that be the case, please be sure to read the requirements for creating an Observed Property or contact us"><i class="fas fa-question-circle"></i></button>
                                             </div>
                                             <select class="custom-select" ng-model="newDatastream.observedproperty" ng-options="x.name for x in obspropList track by x['@iot.id']"  ng-change="getUnitOfMeasurement(x['@iot.id'])">
                                                 <option value="" selected>select the Observed Property this Datastream measures</option>
@@ -229,11 +229,11 @@
                                         <h6 class="modal-title">Unit of Measurement: </h6>
                                         <div class="indent-inputlines mb-4">
                                             <div class="input-group">
-                                                <span class="input-group-addon">Unit Name: </span>
+                                                <span class="input-group-addon">Unit Name:<button type="button" class="input-group-text badge badge-info infobadge" title="Please provide a human readable name of the unit of Measurement"><i class="fas fa-question-circle"></i></button></span>
                                                 <input class="form-control" type="text" placeholder="Example: Microgram per Cubic Meter" ng-model="newDatastream.unitOfMeasurement.name" />
-                                                <span class="input-group-addon">Symbol: </span>
+                                                <span class="input-group-addon">Symbol:<button type="button" class="input-group-text badge badge-info infobadge" title="Please provide a Symbol for the unit of Measurement.&#013;&#010;We advice to use UCUM symbols"><i class="fas fa-question-circle"></i></button></span>
                                                 <input class="form-control" type="text" placeholder="Example: ug/m3" ng-model="newDatastream.unitOfMeasurement.symbol" />
-                                                <span class="input-group-addon">Definition: </span>
+                                                <span class="input-group-addon">Definition:<button type="button" class="input-group-text badge badge-info infobadge" title="Please provide a link to a definition of the unit of Measurement"><i class="fas fa-question-circle"></i></button></span>
                                                 <input class="form-control" type="text" placeholder="Example: http://unitsofmeasure.org/ucum.html" ng-model="newDatastream.unitOfMeasurement.definition" />
                                             </div>
                                         </div>
@@ -247,7 +247,7 @@
                                                 </div>
                                                 <div class="input-group">
                                                     <span class="input-group-addon">Installation Date:<button type="button" class="input-group-text badge badge-info infobadge" title="Please provide the Installation date of the Software.&#013;&#010;Please use the ISO8601 Time Format without milliseconds. The Format consists of:&#013;&#010;- Year-Month-Day followed by a 'T' separator followed by Hour:Minute:Second followed by a Timezone&#013;&#010;- Please provide hours in 24 hours format&#013;&#010;- The Timezone may be provided with + or - Hours:Minutes deviation from GMT&#013;&#010;Example: 2019-11-01T22:00:00+01:00 is November the 1st, 10pm in UTC+1 Timezone (Central European)"><i class="fas fa-question-circle"></i></button></span>
-                                                    <input class="form-control" type="text" placeholder="Example: 2019-05-26T14:21:44Z" ng-model="newDatastream.properties.softwareversion.date" pattern="^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)$"/>
+                                                    <input class="form-control" type="text" placeholder="Example: 2019-05-26T14:21:44+00:00" ng-model="newDatastream.properties.softwareversion.date" pattern="^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)$"/>
                                                 </div>
                                             </div>
                                             <div class="input-group">
@@ -282,12 +282,10 @@
                                         <li ng-if="!newDatastream.observedproperty" class="list-group-item">Observed Property id:&nbsp;<span class="text-danger">Please select an Observed Property</span></li>
                                         <li ng-if="newDatastream.observedproperty" class="list-group-item list-group-item-success">Observed Property id: {{ newDatastream.observedproperty["@iot.id"] }}</li>
                                         
-                                        <li class="list-group-item">unhashed Datastream id: {{ generateDatastreamid()["unhashed"] }}</li>
-
-                                        <li class="list-group-item">Datastream id: {{ generateDatastreamid()["@iot.id"] }}</li>
+                                        <li class="list-group-item">unhashed Datastream id: saqn:ds:<span style="color: blue;margin: 0px">{{ newThing.properties["operator.domain"] }}</span>:<span style="color: blue;margin: 0px">{{ newThing.properties["shortname"] }}</span>:<span style="color: blue;margin: 0px">{{ newThing.properties["hardware.id"] }}</span>:<span style="color: green;margin: 0px">{{ newDatastream.sensor.properties["manufacturer.domain"] }}</span>:<span style="color: green;margin: 0px">{{ newDatastream.sensor.properties["shortname"] }}</span>:<span style="color: red;margin: 0px">{{ newDatastream.properties["hardware.serial_number"] }}</span>:<span style="color: purple;margin: 0px">{{ newDatastream.observedproperty.properties["shortname"] }}</span>   </li>
 
                                         </ul>
-
+<!-- hash datastream ID on pressing the save button. display a notification and then list the datastream in the list with its id, sensor and obsprop. also clear relevant fields. edit button? or ask if everything correct before submitting-->
 
                                     </div>
                                 </div>
@@ -313,5 +311,3 @@
     </div>
 </div>
 
-<!-- sha1 library, MIT license -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/js-sha1/0.6.0/sha1.js"></script>

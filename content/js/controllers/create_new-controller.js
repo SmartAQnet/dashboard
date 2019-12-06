@@ -42,13 +42,12 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
     };
     
     $scope.getUnitOfMeasurement = function(obspropid){
-        $http.get(getUrl() + "/v1.0/ObservedProperties('" + obspropid + "')/properties/conventions").then(function (response) {
-            if(response.data.conventions.unitOfMeasurement) {
-                console.log(response.data.conventions.unitOfMeasurement);
-                $scope.newDatastream.unitOfMeasurement=response.data.conventions.unitOfMeasurement
-            };
-        }).catch(function (e){
+        $http.get(getUrl() + "/v1.0/ObservedProperties('" + obspropid + "')").then(function (response) {
+            try{
+                $scope.newDatastream.unitOfMeasurement=response.data.properties.conventions.unitOfMeasurement
+            } catch(e){
             console.log("Observerd Property does not have unit of measurement convention")
+            };
         });
     };
 
@@ -103,16 +102,53 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
 
 
     //can try and catch for all components individually to give feedback on the error if necessary
-    $scope.generateDatastreamid = function(){
+    var generateDatastreamid = function(){
+
         try{
-        unhashedid="saqn:ds:" + $scope.newThing.properties["operator.domain"] + ":" + $scope.newThing.properties["shortname"] + ":" + $scope.newThing.properties["operator.domain"] + ":"
-        + $scope.newDatastream.sensor.properties["manufacturer.domain"] + ":" + $scope.newDatastream.sensor.properties["shortname"] + ":"
-        + $scope.newDatastream.properties["hardware.serial_number"] + ":"
-        + $scope.newDatastream.observedproperty.properties["shortname"]
-        return({"unhashed":unhashedid,"@iot.id": sha1(unhashedid)})
+            var thingdomain = $scope.newThing.properties["operator.domain"]
         } catch(e) {
-            return({"unhashed": undefined,"@iot.id": undefined}) 
+            var thingdomain = ''
         }
+
+        try{
+            var thingshortname = $scope.newThing.properties["shortname"]
+        } catch(e) {
+            var thingshortname = ''
+        }
+        
+        try{
+            var thingid = $scope.newThing.properties["hardware.id"]
+        } catch(e) {
+            var thingid = ''
+        }
+                    
+        try{
+            var sensordomain = $scope.newDatastream.sensor.properties["manufacturer.domain"]
+        } catch(e) {
+            var sensordomain = ''
+        }
+                    
+        try{
+            var sensorshortname = $scope.newDatastream.sensor.properties["shortname"]
+        } catch(e) {
+            var sensorshortname = ''
+        }
+                    
+        try{
+            var serialnumber = $scope.newDatastream.properties["hardware.serial_number"]
+        } catch(e) {
+            var serialnumber = ''
+        }
+                    
+        try{
+            var obspropshortname = $scope.newDatastream.observedproperty.properties["shortname"]
+        } catch(e) {
+            var obspropshortname = ''
+        }
+                    
+    var unhashedid = "saqn:ds:" + thingdomain + ":" + thingshortname + ":" + thingid + ":" + sensordomain + ":" + sensorshortname + ":" + serialnumber + ":" + obspropshortname
+    
+    return("---hashed id here---")
     };
     
 
