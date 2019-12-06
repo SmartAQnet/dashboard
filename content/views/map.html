@@ -131,9 +131,14 @@
                     <span ng-if="loadedPercent">PREPARING DATA ({{loadedPercent}}/100)</span>
             </div>
             <div id="#map-timeline-ui-elements" ng-if="!isLoadingData">
-                <rzslider ng-if="!showOnlyLatest" rz-slider-model="slider.minValue"
-                    rz-slider-high="slider.maxValue"
-                    rz-slider-options="slider.options"></rzslider>
+                <div id="slider-container" ng-class="{isAutoPlayActive: isAutoPlayActive}" ng-if="!showOnlyLatest">
+                    <rzslider rz-slider-model="slider.minValue"
+                        rz-slider-high="slider.maxValue"
+                        rz-slider-options="slider.options"></rzslider>
+                        <button class="btn-raised btn text-primary ml-2" ng-click="toggleAutoPlay()">
+                            <i class="fas" ng-class="{'fa-play': !isAutoPlayActive, 'fa-pause': isAutoPlayActive}"></i>
+                        </button>
+                </div>
                 <button id="historicDataButton" class="btn btn-raised dropdown-toggle"  type="button" aria-haspopup="true" aria-expanded="false">
                     Loaded data: 
                         <span ng-if="showOnlyLatest">Latest</span>
