@@ -189,8 +189,8 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
     //views anpassen funktioniert nicht, obwohl console.log($scope) anzeigt, dass die da sein sollten
     if ($scope.id.match(/:home:/)) {
-        $scope.isLayerPinsActive = false
-        $scope.isColorMarkersActive = true
+        $scope.isLayerPinsActive = true
+        $scope.isColorMarkersActive = false
     } else if ($scope.id.match(/:t:/)) {
         $scope.isLayerPinsActive = true
         $scope.isColorMarkersActive = false
@@ -582,7 +582,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         //getAllLocations();
         //getAllObservations();
 
-        loadFeaturesFromServer($scope.showOnlyLatest).then(function () {
+        loadFeaturesFromServer($scope.showOnlyLatest, "", $scope.showOnlyLatest && !$scope.isColorMarkersActive).then(function () {
             selectPinsAndMarkersBasedOnTimeInterval($scope.showOnlyLatest);
         });
     }
@@ -1086,7 +1086,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         ViewfinderSource.clear();
         if (moment.duration(start.diff(end)).asMilliseconds() == 0) {
             //An empty interval signals that only latest data points should be loaded
-            loadFeaturesFromServer(true).then(function () {
+            loadFeaturesFromServer(true, "", !$scope.isColorMarkersActive).then(function () {
                 selectPinsAndMarkersBasedOnTimeInterval($scope.showOnlyLatest);
             });
             return;
@@ -1163,7 +1163,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         var polygonString = serverPolygon.map(function (coordinates) {
             return coordinates.join(" ");
         }).join(",");
-        loadFeaturesFromServer(false, polygonString);
+        loadFeaturesFromServer(false, polygonString, false);
     }
 
     /**
@@ -1177,7 +1177,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
      * @param {*} polygonString string of form "ALong ALat,BLong BLat,CLong CLat,DLong DLat,ALong ALat". Constraints query
      * @returns the angular HTTP Promise
      */
-    function loadFeaturesFromServer(loadLatestOnly, polygonString) {
+    function loadFeaturesFromServer(loadLatestOnly, polygonString, loadOnlyPins) {
         $scope.isLoadingData = true;
         $scope.loadedPercent = 0;
         if (!loadLatestOnly) {
@@ -1201,14 +1201,16 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             //all observations (sorting not necessary, done implicitly when building interval tree)
             "$top=999999;";
         var filterLocation = polygonString ? " and st_within(HistoricalLocations/Location/location,%20geography%27POLYGON((" + polygonString + "))%27)" : "";
-
-        return $http.get(getUrl() + "/v1.0/Things?$expand=" + "HistoricalLocations/Locations," + "Datastreams" +
+        var query = loadOnlyPins ? getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$expand=Locations" : 
+            getUrl() + "/v1.0/Things?$expand=" + "HistoricalLocations/Locations," + "Datastreams" +
             "($filter=ObservedProperty/@iot.id eq '" + obsproperty + "' " + timeIntervalDatastreamFilter + ";" +
             "$expand=ObservedProperty,Observations(" + timeIntervalObservationsFilter + observationsOptions + "$expand=FeatureOfInterest))" +
-            "&$filter=Datastreams/ObservedProperty/@iot.id eq '" + obsproperty + "'" + filterLocation).then(function (response) {
+            "&$filter=Datastreams/ObservedProperty/@iot.id eq '" + obsproperty + "'" + filterLocation;
+
+        return $http.get(query).then(function (response) {
                 //all returned things with at least one datastream
             var thingsPreviouslyInThisRegion = response.data.value.filter(function (thing) {
-                return thing.Datastreams.length > 0;
+                return !thing.Datastreams || thing.Datastreams.length > 0;
             });
             //Clear arrays
             allObservations.length = 0;
@@ -1218,6 +1220,17 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
             locationIntervalTree = new NodeIntervalTree.IntervalTree();
             thingsPreviouslyInThisRegion.forEach(function (thing) {
+
+                if(loadOnlyPins){
+                    $scope.isLoadingData = false;
+                    thing["HistoricalLocations"] = [{
+                        Locations: thing["Locations"]
+                    }];
+                    thing["HistoricalLocations"].forEach(function(loc){
+                        loc.time = moment().toISOString();
+                    });
+                }
+
                 // Guarantee ascending order by date
                 thing["HistoricalLocations"] = thing["HistoricalLocations"].sort(function (a, b) {
                     return moment(a.time).isBefore(moment(b.time)) ? -1 : 1;
@@ -1244,17 +1257,19 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                     Builds the rawObservations array.
                     Observation features are not created now but asynchronly to prevent hangs
                 */
-                thing.Datastreams.forEach(function (datastream) {
-                    return datastream.Observations.forEach(function (observation) {
-                        return rawObservations.push({
-                            datastream: datastream,
-                            observation: observation,
-                            thing: thing
+               if(!loadOnlyPins){
+                    thing.Datastreams.forEach(function (datastream) {
+                        return datastream.Observations.forEach(function (observation) {
+                            return rawObservations.push({
+                                datastream: datastream,
+                                observation: observation,
+                                thing: thing
+                            });
                         });
                     });
-                });
-                //Start feature generation for observations
-                startMakingColorFeatures();
+                    //Start feature generation for observations
+                    startMakingColorFeatures();
+                }
                 $scope.showOnlyLatest = loadLatestOnly;
                 $scope.selectDuration(moment.duration(10, "minutes"));
             });
@@ -1362,6 +1377,14 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             currentMarkerPointer += 2000;
         }, 17);
     }
+
+    $scope.$watch('isColorMarkersActive', function () {
+        if($scope.isColorMarkersActive && $scope.showOnlyLatest && allObservations.length == 0){
+            loadFeaturesFromServer(true, "", false).then(function () {
+                selectPinsAndMarkersBasedOnTimeInterval(true);
+            });
+        }
+    }, true);
 
     /**
      * Stopps the current process of adding markers
