@@ -2,17 +2,56 @@
     <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Location</th>
+            <th ng-if="keyIsSelected('name')">Name</th>
+            <th ng-if="keyIsSelected('description')">Description</th>
+            <th ng-if="keyIsSelected('Locations')">Locations</th>
+            <th ng-if="keyIsSelected('HistoricalLocations',false)">Historical Locations</th>
+            <th ng-if="keyIsSelected('@iot.id',false)">@iot.id</th>
+            <th ng-if="keyIsSelected('Datastreams',false)">Datastreams</th>
             <!--th>Delete</th-->
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="x in thingsList" >
-            <td ng-click="thingClicked(x['@iot.id'])">{{x["name"]}}</td>
-            <td ng-click="thingClicked(x['@iot.id'])">{{x["description"]}}</td>
-            <td ng-click="thingClicked(x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
+            <td ng-if="keyIsSelected('name')" ng-click="thingClicked(x['@iot.id'])">{{x["name"]}}</td>
+            <td ng-if="keyIsSelected('description')" ng-click="thingClicked(x['@iot.id'])">{{x["description"]}}</td>
+            <td ng-if="keyIsSelected('Locations')" ng-click="thingClicked(x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
+            
+            <td ng-if="keyIsSelected('HistoricalLocations',false)" ng-click="thingClicked(x['@iot.id'])">
+                <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
+                    <thead class="st-thead">
+                    <tr class="table-primary">
+                        <th>Time</th>
+                        <th>@iot.id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="y in x['HistoricalLocations']">
+                    <td>{{y["time"]}}</td>
+                    <td>{{y["@iot.id"]}}</td>
+                </tr>
+            </tbody>
+            </table>
+            </td>
+            
+            <td ng-if="keyIsSelected('@iot.id',false)" ng-click="thingClicked(x['@iot.id'])">{{x["@iot.id"]}}</td>
+            <td ng-if="keyIsSelected('Datastreams',false)" ng-click="thingClicked(x['@iot.id'])">
+                <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
+                    <thead class="st-thead">
+                    <tr class="table-primary">
+                        <th>Name</th>
+                        <th>@iot.id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="y in x['Datastreams']">
+                    <td>{{y["name"]}}</td>
+                    <td>{{y["@iot.id"]}}</td>
+                </tr>
+            </tbody>
+            </table>
+            </td>
+
             <!--td ng-click="thingClicked(x['@iot.id'])">
 		    <table class="table table-bordered table-hover st-table table-striped table-sm">
 			    <thead class="st-thead">
@@ -33,6 +72,15 @@
         </tr>
         </tbody>
     </table>
+    <div class="input-group">
+        <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip">&laquo; Previous Page</button>
+        <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip">Next Page &raquo;</button>
+        <div style="margin-left: auto; display: -webkit-inline-box">
+            <span class="input-group-addon">Display</span>
+            <select class="custom-select d-inline-block mx-2" ng-change="setNewTop()" ng-init="newTop" ng-model="newTop" ng-options="x for x in [10,25,50,100]"></select> 
+            <span class="input-group-addon ml-3">Items per Page</span>
+        </div>
+    </div>
     <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newThing"><i class="fa fa-plus"></i> New <span class="fa"></span></button>
     <div style="clear:both;"></div>
     <!-- Modal -->
