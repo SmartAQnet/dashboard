@@ -2,13 +2,13 @@
     <div class="card">
         <div class="card-header">
             <!--button class="backbutton"-->
-            <a class="backbutton" ng-href="#/thing/{{thingId}}"><span class="entityInfoHeader"><i class="fas fa-arrow-left mr-3"></i>Back to Thing: {{thingName}}</span></a>
+            <!-- <a class="backbutton" ng-href="#/thing/{{thingId}}"><span class="entityInfoHeader"><i class="fas fa-arrow-left mr-3"></i>Back to Thing: {{thingName}}</span></a> -->
             <!--button-->
             <ul class="nav nav-tabs mt-4">
                 <li class="nav-item" ng-click="tabPropertiesClicked()"><a class="nav-link" data-target="#properties" data-toggle="tab">Properties</a></li>
                 <li class="nav-item" ng-click="tabThingClicked()"><a class="nav-link" data-target="#thing" data-toggle="tab">Thing</a></li>
                 <li class="nav-item" ng-click="tabSensorClicked()"><a class="nav-link" data-target="#sensor" data-toggle="tab">Sensor</a></li>
-                <li class="nav-item" ng-click="tabObservationsClicked()"><a class="nav-link active" data-target="#observations" data-toggle="tab">Observations</a></li>
+                <li class="nav-item" ng-click="tabObservationsClicked()"><a class="nav-link active show" data-target="#observations" data-toggle="tab">Observations</a></li>
                 <li class="nav-item" ng-click="tabObservedPropertyClicked()"><a class="nav-link" data-target="#observedproperty" data-toggle="tab">ObservedProperty</a></li>
             </ul>
         </div>
@@ -20,20 +20,73 @@
                         <pre class="entityInfoInfo">{{name}}</pre>
                         <span class="entityInfoHeader">Description</span><br />
                         <pre class="entityInfoInfo">{{description}}</pre>
-                        <button class="collapsible">
-                            <span class="entityInfoHeader">Unit Of Measurement</span> <br />
-                        </button>
-                        <div class="collapsible-content">
-                            <pre class="entityInfoInfo">{{unitOfMeasurement | json:4}}</pre>
-                        </div>
-                        <button class="collapsible">
-                            <span class="entityInfoHeader">Observed Area</span> <br />
-                        </button>
-                        <div class="collapsible-content">
-                            <pre class="entityInfoInfo">{{observedArea | json:4}}</pre>
-                        </div>
                         <span class="entityInfoHeader">Id</span> <br />
-                        <pre class="entityInfoInfo">{{id}}</pre>
+                        <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0">{{id}}</pre>
+
+                        <!-- Collapsible/Modal button -->
+                        <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#dsproperties">Show/Hide Properties</button>
+                        <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#dsunitofmeasurement">Show/Hide Unit of Measurement</button>
+                        <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#dsobservedarea">Show/Hide Observed Area</button>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#patchds">Patch Datastream</button>
+
+                        <!-- Datastream Patch modal -->
+
+                        <!-- Thing Patch modal end -->
+
+                        <!-- collapsible properties -->
+                        <div id="dsproperties" class="collapse">
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                    <tr>
+                                        <th colspan="2" class="text-center">Properties</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(key, value) in properties">
+                                        <td>{{key}}</td>
+                                        <td>{{value}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- collapsible end -->
+
+                        <!-- collapsible unit of measurement -->
+                        <div id="dsunitofmeasurement" class="collapse">
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                    <tr>
+                                        <th colspan="2" class="text-center">Unit of Measurement</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(key, value) in unitOfMeasurement">
+                                        <td>{{key}}</td>
+                                        <td>{{value}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- collapsible end -->
+
+                        <!-- collapsible unit of observedarea -->
+                        <div id="dsobservedarea" class="collapse">
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                    <tr>
+                                        <th colspan="2" class="text-center">Observed Area</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(key, value) in observedArea">
+                                        <td>{{key}}</td>
+                                        <td>{{value}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- collapsible end -->
+
                     </div>
                 </div>
 
@@ -43,14 +96,29 @@
                         <pre class="entityInfoInfo">{{thingName}}</pre>
                         <span class="entityInfoHeader">Description</span><br />
                         <pre class="entityInfoInfo">{{thingDescription}}</pre>
-                        <button class="collapsible">
-                            <span class="entityInfoHeader">Properties</span> <br />
-                        </button>
-                        <div class="collapsible-content">
-                            <pre class="entityInfoInfo">{{thingProperties | json:4}}</pre>
-                        </div>
                         <span class="entityInfoHeader">Id</span> <br />
-                        <pre class="entityInfoInfo">{{thingId}}</pre>
+                        <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0">{{thingId}}</pre>
+                        
+                        <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#thingproperties">Show/Hide Properties</button>
+                        <a type="button" class="btn btn-primary collapsed" ng-href="#/thing/{{thingId}}">Go to Thing</a>
+
+                        <!-- collapsible properties -->
+                        <div id="thingproperties" class="collapse">
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                    <tr>
+                                        <th colspan="2" class="text-center">Properties</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(key, value) in thingProperties">
+                                        <td>{{key}}</td>
+                                        <td>{{value}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- collapsible end -->
                     </div>
                 </div>
 
@@ -60,12 +128,29 @@
                         <pre class="entityInfoInfo">{{sensorName}}</pre>
                         <span class="entityInfoHeader">Description</span><br />
                         <pre class="entityInfoInfo">{{sensorDescription}}</pre>
-                        <!--span class="entityInfoHeader">Encoding</span> <br /-->
-                        <!--pre class="entityInfoInfo">{{sensorEncoding}}</pre-->
-                        <span class="entityInfoHeader">Metadata</span> <br />
-                        <pre class="entityInfoInfo">{{sensorMetadata}}</pre>
                         <span class="entityInfoHeader">Id</span> <br />
-                        <pre class="entityInfoInfo">{{sensorId}}</pre>
+                        <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0">{{sensorId}}</pre>
+
+                        <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#sensorproperties">Show/Hide Properties</button>
+                        <a type="button" class="btn btn-primary collapsed" ng-href="#/sensor/{{sensorId}}">Go to Sensor</a>
+
+                        <!-- collapsible properties -->
+                        <div id="sensorproperties" class="collapse">
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                    <tr>
+                                        <th colspan="2" class="text-center">Properties</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(key, value) in sensorProperties">
+                                        <td>{{key}}</td>
+                                        <td>{{value}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- collapsible end -->
                     </div>
                 </div>
 
@@ -152,7 +237,9 @@
                         <span class="entityInfoHeader">Definition</span> <br />
                         <pre class="entityInfoInfo">{{observedPropertyDefinition}}</pre>
                         <span class="entityInfoHeader">Id</span> <br />
-                        <pre class="entityInfoInfo">{{observedPropertyId}}</pre>
+                        <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0">{{observedPropertyId}}</pre>
+
+                        <a type="button" class="btn btn-primary collapsed" ng-href="#//observedproperty/{{observedPropertyId}}">Go to Observed Property</a>
                     </div>
                 </div>
             </div>

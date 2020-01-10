@@ -38,8 +38,9 @@ gostApp.config(function ($routeProvider) {
 		when('/observedproperty/:id', { templateUrl: window.dashboardSettings.root + 'views/observedproperty.html', controller: "ObservedPropertyCtrl", activetab: 'properties' }).
 		when('/observedproperties', { templateUrl: window.dashboardSettings.root + 'views/observedproperties.html', controller: "ObservedPropertiesCtrl", activetab: 'properties' }).
 		when('/datastream/:id', { templateUrl: window.dashboardSettings.root + 'views/datastream.html', controller: "DatastreamCtrl", activetab: 'things' }).
+		when('/datastream/:id/observations', { templateUrl: window.dashboardSettings.root + 'views/observations.html', controller: "ObservationsCtrl", activetab: 'things' }).
 		when('/datastreams', { templateUrl: window.dashboardSettings.root + 'views/datastreams.html', controller: "DatastreamsCtrl", activetab: 'sensors' }).
-		when('/observations', { templateUrl: window.dashboardSettings.root + 'views/observations.html', controller: "ObservationsCtrl", activetab: 'sensors' }).
+		//when('/observations', { templateUrl: window.dashboardSettings.root + 'views/observations.html', controller: "ObservationsCtrl", activetab: 'sensors' }).
 		when('/featuresofinterest', { templateUrl: window.dashboardSettings.root + 'views/featuresofinterest.html', controller: "FeaturesOfInterestCtrl" }).
 		when('/create_new', { templateUrl: window.dashboardSettings.root + 'views/create_new.html', controller: "CreateNewCtrl" }).
 		//when('/:type/:id/patch', { templateUrl: window.dashboardSettings.root + 'views/patch.html', controller: "PatchCtrl" }).

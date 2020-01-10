@@ -102,20 +102,14 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     //     $scope.thingId = response.data["@iot.id"];
     //     $scope.thingName = response.data["name"];
     // });
-    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")?$expand=Thing($expand=Locations),ObservedProperty").then(function (response) {
-        $scope.thingId = response.data["Thing"]["@iot.id"];
-        $scope.thingName = response.data["Thing"]["name"];
-        $scope.location = response.data["Thing"]["Locations"][0]["location"]["coordinates"];
+    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")").then(function (response) {
+
         $scope.name = response.data["name"];
         $scope.description = response.data["description"];
         $scope.unitOfMeasurement = response.data["unitOfMeasurement"];
         $scope.observedArea = response.data["observedArea"];
+        $scope.properties = response.data["properties"];
         $scope.Page.selectedDatastream = response.data;
-
-        $scope.observedPropertyId = response.data["ObservedProperty"]["@iot.id"];
-        $scope.observedPropertyName = response.data["ObservedProperty"]["name"];
-        $scope.observedPropertyDescription = response.data["ObservedProperty"]["description"];
-        $scope.observedPropertyDefinition = response.data["ObservedProperty"]["definition"];
 
         $scope.showMap = true;
     });
@@ -126,10 +120,12 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     //$scope.tabPropertiesClicked = function () {};
 
     $scope.tabThingClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing?$expand=Locations").then(function (response) {
             $scope.thingId = response.data["@iot.id"];
+            $scope.thingName = response.data["name"];
             $scope.thingDescription = response.data["description"];
             $scope.thingProperties = response.data["properties"];
+            $scope.thingLocation = response.data["Thing"]["Locations"][0]["location"]["coordinates"];
         });
     };
 
@@ -139,7 +135,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
             $scope.sensorId = response.data["@iot.id"];
             $scope.sensorDescription = response.data["description"];
             $scope.sensorEncoding = response.data["encodingType"];
-            $scope.sensorMetadata = response.data["metadata"];
+            $scope.sensorProperties = response.data["properties"];
         });
     };
 
@@ -151,6 +147,15 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         }, 10);
     };
 
+
+    $scope.tabObservedPropertyClicked = function () {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/ObservedProperty").then(function (response) {
+            $scope.observedPropertyId = response.data["@iot.id"];
+            $scope.observedPropertyName = response.data["name"];
+            $scope.observedPropertyDescription = response.data["description"];
+            $scope.observedPropertyDefinition = response.data["definition"];
+        });
+    };
 
 	// $scope.tabObservedPropertyClicked = function () {
     // };

@@ -18,6 +18,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     $location.search({})
 
     $scope.patchThing = {}
+    $scope.patchLocation = {}
 
     $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")?$expand=Locations").then(function (response) {
         $scope.name = response.data["name"];
@@ -32,10 +33,9 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         //     'name': $scope.patchThing.name, 
         //     'description': $scope.patchThing.description, 
         //     'properties': {
-        //         'device_id': $scope.patchThing.description['device_id'],
-        //         'commission_date': $scope.patchThing.description['commission_date'],
-        //         'device_name': $scope.patchThing.description['device_name'],
-        //         'operator_url': $scope.patchThing.description['operator_url']
+        //         'hardware.id': $scope.patchThing.description['hardware.id'],
+        //         'shortname': $scope.patchThing.description['shortname'],
+        //         'operator.domain': $scope.patchThing.description['operator.domain']
         //     }
         // };
 
@@ -49,6 +49,11 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     });
     $scope.mapVisible = true;
     
+
+    $scope.deletekey = function(key,obj){
+        delete obj[key]
+    }
+
     $scope.tabPropertiesClicked = function () {
     };
 
@@ -57,16 +62,21 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
     //display current thing location in another color --> change color of the respective pin
 
-    /* //not working atm, cant find the functions which are defined in the map controller... maybe add this function to the map controller where the view is centered and check the current scope
+    //not working atm, cant find the functions which are defined in the map controller... maybe add this function to the map controller where the view is centered and check the current scope
     $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")/Locations").then(function (response) {
         $scope.locationsList = response.data.value;
-        highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
-        setview($scope.locationsList[0]["location"]["coordinates"]);
-    });
-    */
 
-    $scope.pathEntity = function(){
-        if($scope.patchpw == 'smartaqnet'){
+        $scope.patchLocation.name = $scope.locationsList[0]["name"]
+        $scope.patchLocation.description = $scope.locationsList[0]["description"]
+        $scope.patchLocation.coordinates = $scope.locationsList[0]["location"]["coordinates"]
+
+        //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
+        //setview($scope.locationsList[0]["location"]["coordinates"]);
+    });
+    
+
+    $scope.patchEntity = function(){
+        if(document.getElementById('patchpwcontainer').value == 'smartaqnet'){
             $scope.pwvalid = "PASSWORD CORRECT";
             document.getElementById('patchpwcontainer').classList.add("text-success");
             document.getElementById('patchpwcontainer').classList.remove("text-danger");

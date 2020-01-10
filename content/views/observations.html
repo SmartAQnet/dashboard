@@ -2,21 +2,33 @@
     <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
-            <th>ID</th>
-            <th>Phenomenon Time</th>
-            <th>Result</th>
-            <th>Result Time</th>
-            <th>Delete</th>
+            <th ng-if="keyIsSelected('resultTime',resultTime)">Result Time</th>
+            <th ng-if="keyIsSelected('result')">Result</th>
+            <th ng-if="keyIsSelected('phenomenonTime',!resultTime)">Phenomenon Time</th>
+            <th ng-if="keyIsSelected('Datastream',false)">Datastream</th>
+            <th ng-if="keyIsSelected('@iot.id',false)">@iot.id</th>
+            <th ng-if="keyIsSelected('FeatureOfInterest',false)">Feature of Interest</th>
+            <!--th>Delete</th-->
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="x in observationsList">
-            <td>{{x["@iot.id"]}}</td>
-            <td>{{x["phenomenonTime"]}}</td>
-            <td>{{x["result"]}}</td>
-            <td>{{x["resultTime"]}}</td>
-            <td><div class="fa fa-remove delete-entity" ng-click="deleteObservationClicked(x)"></div></td>
+            <td ng-if="keyIsSelected('resultTime',resultTime)">{{x["resultTime"]}}</td>
+            <td ng-if="keyIsSelected('result')">{{x["result"]}}</td>
+            <td ng-if="keyIsSelected('phenomenonTime',!resultTime)">{{x["phenomenonTime"]}}</td>
+            <td ng-if="keyIsSelected('Datastream',false)">{{x["Datastream"]}}</td>
+            <td ng-if="keyIsSelected('@iot.id',false)">{{x["@iot.id"]}}</td>
+            <td ng-if="keyIsSelected('FeatureOfInterest',false)">{{x["FeatureOfInterest"]}}</td>
         </tr>
         </tbody>
     </table>
+    <div class="input-group">
+        <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip">&laquo; Previous Page</button>
+        <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip">Next Page &raquo;</button>
+        <div style="margin-left: auto; display: -webkit-inline-box">
+            <span class="input-group-addon">Display</span>
+            <select class="custom-select d-inline-block mx-2" ng-change="setNewTop()" ng-init="newTop" ng-model="newTop" ng-options="x for x in [10,25,50,100]"></select> 
+            <span class="input-group-addon ml-3">Items per Page</span>
+        </div>
+    </div>
 </div>

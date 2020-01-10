@@ -15,6 +15,13 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     var query=getUrl() + "/v1.0/Things"+ Object.keys($routeParams).reduce(
 	    (a, i) => a + i + "=" + $routeParams[i] + "&","?").slice(0,-1) 
 
+
+
+
+
+
+    /** General functions that should be available in a parent controller */
+
     $http.get(query).then(function (response) {
 
         if($routeParams['$top']){
@@ -42,6 +49,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     }
     */
 
+    
     $scope.keyIsSelected = function(key, def=true){
         if ($routeParams['$select']){
             if($routeParams['$select'].split(',').includes(key)){ 
@@ -68,6 +76,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         $route.updateParams({'$top':$scope.newTop})
     };
 
+    /** up to here. actually the next one (or the next three) aswell */
     
     $scope.thingClicked = function (thingID) {
         angular.forEach($scope.things, function (value, key) {

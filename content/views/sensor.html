@@ -14,12 +14,27 @@
                         <pre class="entityInfoInfo">{{name}}</pre>
                         <span class="entityInfoHeader">Description</span><br />
                         <pre class="entityInfoInfo">{{description}}</pre>
-                        <button class="collapsible">
-                            <span class="entityInfoHeader">Properties</span> <br />
-                        </button>
-                        <div class="collapsible-content">
-                            <pre class="entityInfoInfo">{{properties | json:4}}</pre>
+                        <span class="entityInfoHeader">Id</span> <br />
+                        <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0">{{id}}</pre>
+
+                        <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#sensorproperties">Show/Hide Properties</button>
+                         <!-- collapsible properties -->
+                         <div id="sensorproperties" class="collapse" style="overflow:auto">
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                    <tr>
+                                        <th colspan="2" class="text-center">Properties</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(key, value) in properties">
+                                        <td>{{key}}</td>
+                                        <td>{{value}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
+                        <!-- collapsible end -->
                     </div>
                 </div>
                 <div class="tab-pane" id="datastreams">
@@ -53,10 +68,7 @@
     </div>
     <div class="row py-2">
         <div class="col-md-12">
-            <div class="card" >
-                <div class="card-header">Map showing all Sensors of type {{name}}</div>
-                <div class="map-container" ng-include="$window.dashboardSettings.root + 'views/map.html'">
-                </div>            
+            <div ng-if="showMap" class="map-container" ng-include="$window.dashboardSettings.root + 'views/map.html'">
             </div>
         </div>
     </div>
