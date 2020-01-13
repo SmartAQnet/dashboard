@@ -36,7 +36,6 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
         } else {
             $scope.nextLinkSkip = 0
         };
-        console.log($scope.observationsList)
     });
     
     $scope.keyIsSelected = function(key, def=true){
@@ -66,7 +65,6 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
     };
 
     /** up to here. */
-
 
 
 

@@ -71,7 +71,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         $scope.patchLocation.coordinates = $scope.locationsList[0]["location"]["coordinates"]
 
         //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
-        //setview($scope.locationsList[0]["location"]["coordinates"]);
+        setview($scope.locationsList[0]["location"]["coordinates"],15);
     });
     
 

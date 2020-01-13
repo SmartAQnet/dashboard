@@ -2,9 +2,9 @@
     <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
-            <th ng-if="keyIsSelected('resultTime',resultTime)">Result Time</th>
+            <th ng-if="keyIsSelected('resultTime')">Result Time</th>
             <th ng-if="keyIsSelected('result')">Result</th>
-            <th ng-if="keyIsSelected('phenomenonTime',!resultTime)">Phenomenon Time</th>
+            <th ng-if="keyIsSelected('phenomenonTime')">Phenomenon Time</th>
             <th ng-if="keyIsSelected('Datastream',false)">Datastream</th>
             <th ng-if="keyIsSelected('@iot.id',false)">@iot.id</th>
             <th ng-if="keyIsSelected('FeatureOfInterest',false)">Feature of Interest</th>
@@ -13,9 +13,9 @@
         </thead>
         <tbody>
         <tr ng-repeat="x in observationsList">
-            <td ng-if="keyIsSelected('resultTime',resultTime)">{{x["resultTime"]}}</td>
+            <td ng-if="keyIsSelected('resultTime')">{{x["resultTime"]}}</td>
             <td ng-if="keyIsSelected('result')">{{x["result"]}}</td>
-            <td ng-if="keyIsSelected('phenomenonTime',!resultTime)">{{x["phenomenonTime"]}}</td>
+            <td ng-if="keyIsSelected('phenomenonTime')">{{x["phenomenonTime"]}}</td>
             <td ng-if="keyIsSelected('Datastream',false)">{{x["Datastream"]}}</td>
             <td ng-if="keyIsSelected('@iot.id',false)">{{x["@iot.id"]}}</td>
             <td ng-if="keyIsSelected('FeatureOfInterest',false)">{{x["FeatureOfInterest"]}}</td>
