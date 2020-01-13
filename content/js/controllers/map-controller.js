@@ -1,13 +1,15 @@
-gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
+gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
 
 
     /************************************ Parameters ************************************/
     //                        set parameters for map and functions
     /************************************************************************************/
-	$http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$count=true&$top=0").then(function (response) {
-		$scope.active_devices = response.data["@iot.count"];
-	});
+    
+    $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$count=true&$top=0").then(function (response) {
+        $scope.active_devices = response.data["@iot.count"];
+    });
 
+    
     var augsburg = [10.8986971, 48.3668041];
     var karlsruhe = [8.4, 49];
 
@@ -187,8 +189,8 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
     //views anpassen funktioniert nicht, obwohl console.log($scope) anzeigt, dass die da sein sollten
     if ($scope.id.match(/:home:/)) {
-        $scope.isLayerPinsActive = false
-        $scope.isColorMarkersActive = true
+        $scope.isLayerPinsActive = true
+        $scope.isColorMarkersActive = false
     } else if ($scope.id.match(/:t:/)) {
         $scope.isLayerPinsActive = true
         $scope.isColorMarkersActive = false
@@ -580,7 +582,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         //getAllLocations();
         //getAllObservations();
 
-        loadFeaturesFromServer($scope.showOnlyLatest).then(function () {
+        loadFeaturesFromServer($scope.showOnlyLatest, "", $scope.showOnlyLatest && !$scope.isColorMarkersActive).then(function () {
             selectPinsAndMarkersBasedOnTimeInterval($scope.showOnlyLatest);
         });
     }
@@ -1084,7 +1086,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         ViewfinderSource.clear();
         if (moment.duration(start.diff(end)).asMilliseconds() == 0) {
             //An empty interval signals that only latest data points should be loaded
-            loadFeaturesFromServer(true).then(function () {
+            loadFeaturesFromServer(true, "", !$scope.isColorMarkersActive).then(function () {
                 selectPinsAndMarkersBasedOnTimeInterval($scope.showOnlyLatest);
             });
             return;
@@ -1161,7 +1163,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         var polygonString = serverPolygon.map(function (coordinates) {
             return coordinates.join(" ");
         }).join(",");
-        loadFeaturesFromServer(false, polygonString);
+        loadFeaturesFromServer(false, polygonString, false);
     }
 
     /**
@@ -1175,7 +1177,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
      * @param {*} polygonString string of form "ALong ALat,BLong BLat,CLong CLat,DLong DLat,ALong ALat". Constraints query
      * @returns the angular HTTP Promise
      */
-    function loadFeaturesFromServer(loadLatestOnly, polygonString) {
+    function loadFeaturesFromServer(loadLatestOnly, polygonString, loadOnlyPins) {
         $scope.isLoadingData = true;
         $scope.loadedPercent = 0;
         if (!loadLatestOnly) {
@@ -1199,14 +1201,16 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             //all observations (sorting not necessary, done implicitly when building interval tree)
             "$top=999999;";
         var filterLocation = polygonString ? " and st_within(HistoricalLocations/Location/location,%20geography%27POLYGON((" + polygonString + "))%27)" : "";
-
-        return $http.get(getUrl() + "/v1.0/Things?$expand=" + "HistoricalLocations/Locations," + "Datastreams" +
+        var query = loadOnlyPins ? getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$expand=Locations" : 
+            getUrl() + "/v1.0/Things?$expand=" + "HistoricalLocations/Locations," + "Datastreams" +
             "($filter=ObservedProperty/@iot.id eq '" + obsproperty + "' " + timeIntervalDatastreamFilter + ";" +
             "$expand=ObservedProperty,Observations(" + timeIntervalObservationsFilter + observationsOptions + "$expand=FeatureOfInterest))" +
-            "&$filter=Datastreams/ObservedProperty/@iot.id eq '" + obsproperty + "'" + filterLocation).then(function (response) {
+            "&$filter=Datastreams/ObservedProperty/@iot.id eq '" + obsproperty + "'" + filterLocation;
+
+        return $http.get(query).then(function (response) {
                 //all returned things with at least one datastream
             var thingsPreviouslyInThisRegion = response.data.value.filter(function (thing) {
-                return thing.Datastreams.length > 0;
+                return !thing.Datastreams || thing.Datastreams.length > 0;
             });
             //Clear arrays
             allObservations.length = 0;
@@ -1216,6 +1220,17 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
 
             locationIntervalTree = new NodeIntervalTree.IntervalTree();
             thingsPreviouslyInThisRegion.forEach(function (thing) {
+
+                if(loadOnlyPins){
+                    $scope.isLoadingData = false;
+                    thing["HistoricalLocations"] = [{
+                        Locations: thing["Locations"]
+                    }];
+                    thing["HistoricalLocations"].forEach(function(loc){
+                        loc.time = moment().toISOString();
+                    });
+                }
+
                 // Guarantee ascending order by date
                 thing["HistoricalLocations"] = thing["HistoricalLocations"].sort(function (a, b) {
                     return moment(a.time).isBefore(moment(b.time)) ? -1 : 1;
@@ -1242,17 +1257,19 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                     Builds the rawObservations array.
                     Observation features are not created now but asynchronly to prevent hangs
                 */
-                thing.Datastreams.forEach(function (datastream) {
-                    return datastream.Observations.forEach(function (observation) {
-                        return rawObservations.push({
-                            datastream: datastream,
-                            observation: observation,
-                            thing: thing
+               if(!loadOnlyPins){
+                    thing.Datastreams.forEach(function (datastream) {
+                        return datastream.Observations.forEach(function (observation) {
+                            return rawObservations.push({
+                                datastream: datastream,
+                                observation: observation,
+                                thing: thing
+                            });
                         });
                     });
-                });
-                //Start feature generation for observations
-                startMakingColorFeatures();
+                    //Start feature generation for observations
+                    startMakingColorFeatures();
+                }
                 $scope.showOnlyLatest = loadLatestOnly;
                 $scope.selectDuration(moment.duration(10, "minutes"));
             });
@@ -1328,7 +1345,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         stopAddingMarkers();
         var colorFeatures = ColoredMarkerSource.getFeatures();
         //Add 2000 at a time, then wait 17ms
-        markerAddingInterval = setInterval(function () {
+        markerAddingInterval = setTimeout(function addMarker() {
             if (currentMarkerPointer >= currentObservationList.length && currentMarkerPointer >= colorFeatures.length) {
                 stopAddingMarkers();
                 return;
@@ -1336,20 +1353,20 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
             //While there are features in the map from last interval, reuse old features
             for (var colorFeaturesPointer = currentMarkerPointer; colorFeaturesPointer < colorFeatures.length &&
                 colorFeaturesPointer < currentObservationList.length &&
-                colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++) {
+                colorFeaturesPointer < currentMarkerPointer + 1000; colorFeaturesPointer++) {
                 colorFeatures[colorFeaturesPointer].setGeometry(currentObservationList[colorFeaturesPointer].getGeometry());
                 colorFeatures[colorFeaturesPointer].setStyle(currentObservationList[colorFeaturesPointer].getStyle());
                 colorFeatures[colorFeaturesPointer].setProperties(currentObservationList[colorFeaturesPointer].getProperties());
             }
             //If there were more features in the old map, delete unused old features
             if (colorFeaturesPointer < colorFeatures.length) {
-                for (; colorFeaturesPointer < colorFeatures.length && colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++) {
+                for (; colorFeaturesPointer < colorFeatures.length && colorFeaturesPointer < currentMarkerPointer + 1000; colorFeaturesPointer++) {
                     ColoredMarkerSource.removeFeature(colorFeatures[colorFeaturesPointer]);
                 }
             }
             //If there were less features in the old map, create new ones
             else {
-                for (; colorFeaturesPointer < currentObservationList.length && colorFeaturesPointer < currentMarkerPointer + 2000; colorFeaturesPointer++) {
+                for (; colorFeaturesPointer < currentObservationList.length && colorFeaturesPointer < currentMarkerPointer + 1000; colorFeaturesPointer++) {
                     var newFeature = new ol.Feature();
                     newFeature.setGeometry(currentObservationList[colorFeaturesPointer].getGeometry());
                     newFeature.setStyle(currentObservationList[colorFeaturesPointer].getStyle());
@@ -1357,16 +1374,25 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
                     ColoredMarkerSource.addFeature(newFeature);
                 }
             }
-            currentMarkerPointer += 2000;
-        }, 17);
+            currentMarkerPointer += 1000;
+            markerAddingInterval = setTimeout(addMarker, 1);
+        }, 1);
     }
+
+    $scope.$watch('isColorMarkersActive', function () {
+        if($scope.isColorMarkersActive && $scope.showOnlyLatest && allObservations.length == 0){
+            loadFeaturesFromServer(true, "", false).then(function () {
+                selectPinsAndMarkersBasedOnTimeInterval(true);
+            });
+        }
+    }, true);
 
     /**
      * Stopps the current process of adding markers
      */
     function stopAddingMarkers() {
         if (markerAddingInterval != null) {
-            clearInterval(markerAddingInterval);
+            clearTimeout(markerAddingInterval);
             markerAddingInterval = null;
         }
     }
@@ -1593,6 +1619,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
         options: {
             floor: 0,
             ceil: 1,
+            interval:30,
             step: 0.000001,
             precision: 10,
             draggableRange: true,
@@ -1609,6 +1636,26 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce) {
     setTimeout(function () {
         return $scope.$broadcast('rzSliderForceRender');;
     }, 1000);
+
+    $scope.isAutoPlayActive = false;
+    var intervalAutoPlay = null;
+    $scope.toggleAutoPlay = function(){
+        $scope.isAutoPlayActive = !$scope.isAutoPlayActive;
+        if($scope.isAutoPlayActive){
+            intervalAutoPlay = $interval(function(){
+                if($scope.slider.maxValue + 0.001 < 1){
+                    $scope.slider.minValue += 0.001;
+                    $scope.slider.maxValue += 0.001;
+                } else {
+                    $scope.slider.maxValue = $scope.slider.maxValue - $scope.slider.minValue;
+                    $scope.slider.minValue = 0;
+                }
+                $scope.$broadcast('rzSliderForceRender');
+            }, 30);
+        } else if(intervalAutoPlay) {
+            $interval.cancel(intervalAutoPlay);
+        }
+    }
 
     /************************************ Obsproperty Selection ******************************/
     //                  creates the dropdown menu to select a observed property

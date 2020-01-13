@@ -3,6 +3,7 @@ var gostApp = angular.module('gostApp', ['ngRoute', 'vs-repeat', 'rzSlider']);
 
 gostApp.run(function($rootScope, $window) {
 	$rootScope.$window = $window;
+	$rootScope.moment = $window.moment;
 	/* This function allows to trigger AngularJS' recalculation if the scope was externally changed */
 	$rootScope.safeApply = function(fn) {
 		if(!this.$root) return;
@@ -77,7 +78,7 @@ function getId(id) {
 }
 
 function guid() {
-	function s4() { 
+	function s4() {
 		return Math.floor((1 + Math.random()) * 0x10000)
 			.toString(16)
 			.substring(1);
