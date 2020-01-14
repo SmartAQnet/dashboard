@@ -3,6 +3,11 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
     $scope.Page.setHeaderIcon(iconObservation);
     $scope.datastreamid = $routeParams.id;
 
+    $http.get(getUrl() + "/v1.0/Datastreams('" + $scope.datastreamid + "')").then(function (response) {
+        $scope.currentdatastream = response.data
+        $scope.uOM = $scope.currentdatastream["unitOfMeasurement"]   
+    });
+
     //defaults
     if(!("$orderby" in $routeParams)) $routeParams["$orderby"]="phenomenonTime desc";
 

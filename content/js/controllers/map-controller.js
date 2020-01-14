@@ -1,5 +1,15 @@
-gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
+gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $interval) {
 
+
+
+
+
+
+    /*
+    if(!("$filter" in $routeParams)){
+        $routeParams["$filter"]=filterparamforviewport()
+    };
+    */
 
     /************************************ Parameters ************************************/
     //                        set parameters for map and functions
@@ -24,9 +34,9 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
     };
 
 
-    function setview(coordinates) {
+    function setview(coordinates, mapzoom=13) {
         let view = new ol.View({
-            zoom: 13,
+            zoom: mapzoom,
             center: ol.proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857'),
             maxZoom: 20
         })
@@ -186,35 +196,51 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
 
     $scope.isKrigingActive = false
 
-
-    //views anpassen funktioniert nicht, obwohl console.log($scope) anzeigt, dass die da sein sollten
-    if ($scope.id.match(/:home:/)) {
-        $scope.isLayerPinsActive = true
-        $scope.isColorMarkersActive = false
-    } else if ($scope.id.match(/:t:/)) {
-        $scope.isLayerPinsActive = true
-        $scope.isColorMarkersActive = false
-    } else if ($scope.id.match(/:op:/)) {
-        $scope.isLayerPinsActive = false
-        $scope.isColorMarkersActive = true
-    } else if ($scope.id.match(/:ds:/)) {
-        $scope.isLayerPinsActive = false
-        $scope.isColorMarkersActive = true
-    } else if ($scope.id.match(/:s:/)) {
-        $scope.isLayerPinsActive = false
-        $scope.isColorMarkersActive = true
-    };
-
+    // ???
     $scope.$on("centerOn", function (event, location) {
         setview(location.coordinates);
     });
+    
+    
 
+
+    //set defaults depending on routing parameters
+    if ($routeParams.id){
+        if ($routeParams.id.match(/:t:/)) {
+            $scope.isLayerPinsActive = true
+            $scope.isColorMarkersActive = false
+            $http.get(getUrl() + "/v1.0/Things('" + $routeParams.id + "')/Locations").then(function (response) {
+                setview(response.data.value[0]["location"]["coordinates"]);
+            });
+        } else if ($routeParams.id.match(/:op:/)) {
+            $scope.isLayerPinsActive = false
+            $scope.isColorMarkersActive = true
+        } else if ($routeParams.id.match(/:ds:/)) {
+            $scope.isLayerPinsActive = false
+            $scope.isColorMarkersActive = true
+            $http.get(getUrl() + "/v1.0/Datastreams('" + $routeParams.id + "')/Thing/Locations").then(function (response) {
+                setview(response.data.value[0]["location"]["coordinates"]);
+            });
+        } else if ($routeParams.id.match(/:s:/)) {
+            $scope.isLayerPinsActive = false
+            $scope.isColorMarkersActive = true
+        } else {
+            $scope.isLayerPinsActive = true
+            $scope.isColorMarkersActive = false
+        }
+    } else {
+        $scope.isLayerPinsActive = true
+        $scope.isColorMarkersActive = false
+    }
+    
+
+    /*
     if ($scope.location) {
         setview($scope.location);
-    }
+    }*/
 
-    //Default Layers at page loading
 
+    //Default Layers at page loading: activate/deactivate layers
     togglelayers(PinLayer, $scope.isLayerPinsActive);
     togglelayers(ColoredMarkerLayer, $scope.isColorMarkersActive);
     togglelayers(canvasLayer, $scope.isKrigingActive);
@@ -500,6 +526,11 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
         });
     }
 
+// CAZ
+//https://api.smartaq.net/v1.0/Locations?$filter=st_within(location,geography'POLYGON((10.924750 48.386800,10.870650 48.386800,10.870650 48.332600,10.924750 48.332600, 10.924750 48.386800))')
+
+
+
     //get all observations for colored markers
     function getAllObservations() {
         $http.get(getUrl() + "/v1.0/Datastreams?$filter=not%20PhenomenonTime%20lt%20now()%20sub%20duration%27P1D%27%20and%20ObservedProperty/@iot.id%20eq%20%27" + obsproperty + "%27&$expand=ObservedProperty,Observations($top=1;$orderby=phenomenonTime%20desc;$expand=FeatureOfInterest)&$top=999999").then(function (response) {
@@ -668,13 +699,14 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
         $http.get(getUrl() + "/v1.0/Observations('" + observationId + "')?$expand=FeatureOfInterest,Datastream($expand=Thing,ObservedProperty,Sensor)").then(function (response) {
             observationInfo = response.data;
 
-            var info = document.getElementById('map-detailed-tooltip');
-            var crosslinks = document.getElementById('map-crosslinks');
+            // var info = document.getElementById('map-detailed-tooltip');
+            // var crosslinks = document.getElementById('map-crosslinks');
             // feature.setStyle({stroke: 'rgba(255,255,255,1.0)'});
             var featureInfo = feature.getProperties();
             $scope.information = {
                 observation: featureInfo.obspropertyName + " [" + featureInfo.dsUnit["symbol"] + "]: " + featureInfo.obsresult,
                 phenomenonTime: observationInfo['phenomenonTime'],
+                resultTime: observationInfo['resultTime'],
                 thingLink: "#/thing/" + observationInfo['Datastream']['Thing']['@iot.id'] + "?$expand=Locations",
                 thingLinkName: observationInfo['Datastream']['Thing']['name'],
                 datastreamLink: "#/datastream/" + observationInfo['Datastream']['@iot.id'],
@@ -720,6 +752,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
 
 
     olMap.on('click', function (evt) {
+        console.log(filterparamforviewport())
         var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
             return feature
         });
@@ -867,7 +900,22 @@ gostApp.controller('MapCtrl', function ($scope, $http, $sce, $interval) {
         return ([topright, topleft, bottomleft, bottomright]);
     };
 
+    function getcurrentextendPolygon(){
+        let topright = getcurrentextend()[0]
+        let topleft = getcurrentextend()[1]
+        let bottomleft = getcurrentextend()[2]
+        let bottomright = getcurrentextend()[3]
+        return ( "((" + topright[0].toString() + " " + topright[1].toString() + 
+        "," + topleft[0].toString() + " " + topleft[1].toString() +
+        "," + bottomleft[0].toString() + " " + bottomleft[1].toString() +
+        "," + bottomright[0].toString() + " " + bottomright[1].toString() + 
+        "," + topright[0].toString() + " " + topright[1].toString() + "))"
+        )
+    }
 
+    function filterparamforviewport(){
+        return ("st_within(location,geography'POLYGON" + getcurrentextendPolygon() + "')")
+    }
 
     function krigstuff(locations, values) {
         var lats = locations.map(function (x) {

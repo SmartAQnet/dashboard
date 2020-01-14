@@ -5589,3 +5589,8 @@ span.rz-pointer {
 .export-cell{
   vertical-align: middle;
 }
+
+.gridpos1{
+  grid-column: 1;
+  grid-row: 1;
+};

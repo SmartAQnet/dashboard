@@ -1,9 +1,9 @@
-<div>
-    <table class="table table-bordered table-hover st-table table-striped table-sm">
+<div style="display: grid">
+    <table class="table table-bordered table-hover st-table table-striped table-sm gridpos1">
         <thead class="st-thead">
         <tr>
             <th ng-if="keyIsSelected('resultTime')">Result Time</th>
-            <th ng-if="keyIsSelected('result')">Result</th>
+            <th ng-if="keyIsSelected('result')">Result [{{uOM['symbol']}}]</th>
             <th ng-if="keyIsSelected('phenomenonTime')">Phenomenon Time</th>
             <th ng-if="keyIsSelected('Datastream',false)">Datastream</th>
             <th ng-if="keyIsSelected('@iot.id',false)">@iot.id</th>
@@ -22,6 +22,12 @@
         </tr>
         </tbody>
     </table>
+    <div id="loading-screen-wrapper" class="gridpos1 mt-5" style="z-index: -1">
+        <div id="loading-screen" >
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            LOADING...
+        </div>
+    </div>
     <div class="input-group">
         <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip">&laquo; Previous Page</button>
         <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip">Next Page &raquo;</button>
@@ -31,4 +37,7 @@
             <span class="input-group-addon ml-3">Items per Page</span>
         </div>
     </div>
+    <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0"></pre>
+                        
+    <a type="button" class="btn btn-primary collapsed" ng-href="#/datastream/{{id}}/observations">Download Observations</a>
 </div>

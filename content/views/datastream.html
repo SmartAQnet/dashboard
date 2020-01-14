@@ -25,6 +25,7 @@
 
                         <!-- Collapsible/Modal button -->
                         <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#dsproperties">Show/Hide Properties</button>
+                        <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#dslicense">Show/Hide License</button>
                         <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#dsunitofmeasurement">Show/Hide Unit of Measurement</button>
                         <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#dsobservedarea">Show/Hide Observed Area</button>
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#patchds">Patch Datastream</button>
@@ -42,7 +43,25 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="(key, value) in properties">
+                                    <tr ng-hide="key=='license'" ng-repeat="(key, value) in properties">
+                                        <td>{{key}}</td>
+                                        <td>{{value}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- collapsible end -->
+
+                        <!-- collapsible properties -->
+                        <div id="dslicense" class="collapse">
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                    <tr>
+                                        <th colspan="2" class="text-center">License</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(key, value) in properties.license">
                                         <td>{{key}}</td>
                                         <td>{{value}}</td>
                                     </tr>
@@ -199,33 +218,36 @@
                         </div>
                     </div>
                     <div id="sideBySideComparison" ng-if="datastreams.state == Datastreams.states['secondary_loaded']">
-                            <div class="streamTitle main">{{name}}</div>
-                            <div id="observations-table-main" class="table table-bordered table-hover st-table table-striped table-sm">
-                                <div class="grid-row grid-header">
-                                    <div class="grid-cell">Result Time</div>
-                                    <div ng-repeat-end class="grid-cell">Result [<span id="unitOfMeasurementone"></span>]</div>
-                                </div>
-                                <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0, autoresize: true}">
-                                    <div class="grid-row" ng-class="{top: x == observationsList[0]}" ng-repeat="x in observationsList">
-                                        <div class="grid-cell">{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
-                                        <div class="grid-cell">{{x["result"]}}</div>
-                                    </div>
+                        <div class="streamTitle main">{{name}}</div>
+                        <div id="observations-table-main" class="table table-bordered table-hover st-table table-striped table-sm">
+                            <div class="grid-row grid-header">
+                                <div class="grid-cell">Result Time</div>
+                                <div ng-repeat-end class="grid-cell">Result [<span id="unitOfMeasurementone"></span>]</div>
+                            </div>
+                            <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0, autoresize: true}">
+                                <div class="grid-row" ng-class="{top: x == observationsList[0]}" ng-repeat="x in observationsList">
+                                    <div class="grid-cell">{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
+                                    <div class="grid-cell">{{x["result"]}}</div>
                                 </div>
                             </div>
-                            <div class="streamTitle secondary">{{nameSecondary}}</div>
-                            <div id="observations-table-secondary" class="table table-bordered table-hover st-table table-striped table-sm">
-                                <div class="grid-row grid-header">
-                                    <div class="grid-cell">Result Time</div>
-                                    <div ng-repeat-end class="grid-cell">Result [<span id="unitOfMeasurementtwo"></span>]</div>
-                                </div>
-                                <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0}">
-                                    <div class="grid-row" ng-class="{top: x == secondObservationsList[0]}" ng-repeat="x in secondObservationsList">
-                                        <div class="grid-cell">{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
-                                        <div class="grid-cell">{{x["result"]}}</div>
-                                    </div>
+                        </div>
+                        <div class="streamTitle secondary">{{nameSecondary}}</div>
+                        <div id="observations-table-secondary" class="table table-bordered table-hover st-table table-striped table-sm">
+                            <div class="grid-row grid-header">
+                                <div class="grid-cell">Result Time</div>
+                                <div ng-repeat-end class="grid-cell">Result [<span id="unitOfMeasurementtwo"></span>]</div>
+                            </div>
+                            <div class="grid-body" vs-repeat="{size:35, 'scroll-margin': 0}">
+                                <div class="grid-row" ng-class="{top: x == secondObservationsList[0]}" ng-repeat="x in secondObservationsList">
+                                    <div class="grid-cell">{{x["resultTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
+                                    <div class="grid-cell">{{x["result"]}}</div>
                                 </div>
                             </div>
+                        </div>
                     </div>
+                    <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0"></pre>
+                        
+                    <a type="button" class="btn btn-primary collapsed" ng-href="#/datastream/{{id}}/observations">View more/download Observations</a>
                 </div>
 
                 <div class="tab-pane" id="observedproperty">
