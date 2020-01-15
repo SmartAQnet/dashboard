@@ -1,5 +1,35 @@
-<div style="display: grid">
-    <table class="table table-bordered table-hover st-table table-striped table-sm gridpos1">
+<div>
+    <a type="button" class="btn btn-primary" ng-href="#/datastream/{{datastreamid}}">Go back to Datastream</a>
+    <div class="entityInfo">
+        <span class="entityInfoHeader">Total Number of Observations in this Datastream: </span> <br />
+        <pre class="entityInfoInfo" ng-if="dataIsLoaded">{{count}}</pre>
+        <pre class="entityInfoInfo" ng-if="!dataIsLoaded">... loading ...</pre>
+        <span class="entityInfoHeader">Select Parameter: </span>
+        <form>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectedparams['resultTime']">Result Time
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectedparams['result']">Result
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectedparams['phenomenonTime']">Phenomenon Time
+            </label>
+        </form>
+        <span class="entityInfoHeader">Top parameter: </span>
+        <form class="form-inline">
+            <div class="form-group" style="padding-top: 0">
+                <input type="text" class="form-control text-center" ng-model="newTop" style="width: 60px">
+            </div>
+            <div class="form-group mb-2" style="padding-top: 0">
+                <input type="text" readonly class="form-control-plaintext" value="Items per Page">
+            </div>
+
+        </form>
+        <button type="button" class="btn btn-outline-primary btn-block" ng-click="updatequery()">Refresh Table</button>
+    </div>
+    <pre class="entityInfoInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></pre>
+    <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
             <th ng-if="keyIsSelected('resultTime')">Result Time</th>
@@ -22,22 +52,18 @@
         </tr>
         </tbody>
     </table>
-    <div id="loading-screen-wrapper" class="gridpos1 mt-5" style="z-index: -1">
+    <div id="loading-screen-wrapper" ng-if="!dataIsLoaded">
         <div id="loading-screen" >
                 <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
             LOADING...
         </div>
     </div>
     <div class="input-group">
-        <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip">&laquo; Previous Page</button>
-        <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip">Next Page &raquo;</button>
-        <div style="margin-left: auto; display: -webkit-inline-box">
-            <span class="input-group-addon">Display</span>
-            <select class="custom-select d-inline-block mx-2" ng-change="setNewTop()" ng-init="newTop" ng-model="newTop" ng-options="x for x in [10,25,50,100]"></select> 
-            <span class="input-group-addon ml-3">Items per Page</span>
-        </div>
+        <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip" style="margin-left: auto">&laquo; Previous Page</button>
+        <button ng-if="dataIsLoaded" class="btn btn-secondary" disabled>Page {{currentpage}} of {{maxpages}}</button>
+        <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip" style="margin-right: auto">Next Page &raquo;</button>
     </div>
     <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0"></pre>
                         
-    <a type="button" class="btn btn-primary collapsed" ng-href="#/datastream/{{id}}/observations">Download Observations</a>
+    <a type="button" class="btn btn-block btn-primary" ng-href="#/datastream/{{datastreamid}}/observations">Download Observations</a>
 </div>

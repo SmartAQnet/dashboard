@@ -16,7 +16,8 @@
             <td ng-if="keyIsSelected('name')" ng-click="thingClicked(x['@iot.id'])">{{x["name"]}}</td>
             <td ng-if="keyIsSelected('description')" ng-click="thingClicked(x['@iot.id'])">{{x["description"]}}</td>
             <td ng-if="keyIsSelected('Locations')" ng-click="thingClicked(x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
-            
+            <td class="export-cell"><exportBtn thingid="x['@iot.id']"></exportBtn></td> 
+
             <td ng-if="keyIsSelected('HistoricalLocations',false)" ng-click="thingClicked(x['@iot.id'])">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">

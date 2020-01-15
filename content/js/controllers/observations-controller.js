@@ -3,18 +3,59 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
     $scope.Page.setHeaderIcon(iconObservation);
     $scope.datastreamid = $routeParams.id;
 
+
+    $scope.dataIsLoaded = false //for display of loading animation etc
+
+    /*
+    $scope.faasurl = "http://193.196.36.99:8080/function/thing-to-csv?thingid={{thingid}}&from_date={{from}}&to_date={{to}}&download={{thingid}}"
+
+    $scope.faasquery = {}
+    $scope.faasquery.thingid
+    */
+
+
     $http.get(getUrl() + "/v1.0/Datastreams('" + $scope.datastreamid + "')").then(function (response) {
         $scope.currentdatastream = response.data
         $scope.uOM = $scope.currentdatastream["unitOfMeasurement"]   
     });
 
     //defaults
+
+    // --- select query parameters, set default when no select parameter is given; then provide function that updates url
+    $scope.selectedparams = {}
+    if("$select" in $routeParams){
+        $route.current.params["$select"].split(",").forEach(val => $scope.selectedparams[val] = true)
+    } else {
+        $scope.selectedparams.resultTime = true;
+        $scope.selectedparams.phenomenonTime = true;
+        $scope.selectedparams.result = true;
+    }
+
+    $scope.updatequery = function(){
+        let trueparams = []
+        Object.keys($scope.selectedparams).forEach(key => {
+            if($scope.selectedparams[key]==true){
+                trueparams.push(key)
+            } 
+        })
+        $route.updateParams({'$select': trueparams.join(),'$top': $scope.newTop});
+    };
+    // ---
+
+
     if(!("$orderby" in $routeParams)) $routeParams["$orderby"]="phenomenonTime desc";
+    if(!("$count" in $routeParams)) $routeParams["$count"]="true";
 
     if(!("$top" in $routeParams)){
         $scope.newTop = 50;
-        $route.updateParams({'$top':$scope.newTop});
-    } else {$scope.newTop = $routeParams["$top"]}
+        $route.updateParams({'$top': $scope.newTop});
+    } else {
+        $scope.newTop = $routeParams["$top"]
+    }
+
+
+
+
 
 
     //Implement Server Query Language in Static urls
@@ -26,7 +67,7 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
 
     console.log(query)
     $http.get(query).then(function (response) {
-
+        $scope.dataIsLoaded = true
         if($routeParams['$top']){
             $scope.newTop = $routeParams['$top']
         };
@@ -41,6 +82,14 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
         } else {
             $scope.nextLinkSkip = 0
         };
+
+        $scope.count = response.data["@iot.count"]
+        $scope.maxpages = Math.ceil($scope.count/$scope.newTop)
+        if($scope.nextLinkSkip > 0){
+            $scope.currentpage = Math.ceil($scope.nextLinkSkip/$scope.newTop)
+        } else {
+            $scope.currentpage = 1
+        }
     });
     
     $scope.keyIsSelected = function(key, def=true){
