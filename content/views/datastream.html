@@ -119,7 +119,7 @@
                         <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0">{{thingId}}</pre>
                         
                         <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#thingproperties">Show/Hide Properties</button>
-                        <a type="button" class="btn btn-primary collapsed" ng-href="#/thing/{{thingId}}">Go to Thing</a>
+                        <a type="button" class="btn btn-primary" ng-href="#/thing/{{thingId}}">Go to Thing</a>
 
                         <!-- collapsible properties -->
                         <div id="thingproperties" class="collapse">
@@ -151,7 +151,7 @@
                         <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0">{{sensorId}}</pre>
 
                         <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#sensorproperties">Show/Hide Properties</button>
-                        <a type="button" class="btn btn-primary collapsed" ng-href="#/sensor/{{sensorId}}">Go to Sensor</a>
+                        <a type="button" class="btn btn-primary" ng-href="#/sensor/{{sensorId}}">Go to Sensor</a>
 
                         <!-- collapsible properties -->
                         <div id="sensorproperties" class="collapse">
@@ -247,7 +247,7 @@
                     </div>
                     <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0"></pre>
                         
-                    <a type="button" class="btn btn-primary collapsed" ng-href="#/datastream/{{id}}/observations">View more/download Observations</a>
+                    <a type="button" class="btn btn-primary" ng-href="#/datastream/{{id}}/observations">View more/download Observations</a>
                 </div>
 
                 <div class="tab-pane" id="observedproperty">
@@ -260,8 +260,7 @@
                         <pre class="entityInfoInfo">{{observedPropertyDefinition}}</pre>
                         <span class="entityInfoHeader">Id</span> <br />
                         <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0">{{observedPropertyId}}</pre>
-
-                        <a type="button" class="btn btn-primary collapsed" ng-href="#//observedproperty/{{observedPropertyId}}">Go to Observed Property</a>
+                        <a type="button" class="btn btn-primary" ng-href="#/observedproperty/{{observedPropertyId}}">Go to Observed Property</a>
                     </div>
                 </div>
             </div>

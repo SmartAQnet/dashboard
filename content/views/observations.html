@@ -7,19 +7,19 @@
         <span class="entityInfoHeader">Select Parameter: </span>
         <form>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectedparams['resultTime']">Result Time
+                <input type="checkbox" ng-model="selectparams['resultTime']">Result Time
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectedparams['result']">Result
+                <input type="checkbox" ng-model="selectparams['result']">Result
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectedparams['phenomenonTime']">Phenomenon Time
+                <input type="checkbox" ng-model="selectparams['phenomenonTime']">Phenomenon Time
             </label>
         </form>
         <span class="entityInfoHeader">Top parameter: </span>
         <form class="form-inline">
             <div class="form-group" style="padding-top: 0">
-                <input type="text" class="form-control text-center" ng-model="newTop" style="width: 60px">
+                <input type="text" class="form-control text-center" ng-model="$parent.newTop" style="width: 60px">
             </div>
             <div class="form-group mb-2" style="padding-top: 0">
                 <input type="text" readonly class="form-control-plaintext" value="Items per Page">
@@ -42,7 +42,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="x in observationsList">
+        <tr ng-repeat="x in dataList">
             <td ng-if="keyIsSelected('resultTime')">{{x["resultTime"]}}</td>
             <td ng-if="keyIsSelected('result')">{{x["result"]}}</td>
             <td ng-if="keyIsSelected('phenomenonTime')">{{x["phenomenonTime"]}}</td>

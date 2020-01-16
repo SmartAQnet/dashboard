@@ -1,23 +1,65 @@
 <div>
+    <div class="entityInfo">
+        <span class="entityInfoHeader">Total Number of Things: </span> <br />
+        <pre class="entityInfoInfo" ng-if="dataIsLoaded">{{count}}</pre>
+        <pre class="entityInfoInfo" ng-if="!dataIsLoaded">... loading ...</pre>
+        <span class="entityInfoHeader">Select Parameter: </span>
+        <form>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams['name']">Name
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams['description']">Description
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams['Locations']">Location
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams['HistoricalLocations']">Historical Locations
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams['@iot.id']">@iot.id
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams['Datastreams']">Datastreams
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams['properties']">Properties
+            </label>
+        </form>
+        <span class="entityInfoHeader">Top parameter: </span>
+        <form class="form-inline">
+            <div class="form-group" style="padding-top: 0">
+                <input type="text" class="form-control text-center" ng-model="$parent.newTop" style="width: 60px">
+            </div>
+            <div class="form-group mb-2" style="padding-top: 0">
+                <input type="text" readonly class="form-control-plaintext" value="Items per Page">
+            </div>
+
+        </form>
+        <button type="button" class="btn btn-outline-primary btn-block" ng-click="updatequery()">Refresh Table</button>
+    </div>
+    <pre class="entityInfoInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></pre>
     <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
             <th ng-if="keyIsSelected('name')">Name</th>
             <th ng-if="keyIsSelected('description')">Description</th>
-            <th ng-if="keyIsSelected('Locations')">Locations</th>
+            <th ng-if="keyIsSelected('Locations')">Location</th>
             <th ng-if="keyIsSelected('HistoricalLocations',false)">Historical Locations</th>
             <th ng-if="keyIsSelected('@iot.id',false)">@iot.id</th>
             <th ng-if="keyIsSelected('Datastreams',false)">Datastreams</th>
+            <th ng-if="keyIsSelected('properties',false)">Properties</th>
+            <th>Download</th>
             <!--th>Delete</th-->
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="x in thingsList" >
+        <tr ng-repeat="x in dataList" >
             <td ng-if="keyIsSelected('name')" ng-click="thingClicked(x['@iot.id'])">{{x["name"]}}</td>
             <td ng-if="keyIsSelected('description')" ng-click="thingClicked(x['@iot.id'])">{{x["description"]}}</td>
             <td ng-if="keyIsSelected('Locations')" ng-click="thingClicked(x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
-            <td class="export-cell"><exportBtn thingid="x['@iot.id']"></exportBtn></td> 
-
+            
             <td ng-if="keyIsSelected('HistoricalLocations',false)" ng-click="thingClicked(x['@iot.id'])">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
@@ -36,6 +78,7 @@
             </td>
             
             <td ng-if="keyIsSelected('@iot.id',false)" ng-click="thingClicked(x['@iot.id'])">{{x["@iot.id"]}}</td>
+
             <td ng-if="keyIsSelected('Datastreams',false)" ng-click="thingClicked(x['@iot.id'])">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
@@ -53,37 +96,24 @@
             </table>
             </td>
 
-            <!--td ng-click="thingClicked(x['@iot.id'])">
-		    <table class="table table-bordered table-hover st-table table-striped table-sm">
-			    <thead class="st-thead">
-				    <tr>
-					    <th>Key</th>
-					    <th>Value</th>
-				    </tr>
-			    </thead>
-			    <tbody>
-				    <tr ng-repeat="(key,value) in x['properties']" >
-					    <td>{{key}}</td>
-					    <td>{{value}}</td>
-				    </tr>
-			    </tbody>
-		    </table>
-	    </td>
-            <td><div class="fa fa-remove delete-entity" ng-click="deleteThingClicked(x)"></div></td-->
+            <td ng-if="keyIsSelected('properties',false)" ng-click="thingClicked(x['@iot.id'])">{{x["properties"]}}</td>
+            <td class="export-cell"><exportBtn thingid="x['@iot.id']"></exportBtn></td>
+
         </tr>
         </tbody>
     </table>
-    <div class="input-group">
-        <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip">&laquo; Previous Page</button>
-        <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip">Next Page &raquo;</button>
-        <div style="margin-left: auto; display: -webkit-inline-box">
-            <span class="input-group-addon">Display</span>
-            <select class="custom-select d-inline-block mx-2" ng-change="setNewTop()" ng-init="newTop" ng-model="newTop" ng-options="x for x in [10,25,50,100]"></select> 
-            <span class="input-group-addon ml-3">Items per Page</span>
+    <div id="loading-screen-wrapper" ng-if="!dataIsLoaded">
+        <div id="loading-screen" >
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            LOADING...
         </div>
     </div>
-    <button type="button" class="btn btn-primary btn-sm btn-add-entity" data-toggle="modal" data-target="#newThing"><i class="fa fa-plus"></i> New <span class="fa"></span></button>
-    <div style="clear:both;"></div>
+    <div class="input-group">
+        <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip" style="margin-left: auto">&laquo; Previous Page</button>
+        <button ng-if="dataIsLoaded" class="btn btn-secondary" disabled>Page {{currentpage}} of {{maxpages}}</button>
+        <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip" style="margin-right: auto">Next Page &raquo;</button>
+    </div>
+
     <!-- Modal -->
     <div class="modal fade" id="newThing" role="dialog">
         <div class="modal-dialog">
@@ -113,4 +143,5 @@
             </div>
         </div>
     </div>
+
 </div>
