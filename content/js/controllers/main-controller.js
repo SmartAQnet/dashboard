@@ -91,7 +91,8 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
                 $scope.nextLinkSkip = 0
             };
 
-            $scope.maxpages = Math.ceil(response.data["@iot.count"]/$scope.newTop)
+            $scope.count = response.data["@iot.count"]
+            $scope.maxpages = Math.ceil($scope.count/$scope.newTop)
             if($scope.nextLinkSkip > 0){
                 $scope.currentpage = Math.ceil($scope.nextLinkSkip/$scope.newTop)
             } else {

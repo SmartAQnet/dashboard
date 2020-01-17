@@ -2,7 +2,7 @@
     <a type="button" class="btn btn-primary" ng-href="#/datastream/{{datastreamid}}">Go back to Datastream</a>
     <div class="entityInfo">
         <span class="entityInfoHeader">Total Number of Observations in this Datastream: </span> <br />
-        <pre class="entityInfoInfo" ng-if="dataIsLoaded">{{count}}</pre>
+        <pre class="entityInfoInfo" ng-if="dataIsLoaded">{{$parent.count}}</pre>
         <pre class="entityInfoInfo" ng-if="!dataIsLoaded">... loading ...</pre>
         <span class="entityInfoHeader">Select Parameter: </span>
         <form>
@@ -38,7 +38,6 @@
             <th ng-if="keyIsSelected('Datastream',false)">Datastream</th>
             <th ng-if="keyIsSelected('@iot.id',false)">@iot.id</th>
             <th ng-if="keyIsSelected('FeatureOfInterest',false)">Feature of Interest</th>
-            <!--th>Delete</th-->
         </tr>
         </thead>
         <tbody>

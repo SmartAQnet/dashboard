@@ -120,7 +120,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     //$scope.tabPropertiesClicked = function () {};
 
     $scope.tabThingClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing?$expand=Locations").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing").then(function (response) {
             $scope.thingId = response.data["@iot.id"];
             $scope.thingName = response.data["name"];
             $scope.thingDescription = response.data["description"];

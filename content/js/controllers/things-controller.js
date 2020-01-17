@@ -4,6 +4,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
     //defaults
     // --- grab query parameters and set scope variables
+    
 
     if("$select" in $routeParams){
         $route.current.params["$select"].split(",").forEach(val => $scope.selectparams[val] = true)
@@ -13,12 +14,15 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         $scope.selectparams.Locations = true;
     }
 
-
+    //watching doesnt work, triggers only when clicking a second time. a different way? or put a timeout somewhere to force at the end of the queue?
     $scope.expandparams.Locations = $scope.selectparams.Locations;
     $scope.$watch("selectparams['Locations']", $scope.expandparams.Locations = $scope.selectparams.Locations);
 
     $scope.expandparams.HistoricalLocations = $scope.selectparams.HistoricalLocations;
     $scope.$watch("selectparams['HistoricalLocations']", $scope.expandparams.HistoricalLocations = $scope.selectparams.HistoricalLocations);
+
+    $scope.expandparams.Datastreams = $scope.selectparams.Datastreams;
+    $scope.$watch("selectparams['Datastreams']", $scope.expandparams.Datastreams = $scope.selectparams.Datastreams);
 
     if(!("$orderby" in $routeParams)) $routeParams["$orderby"]="name asc";
     if(!("$count" in $routeParams)) $routeParams["$count"]="true";
@@ -80,4 +84,8 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         });
     };
     */
+
+
+
+
 });
