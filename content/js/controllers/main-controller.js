@@ -27,12 +27,6 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     
     //function for "update table" button that pushes the user input into the url to trigger the query
     $scope.updatequery = function(){
-        let trueparamsselect = []
-        Object.keys($scope.selectparams).forEach(key => {
-            if($scope.selectparams[key]==true){
-                trueparamsselect.push(key)
-            } 
-        });
 
         let trueparamsexpand = []
         Object.keys($scope.expandparams).forEach(key => {
@@ -45,16 +39,10 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
 
         paramUpdate['$top'] = $scope.newTop
 
-        if(trueparamsselect.length>0){
-            paramUpdate['$select'] = trueparamsselect.join()
-        } else {
-            trueparamsselect=null
-        }
-
         if(trueparamsexpand.length>0){
             paramUpdate['$expand'] = trueparamsexpand.join()
         } else {
-            trueparamsexpand=null
+            paramUpdate['$expand'] = null
         }
 
         $route.updateParams(paramUpdate);
@@ -70,6 +58,8 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
             $scope.newTop = 50;
             $route.updateParams({'$top':$scope.newTop});
         } else {$scope.newTop = $routeParams["$top"]}
+
+        $scope.updatequery()
 
         $http.get(url).then(function (response) {
 
@@ -100,7 +90,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
             }
         });
     };
-    
+    /* //function that was used to bind checkbox to select parameter in query
     $scope.keyIsSelected = function(key, def=true){
         if ($routeParams['$select']){
             if($routeParams['$select'].split(',').includes(key)){ 
@@ -111,7 +101,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
         } else {
             return def //if no select parameter is given, return the given default, if no default given, return true (~no select is equal to show all)
         }
-    };
+    };*/
 
     $scope.followNextLink = function(){
         $route.updateParams({'$skip':$scope.nextLinkSkip});
@@ -125,6 +115,16 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
 
     $scope.setNewTop = function(){
         $route.updateParams({'$top':$scope.newTop})
+    };
+
+    $scope.linkClicked = function (type, id) {
+        angular.forEach($scope.things, function (value, key) {
+            if (value["@iot.id"] == id) {
+                //$scope.Page.selectedThing = value;
+            }
+        });
+
+        $scope.Page.go(type + "/" + id);
     };
 
     /** up to here. */

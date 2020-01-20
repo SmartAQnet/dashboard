@@ -1,8 +1,10 @@
-gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page) {
+gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, $location, Page) {
     $scope.id = $routeParams.id;
     $scope.Page.setTitle('DATASTREAM(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconDatastream);
  
+    //remove query params
+    $location.search({})
     
 /*
     $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$orderby=resultTime%20desc&$expand=FeatureOfInterest&$top=1").then(function (response) {
@@ -120,12 +122,12 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     //$scope.tabPropertiesClicked = function () {};
 
     $scope.tabThingClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Thing?$expand=Locations").then(function (response) {
             $scope.thingId = response.data["@iot.id"];
             $scope.thingName = response.data["name"];
             $scope.thingDescription = response.data["description"];
             $scope.thingProperties = response.data["properties"];
-            $scope.thingLocation = response.data["Thing"]["Locations"][0]["location"]["coordinates"];
+            $scope.thingLocation = response.data["Locations"][0]["location"]["coordinates"];
         });
     };
 

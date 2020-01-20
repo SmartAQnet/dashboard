@@ -42,23 +42,23 @@
     <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
-            <th ng-if="keyIsSelected('name')">Name</th>
-            <th ng-if="keyIsSelected('description')">Description</th>
-            <th ng-if="keyIsSelected('Locations')">Location</th>
-            <th ng-if="keyIsSelected('HistoricalLocations',false)">Historical Locations</th>
-            <th ng-if="keyIsSelected('@iot.id',false)">@iot.id</th>
-            <th ng-if="keyIsSelected('Datastreams',false)">Datastreams</th>
-            <th ng-if="keyIsSelected('properties',false)">Properties</th>
+            <th ng-if="selectparams['name']">Name</th>
+            <th ng-if="selectparams['description']">Description</th>
+            <th ng-if="selectparams['Locations']">Location</th>
+            <th ng-if="selectparams['HistoricalLocations']">Historical Locations</th>
+            <th ng-if="selectparams['@iot.id']">@iot.id</th>
+            <th ng-if="selectparams['Datastreams']">Datastreams</th>
+            <th ng-if="selectparams['properties']">Properties</th>
             <th>Download</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="x in dataList" >
-            <td ng-if="keyIsSelected('name')" ng-click="thingClicked(x['@iot.id'])">{{x["name"]}}</td>
-            <td ng-if="keyIsSelected('description')" ng-click="thingClicked(x['@iot.id'])">{{x["description"]}}</td>
-            <td ng-if="keyIsSelected('Locations')" ng-click="thingClicked(x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
+            <td ng-if="selectparams['name']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["name"]}}</td>
+            <td ng-if="selectparams['description']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["description"]}}</td>
+            <td ng-if="selectparams['Locations']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
             
-            <td ng-if="keyIsSelected('HistoricalLocations',false)" ng-click="thingClicked(x['@iot.id'])">
+            <td ng-if="selectparams['HistoricalLocations']" ng-click="linkClicked('thing',x['@iot.id'])">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
                     <tr class="table-primary">
@@ -75,9 +75,9 @@
             </table>
             </td>
             
-            <td ng-if="keyIsSelected('@iot.id',false)" ng-click="thingClicked(x['@iot.id'])">{{x["@iot.id"]}}</td>
+            <td ng-if="selectparams['@iot.id']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["@iot.id"]}}</td>
 
-            <td ng-if="keyIsSelected('Datastreams',false)" ng-click="thingClicked(x['@iot.id'])">
+            <td ng-if="selectparams['Datastreams']">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
                     <tr class="table-primary">
@@ -86,7 +86,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="y in x['Datastreams']">
+                <tr ng-repeat="y in x['Datastreams']" ng-click="linkClicked('datastream',y['@iot.id'])">
                     <td>{{y["name"]}}</td>
                     <td>{{y["@iot.id"]}}</td>
                 </tr>
@@ -94,7 +94,7 @@
             </table>
             </td>
 
-            <td ng-if="keyIsSelected('properties',false)" ng-click="thingClicked(x['@iot.id'])">{{x["properties"]}}</td>
+            <td ng-if="selectparams['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
             <td class="export-cell"><exportBtn thingid="x['@iot.id']"></exportBtn></td>
 
         </tr>

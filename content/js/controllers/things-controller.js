@@ -5,25 +5,28 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     //defaults
     // --- grab query parameters and set scope variables
     
+    if($scope.selectparams.name == undefined){$scope.selectparams.name = true};
+    if($scope.selectparams.description == undefined){$scope.selectparams.description = true};
+    if($scope.selectparams.Locations == undefined){$scope.selectparams.Locations = true};
 
-    if("$select" in $routeParams){
-        $route.current.params["$select"].split(",").forEach(val => $scope.selectparams[val] = true)
-    } else {
-        $scope.selectparams.name = true;
-        $scope.selectparams.description = true;
-        $scope.selectparams.Locations = true;
-    }
 
-    //watching doesnt work, triggers only when clicking a second time. a different way? or put a timeout somewhere to force at the end of the queue?
+    //watch select parameters that dont make sense without expanding
     $scope.expandparams.Locations = $scope.selectparams.Locations;
-    $scope.$watch("selectparams['Locations']", $scope.expandparams.Locations = $scope.selectparams.Locations);
+    $scope.$watch("selectparams['Locations']", function(newval,oldval){
+        $scope.expandparams.Locations = newval
+    });
 
     $scope.expandparams.HistoricalLocations = $scope.selectparams.HistoricalLocations;
-    $scope.$watch("selectparams['HistoricalLocations']", $scope.expandparams.HistoricalLocations = $scope.selectparams.HistoricalLocations);
+    $scope.$watch("selectparams['HistoricalLocations']", function(newval,oldval){
+        $scope.expandparams.HistoricalLocations = newval
+    });
 
     $scope.expandparams.Datastreams = $scope.selectparams.Datastreams;
-    $scope.$watch("selectparams['Datastreams']", $scope.expandparams.Datastreams = $scope.selectparams.Datastreams);
+    $scope.$watch("$parent.selectparams['Datastreams']", function(newval, oldval){
+        $scope.expandparams.Datastreams = newval
+    });
 
+    //default parameters that used in the query but hidden from the url 
     if(!("$orderby" in $routeParams)) $routeParams["$orderby"]="name asc";
     if(!("$count" in $routeParams)) $routeParams["$count"]="true";
     // ---
@@ -50,15 +53,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
    
     $scope.loadTable(query);
     
-    $scope.thingClicked = function (thingID) {
-        angular.forEach($scope.things, function (value, key) {
-            if (value["@iot.id"] == thingID) {
-                $scope.Page.selectedThing = value;
-            }
-        });
 
-        $scope.Page.go("thing/" + thingID);
-    };
 
 
 
