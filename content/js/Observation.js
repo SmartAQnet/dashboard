@@ -28,7 +28,7 @@ Stream.prototype.getFromServer = function($http, handleHttpError, callback){
             callback();
             return;
         }
-        var endDate = moment(r.data.value[0]['phenomenonTime']);
+        var endDate = r.data.value[0]['resultTime'] ? moment(r.data.value[0]['resultTime']) : moment(r.data.value[0]['phenomenonTime'].split("/")[0]);
         var startDate = moment(endDate).subtract(1, 'days');
         this.getFromServerDateTime($http, handleHttpError, startDate, endDate, callback);
     }.bind(this)).catch((function(error){
@@ -95,6 +95,7 @@ Stream.prototype.addDataPoint = function(value, method, isLive){
             this.datasetDownsampled[method](point);
         }
     } else {
+        //This pushed start and end results of a phenomenon seperatly. Now it only pushes end resutls
         var interval = moment.interval(value['phenomenonTime']);
         var pointStart = {
             phenomenonTime: value['phenomenonTime'],
@@ -111,13 +112,13 @@ Stream.prototype.addDataPoint = function(value, method, isLive){
             y: value['result']
         };
         if(isLive && !this.isLive){
-            this.cacheLive[method](pointStart);
+            //this.cacheLive[method](pointStart);
             this.cacheLive[method](pointEnd);
         }
         else{
-            this.dataset[method](pointStart);
+            //this.dataset[method](pointStart);
             this.dataset[method](pointEnd);
-            this.datasetDownsampled[method](pointStart);
+            //this.datasetDownsampled[method](pointStart);
             this.datasetDownsampled[method](pointEnd);
         }
     }
