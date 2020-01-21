@@ -50,8 +50,10 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
             var startDate = moment().startOf('hour');
             var endDate = moment().startOf('hour').add(32, 'hour');
             if($scope.observationsList.length > 0){
-                startDate = moment($scope.observationsList[$scope.observationsList.length - 1]["phenomenonTime"]);
-                endDate = moment($scope.observationsList[0]["phenomenonTime"]);
+                var start = $scope.observationsList[$scope.observationsList.length - 1];
+                var end = $scope.observationsList[0];
+                startDate = start['resultTime'] ? moment(start['resultTime']) : moment(start['phenomenonTime'].split("/")[0]);
+                endDate = end['resultTime'] ? moment(end['resultTime']) : moment(end['phenomenonTime'].split("/")[0]);
                 setDate(startDate, endDate);
             }
             $('#datetimes').daterangepicker({
