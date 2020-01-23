@@ -24,25 +24,60 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
 
     $scope.selectparams = {}
     $scope.expandparams = {}
-    
+
+    $scope.selectparams.obs = {}
+    $scope.expandparams.obs = {}
+
+    $scope.selectparams.things = {}
+    $scope.expandparams.things = {}
+
     //function for "update table" button that pushes the user input into the url to trigger the query
     $scope.updatequery = function(){
 
         let trueparamsexpand = []
-        Object.keys($scope.expandparams).forEach(key => {
-            if($scope.expandparams[key]==true){
-                trueparamsexpand.push(key)
-            } 
+        Object.keys($scope.expandparams).forEach(category => {
+            category.forEach(key => {
+                if($scope.expandparams[category][key]==true){
+                    trueparamsexpand.push(key)
+                } 
+            });
         });
+
+        let trueparamsselect = []
+        Object.keys($scope.selectparams).forEach(category => {
+            category.forEach(key => {
+                if($scope.selectparams[category][key]==true){
+                    trueparamsselect.push(key)
+                } 
+            });
+        });
+
+        let trueparamsfilter = []
+        Object.keys($scope.filterparams).forEach(category => {
+            category.forEach(key => {
+                if($scope.filterparams[category][key]==true){
+                    trueparamsfilter.push(key)
+                } 
+            });
+        });
+
 
         let paramUpdate = {}
 
         paramUpdate['$top'] = $scope.newTop
 
+
         if(trueparamsexpand.length>0){
             paramUpdate['$expand'] = trueparamsexpand.join()
         } else {
             paramUpdate['$expand'] = null
+        }
+
+        //needs to be more specific, there are some that need to be concatenated with or and some with and
+        if(trueparamsfilter.length>0){
+            paramUpdate['$filter'] = trueparamsfilter.join(' or ')
+        } else {
+            paramUpdate['$filter'] = null
         }
 
         $route.updateParams(paramUpdate);

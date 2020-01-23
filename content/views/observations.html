@@ -1,7 +1,6 @@
 <div>
-    <a type="button" class="btn btn-primary" ng-href="#/datastream/{{datastreamid}}">Go back to Datastream</a>
     <div class="entityInfo">
-        <span class="entityInfoHeader">Total Number of Observations in this Datastream: </span> <br />
+        <span class="entityInfoHeader">Total Number of Observations selected: </span> <br />
         <pre class="entityInfoInfo" ng-if="dataIsLoaded">{{$parent.count}}</pre>
         <pre class="entityInfoInfo" ng-if="!dataIsLoaded">... loading ...</pre>
         <span class="entityInfoHeader">Select Parameter: </span>
@@ -32,22 +31,22 @@
     <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
-            <th ng-if="keyIsSelected('resultTime')">Result Time</th>
-            <th ng-if="keyIsSelected('result')">Result [{{uOM['symbol']}}]</th>
-            <th ng-if="keyIsSelected('phenomenonTime')">Phenomenon Time</th>
-            <th ng-if="keyIsSelected('Datastream',false)">Datastream</th>
-            <th ng-if="keyIsSelected('@iot.id',false)">@iot.id</th>
-            <th ng-if="keyIsSelected('FeatureOfInterest',false)">Feature of Interest</th>
+            <th ng-if="selectparams['obs.resultTime']">Result Time</th>
+            <th ng-if="selectparams['obs.result']">Result [{{uOM['symbol']}}]</th>
+            <th ng-if="selectparams['obs.phenomenonTime']">Phenomenon Time</th>
+            <th ng-if="selectparams['obs.Datastream']">Datastream</th>
+            <th ng-if="selectparams['obs.@iot.id']">@iot.id</th>
+            <th ng-if="selectparams['obs.FeatureOfInterest']">Feature of Interest</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="x in dataList">
-            <td ng-if="keyIsSelected('resultTime')">{{x["resultTime"]}}</td>
-            <td ng-if="keyIsSelected('result')">{{x["result"]}}</td>
-            <td ng-if="keyIsSelected('phenomenonTime')">{{x["phenomenonTime"]}}</td>
-            <td ng-if="keyIsSelected('Datastream',false)">{{x["Datastream"]}}</td>
-            <td ng-if="keyIsSelected('@iot.id',false)">{{x["@iot.id"]}}</td>
-            <td ng-if="keyIsSelected('FeatureOfInterest',false)">{{x["FeatureOfInterest"]}}</td>
+            <td ng-if="selectparams['obs.resultTime']">{{x["resultTime"]}}</td>
+            <td ng-if="selectparams['obs.result']">{{x["result"]}}</td>
+            <td ng-if="selectparams['obs.phenomenonTime']">{{x["phenomenonTime"]}}</td>
+            <td ng-if="selectparams['obs.Datastream']">{{x["Datastream"]}}</td>
+            <td ng-if="selectparams['obs.@iot.id']">{{x["@iot.id"]}}</td>
+            <td ng-if="selectparams['obs.FeatureOfInterest']">{{x["FeatureOfInterest"]}}</td>
         </tr>
         </tbody>
     </table>
@@ -64,5 +63,5 @@
     </div>
     <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0"></pre>
                         
-    <a type="button" class="btn btn-block btn-primary" ng-href="#/datastream/{{datastreamid}}/observations">Download Observations</a>
+    <a type="button" class="btn btn-block btn-primary">Download Observations</a>
 </div>

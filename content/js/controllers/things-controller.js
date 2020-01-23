@@ -5,25 +5,25 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     //defaults
     // --- grab query parameters and set scope variables
     
-    if($scope.selectparams.name == undefined){$scope.selectparams.name = true};
-    if($scope.selectparams.description == undefined){$scope.selectparams.description = true};
-    if($scope.selectparams.Locations == undefined){$scope.selectparams.Locations = true};
+    if($scope.selectparams.things.name == undefined){$scope.selectparams.things.name = true};
+    if($scope.selectparams.things.description == undefined){$scope.selectparams.things.description = true};
+    if($scope.selectparams.things.Locations == undefined){$scope.selectparams.things.Locations = true};
 
 
     //watch select parameters that dont make sense without expanding
-    $scope.expandparams.Locations = $scope.selectparams.Locations;
-    $scope.$watch("selectparams['Locations']", function(newval,oldval){
-        $scope.expandparams.Locations = newval
+    $scope.expandparams.things.Locations = $scope.selectparams.things.Locations;
+    $scope.$watch("selectparams.things['Locations']", function(newval,oldval){
+        $scope.expandparams.things.Locations = newval
     });
 
-    $scope.expandparams.HistoricalLocations = $scope.selectparams.HistoricalLocations;
-    $scope.$watch("selectparams['HistoricalLocations']", function(newval,oldval){
-        $scope.expandparams.HistoricalLocations = newval
+    $scope.expandparams.things.HistoricalLocations = $scope.selectparams.things.HistoricalLocations;
+    $scope.$watch("selectparams.things['HistoricalLocations']", function(newval,oldval){
+        $scope.expandparams.things.HistoricalLocations = newval
     });
 
-    $scope.expandparams.Datastreams = $scope.selectparams.Datastreams;
-    $scope.$watch("$parent.selectparams['Datastreams']", function(newval, oldval){
-        $scope.expandparams.Datastreams = newval
+    $scope.expandparams.things.Datastreams = $scope.selectparams.things.Datastreams;
+    $scope.$watch("$parent.selectparams.things['Datastreams']", function(newval, oldval){
+        $scope.expandparams.things.Datastreams = newval
     });
 
     //default parameters that used in the query but hidden from the url 

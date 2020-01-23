@@ -6,25 +6,25 @@
         <span class="entityInfoHeader">Select Parameter: </span>
         <form>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams['name']">Name
+                <input type="checkbox" ng-model="selectparams.things['name']">Name
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams['description']">Description
+                <input type="checkbox" ng-model="selectparams.things['description']">Description
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams['Locations']">Location
+                <input type="checkbox" ng-model="selectparams.things['Locations']">Location
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams['HistoricalLocations']">Historical Locations
+                <input type="checkbox" ng-model="selectparams.things['HistoricalLocations']">Historical Locations
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams['@iot.id']">@iot.id
+                <input type="checkbox" ng-model="selectparams.things['@iot.id']">@iot.id
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams['Datastreams']">Datastreams
+                <input type="checkbox" ng-model="selectparams.things['Datastreams']">Datastreams
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams['properties']">Properties
+                <input type="checkbox" ng-model="selectparams.things['properties']">Properties
             </label>
         </form>
         <span class="entityInfoHeader">Top parameter: </span>
@@ -42,23 +42,23 @@
     <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
-            <th ng-if="selectparams['name']">Name</th>
-            <th ng-if="selectparams['description']">Description</th>
-            <th ng-if="selectparams['Locations']">Location</th>
-            <th ng-if="selectparams['HistoricalLocations']">Historical Locations</th>
-            <th ng-if="selectparams['@iot.id']">@iot.id</th>
-            <th ng-if="selectparams['Datastreams']">Datastreams</th>
-            <th ng-if="selectparams['properties']">Properties</th>
+            <th ng-if="selectparams.things['name']">Name</th>
+            <th ng-if="selectparams.things['description']">Description</th>
+            <th ng-if="selectparams.things['Locations']">Location</th>
+            <th ng-if="selectparams.things['HistoricalLocations']">Historical Locations</th>
+            <th ng-if="selectparams.things['@iot.id']">@iot.id</th>
+            <th ng-if="selectparams.things['Datastreams']">Datastreams</th>
+            <th ng-if="selectparams.things['properties']">Properties</th>
             <th>Export</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="x in dataList" >
-            <td ng-if="selectparams['name']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["name"]}}</td>
-            <td ng-if="selectparams['description']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["description"]}}</td>
-            <td ng-if="selectparams['Locations']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
+            <td ng-if="selectparams.things['name']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["name"]}}</td>
+            <td ng-if="selectparams.things['description']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["description"]}}</td>
+            <td ng-if="selectparams.things['Locations']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
             
-            <td ng-if="selectparams['HistoricalLocations']" ng-click="linkClicked('thing',x['@iot.id'])">
+            <td ng-if="selectparams.things['HistoricalLocations']" ng-click="linkClicked('thing',x['@iot.id'])">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
                     <tr class="table-primary">
@@ -75,9 +75,9 @@
             </table>
             </td>
             
-            <td ng-if="selectparams['@iot.id']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["@iot.id"]}}</td>
+            <td ng-if="selectparams.things['@iot.id']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["@iot.id"]}}</td>
 
-            <td ng-if="selectparams['Datastreams']">
+            <td ng-if="selectparams.things['Datastreams']">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
                     <tr class="table-primary">
@@ -94,7 +94,7 @@
             </table>
             </td>
 
-            <td ng-if="selectparams['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
+            <td ng-if="selectparams.things['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
             <td class="export-cell"><exportBtn thingid="x['@iot.id']"></exportBtn></td>
 
         </tr>
