@@ -1,8 +1,8 @@
 <div>
     <div class="entityInfo">
         <span class="entityInfoHeader">Total Number of Things: </span> <br />
-        <pre class="entityInfoInfo" ng-if="dataIsLoaded">{{count}}</pre>
-        <pre class="entityInfoInfo" ng-if="!dataIsLoaded">... loading ...</pre>
+        <pre class="entityInfoInfo" ng-if="dataIsLoaded.things">{{count}}</pre>
+        <pre class="entityInfoInfo" ng-if="!dataIsLoaded.things">... loading ...</pre>
         <span class="entityInfoHeader">Select Parameter: </span>
         <form>
             <label class="checkbox-inline">
@@ -100,7 +100,7 @@
         </tr>
         </tbody>
     </table>
-    <div id="loading-screen-wrapper" ng-if="!dataIsLoaded">
+    <div id="loading-screen-wrapper" ng-if="!dataIsLoaded.things">
         <div id="loading-screen" >
                 <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
             LOADING...
@@ -108,7 +108,7 @@
     </div>
     <div class="input-group">
         <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip" style="margin-left: auto">&laquo; Previous Page</button>
-        <button ng-if="dataIsLoaded" class="btn btn-secondary" disabled>Page {{currentpage}} of {{maxpages}}</button>
+        <button ng-if="dataIsLoaded.things" class="btn btn-secondary" disabled>Page {{currentpage}} of {{maxpages}}</button>
         <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip" style="margin-right: auto">Next Page &raquo;</button>
     </div>
 

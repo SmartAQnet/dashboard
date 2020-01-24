@@ -19,24 +19,33 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
 
     
     //triggering ng-ifs for display
-    $scope.dataIsLoaded = false
-
+    $scope.dataIsLoaded = {}
+    $scope.dataIsLoaded.things = undefined
+    $scope.dataIsLoaded.obs = undefined
 
     $scope.selectparams = {}
     $scope.expandparams = {}
+    $scope.filterparamsID = {}
+    $scope.filterparamsOR = {}
 
     $scope.selectparams.obs = {}
     $scope.expandparams.obs = {}
+    $scope.filterparamsID.obs = {}
+    $scope.filterparamsOR.obs = {}
 
     $scope.selectparams.things = {}
     $scope.expandparams.things = {}
+    $scope.filterparamsID.things = {}
+    $scope.filterparamsOR.things = {}
+
+    
 
     //function for "update table" button that pushes the user input into the url to trigger the query
     $scope.updatequery = function(){
 
         let trueparamsexpand = []
         Object.keys($scope.expandparams).forEach(category => {
-            category.forEach(key => {
+            Object.keys($scope.expandparams[category]).forEach(key => {
                 if($scope.expandparams[category][key]==true){
                     trueparamsexpand.push(key)
                 } 
@@ -45,22 +54,30 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
 
         let trueparamsselect = []
         Object.keys($scope.selectparams).forEach(category => {
-            category.forEach(key => {
+            Object.keys($scope.selectparams[category]).forEach(key => {
                 if($scope.selectparams[category][key]==true){
                     trueparamsselect.push(key)
                 } 
             });
         });
 
-        let trueparamsfilter = []
-        Object.keys($scope.filterparams).forEach(category => {
-            category.forEach(key => {
-                if($scope.filterparams[category][key]==true){
-                    trueparamsfilter.push(key)
+        let trueparamsfilterID = []
+        Object.keys($scope.filterparamsID).forEach(category => {
+            Object.keys($scope.filterparamsID[category]).forEach(key => {
+                if($scope.filterparamsID[category][key]==true){
+                    trueparamsfilterID.push("Datastream/@iot.id eq '" + key + "'")
                 } 
             });
         });
 
+        let trueparamsfilterOR = []
+        Object.keys($scope.filterparamsOR).forEach(category => {
+            Object.keys($scope.filterparamsOR[category]).forEach(key => {
+                if($scope.filterparamsOR[category][key]==true){
+                    trueparamsfilterOR.push(key)
+                } 
+            });
+        });
 
         let paramUpdate = {}
 
@@ -73,9 +90,15 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
             paramUpdate['$expand'] = null
         }
 
-        //needs to be more specific, there are some that need to be concatenated with or and some with and
-        if(trueparamsfilter.length>0){
-            paramUpdate['$filter'] = trueparamsfilter.join(' or ')
+
+        if(trueparamsfilterID.length>0){
+            if(trueparamsfilterOR.length>0){
+                paramUpdate['$filter'] = trueparamsfilterID.join(' and ') + " or "  + trueparamsfilterOR.join(' or ')
+            } else {
+                paramUpdate['$filter'] = trueparamsfilterID.join(' and ')
+            }            
+        } else if (trueparamsfilterOR.length>0){
+            paramUpdate['$filter'] = trueparamsfilterOR.join(' or ')
         } else {
             paramUpdate['$filter'] = null
         }
@@ -87,7 +110,9 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
 
 
 
-    $scope.loadTable = function(url){
+    $scope.loadTable = function(url,context){
+
+        $scope.dataIsLoaded[context] = false
 
         if(!("$top" in $routeParams)){
             $scope.newTop = 50;
@@ -98,7 +123,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
 
         $http.get(url).then(function (response) {
 
-            $scope.dataIsLoaded = true
+            $scope.dataIsLoaded[context] = true
             
             $scope.dataList = response.data.value;
             

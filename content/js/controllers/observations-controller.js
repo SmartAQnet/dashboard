@@ -9,9 +9,14 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
     
 
     //watch select parameters that dont make sense without expanding
-    $scope.expandparams.obs.FoI = $scope.selectparams.obs.FoI;
-    $scope.$watch("selectparams.obs.['FoI']", function(newval,oldval){
-        $scope.expandparams.obs.FoI = newval
+    $scope.expandparams.obs.FeatureOfInterest = $scope.selectparams.obs.FeatureOfInterest;
+    $scope.$watch("selectparams.obs['FeatureOfInterest']", function(newval,oldval){
+        $scope.expandparams.obs.FeatureOfInterest = newval
+    });
+
+    $scope.expandparams.obs.Datastream = $scope.selectparams.obs.Datastream;
+    $scope.$watch("selectparams.obs['Datastream']", function(newval,oldval){
+        $scope.expandparams.obs.Datastream = newval
     });
 
 
@@ -43,19 +48,44 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
 
 
     //Implement Server Query Language in Static urls
-    $scope.query=getUrl() + "/v1.0/Observations"+ Object.keys($routeParams).filter(key => key.startsWith("$")).reduce(
+    $scope.obsquery=getUrl() + "/v1.0/Observations"+ Object.keys($routeParams).filter(key => key.startsWith("$")).reduce(
         (a, i) => a + i + "=" + $routeParams[i] + "&","?").slice(0,-1) 
 
 
     //put on ng click in view; button greyed out when not at least one datastream is selected
-    //$scope.loadTable($scope.query);
+    //$scope.loadTable($scope.obsquery,'obs');
     
     
 
+    $scope.checkAllDsOfThing = function(thingid){
+        $http.get(getUrl() + "/v1.0/Things('" + thingid + "')/Datastreams").then(function (response) {
+            response.data.value.forEach(datastream =>{
+                $scope.filterparamsID.obs[datastream["@iot.id"]] = !$scope.filterparamsID.obs[datastream["@iot.id"]]
+            });
+        });
+    };
 
 
+    $scope.loadListOfThings = function(){
 
-
+        $http.get(getUrl() + "/v1.0/Things?$expand=Datastreams").then(function (response){
+            $scope.listOfThings = response.data.value
+            
+            if(response.data["@iot.nextLink"]){
+                var link = response.data["@iot.nextLink"]
+                while(link){
+                    $http.get(link).then(function (resp){
+                        $scope.listOfThings.push(resp.data.value)
+                        if(resp.data["@iot.nextLink"]){
+                            link = resp.data["@iot.nextLink"]
+                        } else {
+                            link = false
+                        };
+                    });
+                };
+            };
+        });
+    };
 
 
 
