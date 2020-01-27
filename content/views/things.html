@@ -1,9 +1,25 @@
 <div>
-    <div class="entityInfo">
-        <span class="entityInfoHeader">Total Number of Things: </span> <br />
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>
+                How to use this Dashboard
+            </h3>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li>Click the name of a Thing or a Datastream to view its metadata</li>
+                <li>Click the checkboxes of any Datastreams or Things and see the information below the table on how to select Observations</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="entityInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0">
+        <span class="entityInfoHeader">Total Number of Things in List: </span> <br />
         <pre class="entityInfoInfo" ng-if="dataIsLoaded.things">{{count}}</pre>
         <pre class="entityInfoInfo" ng-if="!dataIsLoaded.things">... loading ...</pre>
-        <span class="entityInfoHeader">Select Parameter: </span>
+        <span class="entityInfoHeader">Select Things Column Display: </span>
         <form>
             <label class="checkbox-inline">
                 <input type="checkbox" ng-model="selectparams.things['name']">Name
@@ -35,10 +51,12 @@
             <div class="form-group mb-2" style="padding-top: 0">
                 <input type="text" readonly class="form-control-plaintext" value="Items per Page">
             </div>
+            <button type="button" class="btn btn-outline-primary" ng-click="updatequery('things')">Refresh Table</button>
         </form>
-        <button type="button" class="btn btn-outline-primary btn-block" ng-click="updatequery()">Refresh Table</button>
     </div>
-    <pre class="entityInfoInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></pre>
+    <div class="pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
+
+    <!-- Table Start -->
     <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
@@ -54,52 +72,70 @@
         </thead>
         <tbody>
         <tr ng-repeat="x in dataList" >
+            <!-- Name Description Location -->
             <td ng-if="selectparams.things['name']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["name"]}}</td>
             <td ng-if="selectparams.things['description']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["description"]}}</td>
             <td ng-if="selectparams.things['Locations']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
+            <!-- Name Description Location end -->
             
+            <!-- Historical Locations -->
             <td ng-if="selectparams.things['HistoricalLocations']" ng-click="linkClicked('thing',x['@iot.id'])">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
-                    <tr class="table-primary">
-                        <th>Time</th>
-                        <th>@iot.id</th>
+                        <tr class="table-primary">
+                            <th>Time</th>
+                            <th>@iot.id</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="y in x['HistoricalLocations']">
+                        <td>{{y["time"]}}</td>
+                        <td>{{y["@iot.id"]}}</td>
                     </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="y in x['HistoricalLocations']">
-                    <td>{{y["time"]}}</td>
-                    <td>{{y["@iot.id"]}}</td>
-                </tr>
-            </tbody>
-            </table>
+                    </tbody>
+                </table>
             </td>
+            <!-- Historical Locations End-->
             
+            <!-- Thing id -->
             <td ng-if="selectparams.things['@iot.id']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["@iot.id"]}}</td>
+            <!-- Thing id end -->
 
+            <!-- Datastreams -->
             <td ng-if="selectparams.things['Datastreams']">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
-                    <tr class="table-primary">
-                        <th>Name</th>
-                        <th>@iot.id</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="y in x['Datastreams']" ng-click="linkClicked('datastream',y['@iot.id'])">
-                    <td>{{y["name"]}}</td>
-                    <td>{{y["@iot.id"]}}</td>
-                </tr>
-            </tbody>
-            </table>
+                        <tr class="table-primary">
+                            <th>Name</th>
+                            <th>@iot.id</th>
+                            <th>Export</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="y in x['Datastreams']">
+                            <td ng-click="linkClicked('datastream',y['@iot.id'])">{{y["name"]}}</td>
+                            <td ng-click="linkClicked('datastream',y['@iot.id'])">{{y["@iot.id"]}}</td>
+                            <td ng-click="$parent.selectedDatastreams[y['@iot.id']] = !$parent.selectedDatastreams[y['@iot.id']]" style="text-align: center; vertical-align: middle;">
+                                <input type="checkbox" ng-model="$parent.selectedDatastreams[y['@iot.id']]" ng-click="$parent.selectedDatastreams[y['@iot.id']] = !$parent.selectedDatastreams[y['@iot.id']]">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </td>
+            <!-- Datastreams end -->
 
+            <!-- Properties and Export -->
             <td ng-if="selectparams.things['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
-            <td class="export-cell"><exportBtn thingid="x['@iot.id']"></exportBtn></td>
-
+            <td ng-click="checkAllDsOfThing(x['@iot.id'])" style="text-align: center; vertical-align: middle;">
+                <input type="checkbox" ng-model="checkMyDs[x['@iot.id']]" ng-change="checkAllDsOfThing(x['@iot.id'])">
+                <!-- <div class="export-cell"><exportBtn thingid="x['@iot.id']"></exportBtn></div> -->
+            </td>
+            <!-- Properties and Export end -->
         </tr>
         </tbody>
     </table>
+    <!-- Table end -->
+
     <div id="loading-screen-wrapper" ng-if="!dataIsLoaded.things">
         <div id="loading-screen" >
                 <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
@@ -139,6 +175,37 @@
                     <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
                 </div>
             </div>
+        </div>
+    </div>
+
+
+    <div class="pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>
+                How to customize a table of Observations for downloading
+            </h3>
+        </div>
+        <div class="card-body">
+            <ul>
+
+                <li>Select a number of Things or Datastreams by clicking the checkbox in the respective "Export" column</li>
+                <li>Alternatively draw a polygon on the map to select all Things in an area (not implemented yet)</li>
+                <li>Select a timespan from the calendar (default is the past 24 hours)</li>
+                <li>Then click the button below or below the table</li>
+            </ul>
+
+            <h5>Observations Query Parameters</h5>
+        <div class="jumbotron">
+            {{observationsQuery}}
+        </div>
+        <div>
+            <input type="text" id="calendar" />
+        </div>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-outline-primary btn-block" ng-click="showObservations()">Show Selected Observations</button>
         </div>
     </div>
 

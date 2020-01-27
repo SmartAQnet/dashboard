@@ -8,19 +8,17 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
     if($scope.selectparams.obs.phenomenonTime == undefined){$scope.selectparams.obs.phenomenonTime = true};
     
 
-    //watch select parameters that dont make sense without expanding
-    $scope.expandparams.obs.FeatureOfInterest = $scope.selectparams.obs.FeatureOfInterest;
-    $scope.$watch("selectparams.obs['FeatureOfInterest']", function(newval,oldval){
-        $scope.expandparams.obs.FeatureOfInterest = newval
-    });
+    //expand parameters...
 
-    $scope.expandparams.obs.Datastream = $scope.selectparams.obs.Datastream;
-    $scope.$watch("selectparams.obs['Datastream']", function(newval,oldval){
-        $scope.expandparams.obs.Datastream = newval
-    });
+
+    //HAUPTAUFGABE DES OBSERVATIONS CONTROLLER: PARAMETER AUS QUERY LESEN UND ENTSPRECHENDE URL ANFRAGEN
 
 
 
+
+
+
+    
     /* //faas sollte hier "einfach" die ganze tabelle runterladen mit datastream name/id/...? (auswählbar?) als column header
     $scope.faasurl = "http://193.196.36.99:8080/function/thing-to-csv?thingid={{thingid}}&from_date={{from}}&to_date={{to}}&download={{thingid}}"
 
@@ -56,7 +54,7 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
     //$scope.loadTable($scope.obsquery,'obs');
     
     
-
+        /*
     $scope.checkAllDsOfThing = function(thingid){
         $http.get(getUrl() + "/v1.0/Things('" + thingid + "')/Datastreams").then(function (response) {
             response.data.value.forEach(datastream =>{
@@ -64,7 +62,7 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
             });
         });
     };
-
+*/
 
     $scope.loadListOfThings = function(){
 

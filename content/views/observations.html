@@ -101,7 +101,7 @@
 
 
         <button ng-if="dataIsLoaded.obs==undefined" type="button" class="btn btn-outline-primary btn-block" ng-click="loadTable(obsquery,'obs')">Load Observations</button>
-        <button ng-if="dataIsLoaded.obs==true" type="button" class="btn btn-outline-primary btn-block" ng-click="updatequery()">Load Observations</button>
+        <button ng-if="dataIsLoaded.obs==true" type="button" class="btn btn-outline-primary btn-block" ng-click="updatequery('obs')">Load Observations</button>
         <button ng-if="dataIsLoaded.obs==false" type="button" class="btn btn-outline-primary btn-block" disabled>Loading... </button>
     </div>
     <pre class="entityInfoInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></pre>

@@ -23,61 +23,29 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     $scope.dataIsLoaded.things = undefined
     $scope.dataIsLoaded.obs = undefined
 
+
+    $scope.selectedDatastreams = {}
+    $scope.selectedDatastreamIds = []
+    $scope.selectedTimeframe = {}  
+
+    //select for table manipulation. NOT transported into query
     $scope.selectparams = {}
-    $scope.expandparams = {}
-    $scope.filterparamsID = {}
-    $scope.filterparamsOR = {}
-
     $scope.selectparams.obs = {}
-    $scope.expandparams.obs = {}
-    $scope.filterparamsID.obs = {}
-    $scope.filterparamsOR.obs = {}
-
     $scope.selectparams.things = {}
+
+    //expand parameters. ARE transported into the query
+    $scope.expandparams = {}
+    $scope.expandparams.obs = {}
     $scope.expandparams.things = {}
-    $scope.filterparamsID.things = {}
-    $scope.filterparamsOR.things = {}
+
 
     
 
     //function for "update table" button that pushes the user input into the url to trigger the query
-    $scope.updatequery = function(){
+    $scope.updatequery = function(category){
 
-        let trueparamsexpand = []
-        Object.keys($scope.expandparams).forEach(category => {
-            Object.keys($scope.expandparams[category]).forEach(key => {
-                if($scope.expandparams[category][key]==true){
-                    trueparamsexpand.push(key)
-                } 
-            });
-        });
-
-        let trueparamsselect = []
-        Object.keys($scope.selectparams).forEach(category => {
-            Object.keys($scope.selectparams[category]).forEach(key => {
-                if($scope.selectparams[category][key]==true){
-                    trueparamsselect.push(key)
-                } 
-            });
-        });
-
-        let trueparamsfilterID = []
-        Object.keys($scope.filterparamsID).forEach(category => {
-            Object.keys($scope.filterparamsID[category]).forEach(key => {
-                if($scope.filterparamsID[category][key]==true){
-                    trueparamsfilterID.push("Datastream/@iot.id eq '" + key + "'")
-                } 
-            });
-        });
-
-        let trueparamsfilterOR = []
-        Object.keys($scope.filterparamsOR).forEach(category => {
-            Object.keys($scope.filterparamsOR[category]).forEach(key => {
-                if($scope.filterparamsOR[category][key]==true){
-                    trueparamsfilterOR.push(key)
-                } 
-            });
-        });
+        //transport expand parameters into the query
+        let trueparamsexpand = Object.keys($scope.expandparams[category]).filter(key => $scope.expandparams[category][key] == true)
 
         let paramUpdate = {}
 
@@ -91,18 +59,6 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
         }
 
 
-        if(trueparamsfilterID.length>0){
-            if(trueparamsfilterOR.length>0){
-                paramUpdate['$filter'] = trueparamsfilterID.join(' and ') + " or "  + trueparamsfilterOR.join(' or ')
-            } else {
-                paramUpdate['$filter'] = trueparamsfilterID.join(' and ')
-            }            
-        } else if (trueparamsfilterOR.length>0){
-            paramUpdate['$filter'] = trueparamsfilterOR.join(' or ')
-        } else {
-            paramUpdate['$filter'] = null
-        }
-
         $route.updateParams(paramUpdate);
     };
     // ---
@@ -110,27 +66,30 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
 
 
 
-    $scope.loadTable = function(url,context){
+    $scope.loadTable = function(url,category){
 
-        $scope.dataIsLoaded[context] = false
+        $scope.dataIsLoaded[category] = false
 
         if(!("$top" in $routeParams)){
             $scope.newTop = 50;
             $route.updateParams({'$top':$scope.newTop});
         } else {$scope.newTop = $routeParams["$top"]}
 
-        $scope.updatequery()
+        $scope.updatequery(category)
 
         $http.get(url).then(function (response) {
 
-            $scope.dataIsLoaded[context] = true
+            $scope.dataIsLoaded[category] = true
             
             $scope.dataList = response.data.value;
             
+            /*
             if($routeParams['$top']){
                 $scope.newTop = $routeParams['$top']
             };
+            */
 
+            //pagination ---
             if($routeParams['$skip']){
                 $scope.thisLinkSkip = $routeParams['$skip']
             };
@@ -148,20 +107,10 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
             } else {
                 $scope.currentpage = $scope.maxpages
             }
+            //pagination end ---
         });
     };
-    /* //function that was used to bind checkbox to select parameter in query
-    $scope.keyIsSelected = function(key, def=true){
-        if ($routeParams['$select']){
-            if($routeParams['$select'].split(',').includes(key)){ 
-                return true //if key present, return true
-            } else {
-                return false //if key not present, return false
-            }
-        } else {
-            return def //if no select parameter is given, return the given default, if no default given, return true (~no select is equal to show all)
-        }
-    };*/
+
 
     $scope.followNextLink = function(){
         $route.updateParams({'$skip':$scope.nextLinkSkip});
@@ -178,16 +127,16 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     };
 
     $scope.linkClicked = function (type, id) {
+        /*
         angular.forEach($scope.things, function (value, key) {
             if (value["@iot.id"] == id) {
-                //$scope.Page.selectedThing = value;
+                $scope.Page.selectedThing = value;
             }
         });
-
+        */
         $scope.Page.go(type + "/" + id);
     };
 
-    /** up to here. */
 
 
 });

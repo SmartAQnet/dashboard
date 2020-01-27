@@ -65,7 +65,7 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
 
     $scope.addSensortoThing = function(sensor){
         if($scope.thisThingsSensorList.map(sens => sens["@iot.id"]).includes(sensor["@iot.id"])){
-            alert("This Sensor is already attached to the Thing") //implement this as toast
+            $.snackbar({content: "This Sensor is already attached to the Thing"})
         } else {
             $scope.thisThingsSensorList.push(sensor);
             $scope.newSensor = undefined;
@@ -88,7 +88,7 @@ gostApp.controller('CreateNewCtrl', function ($scope, $http, $routeParams) {
 
     $scope.addDatastreamtoThing = function(datastream){
         if($scope.thisThingsDatastreamList.map(ds => ds["@iot.id"]).includes(datastream["@iot.id"])){
-            alert("This Datastream is already attached to the Thing") //implement this as toast
+            $.snackbar({content: "This Datastream is already attached to the Thing"})
         } else {
             $scope.thisThingsDatastreamList.push(datastream);
             $scope.newDatastream = undefined;

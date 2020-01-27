@@ -2,29 +2,18 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     $scope.Page.setTitle('THINGS');
     $scope.Page.setHeaderIcon(iconThing);
 
-    //defaults
-    // --- grab query parameters and set scope variables
-    
+
+    //pure table manipulation, select isnt transported into the query
     if($scope.selectparams.things.name == undefined){$scope.selectparams.things.name = true};
     if($scope.selectparams.things.description == undefined){$scope.selectparams.things.description = true};
     if($scope.selectparams.things.Locations == undefined){$scope.selectparams.things.Locations = true};
+    if($scope.selectparams.things.Datastreams == undefined){$scope.selectparams.things.Datastreams = true};
 
+    //expand stuff per default (expand IS necessarily transported into the query transported into )
+    $scope.expandparams.things.Locations = true;
+    $scope.expandparams.things.HistoricalLocations = true;
+    $scope.expandparams.things.Datastreams = true;
 
-    //watch select parameters that dont make sense without expanding
-    $scope.expandparams.things.Locations = $scope.selectparams.things.Locations;
-    $scope.$watch("selectparams.things['Locations']", function(newval,oldval){
-        $scope.expandparams.things.Locations = newval
-    });
-
-    $scope.expandparams.things.HistoricalLocations = $scope.selectparams.things.HistoricalLocations;
-    $scope.$watch("selectparams.things['HistoricalLocations']", function(newval,oldval){
-        $scope.expandparams.things.HistoricalLocations = newval
-    });
-
-    $scope.expandparams.things.Datastreams = $scope.selectparams.things.Datastreams;
-    $scope.$watch("$parent.selectparams.things['Datastreams']", function(newval, oldval){
-        $scope.expandparams.things.Datastreams = newval
-    });
 
     //default parameters that used in the query but hidden from the url 
     if(!("$orderby" in $routeParams)) $routeParams["$orderby"]="name asc";
@@ -33,9 +22,18 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
     
     //Implement Server Query Language in Static urls
-    $scope.thingsquery=getUrl() + "/v1.0/Things"+ Object.keys($routeParams).reduce(
-	    (a, i) => a + i + "=" + $routeParams[i] + "&","?").slice(0,-1) 
+    var query=getUrl() + "/v1.0/Things" + Object.keys($routeParams).reduce((a, i) => a + i + "=" + $routeParams[i] + "&","?").slice(0,-1) 
 
+    //build query for observations
+    $scope.$watch('selectedDatastreams', function () {
+        $scope.selectedDatastreamIds = Object.keys($scope.selectedDatastreams).filter(key => $scope.selectedDatastreams[key] == true)
+        $scope.observationsQuery = "?$filter=" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ')
+    }, true);
+
+    $scope.$watch('selectedTimeframe', function () {
+        $scope.observationsQueryTime  = "?$filter=" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ')
+    }, true);
+    
 
     /* //this has the problem that the query language allows more complex nesting with ";" between $parameters and deeper nesting with e.g. ()...;$expand=...($select=...))
     //the code here takes care of the form "test(buu,baaa,boo),shubada(shwami,shaa),..."
@@ -46,16 +44,47 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     }
     */
 
+    $scope.checkMyDs = {}
 
- 
-    
+    /*
+    $scope.selectDatastream = function(id){
+        if($scope.selectedDatastreams[id]){
+            $scope.selectedDatastreams[id] = false
+        } else {
+            $scope.selectedDatastreams[id] = true
+        }
+        console.log($scope.selectedDatastreams[id])
+        console.log(id)
+        $scope.selectedDatastreams[id] = !$scope.selectedDatastreams[id]
+    }
+    */
 
+    $scope.checkAllDsOfThing = function(thingid){
+        $scope.checkMyDs[thingid] = !$scope.checkMyDs[thingid]
+        $scope.dataList.forEach(thing => {
+            if(thing["@iot.id"] == thingid){
+                thing["Datastreams"].forEach(datastream => {
+                    $scope.selectedDatastreams[datastream["@iot.id"]] = $scope.checkMyDs[thingid]
+                });
+            };
+        });
+    };
    
-    $scope.loadTable($scope.thingsquery,'things');
+    $scope.loadTable(query,'things');
     
 
 
-
+    //function that builds the observations query and routes to the observations page
+    $scope.showObservations = function(){
+        
+        if($scope.selectedDatastreamIds.length == 0){
+            $.snackbar({content: "Please select at least one Datastream to view Observations"})
+        } else {
+            console.log($scope.selectedDatastreamIds)
+            console.log($scope.selectedTimeframe)
+            //$scope.Page.go("observations" + $scope.observationsQuery);
+        }
+    }
 
     /*
     $scope.addNewThing = function(newThing) {
@@ -80,7 +109,34 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     };
     */
 
+    
+   var nowMoment = moment();
 
+    $(function() {
+        $('#calendar').daterangepicker({
+            timePicker: true,
+            timePicker24Hour: true,
+            startDate: moment(),
+            endDate: moment().subtract(24, 'hour'),
+            drops: "up",
+                    ranges: {
+                        'Latest': [nowMoment, nowMoment],
+                        'Last Hour': [moment().subtract(1, 'hours'), moment()],
+                        'Last 3 Hours': [moment().subtract(3, 'hours'), moment()],
+                        'Last 6 Hours': [moment().subtract(6, 'hours'), moment()],
+                        'Last 12 Hours': [moment().subtract(12, 'hours'), moment()],
+                        'Last 24 Hours': [moment().subtract(24, 'hours'), moment()],
+                        'Last 3 Days': [moment().subtract(3, 'days'), moment()]
+                    },
+            locale: {
+                format: 'YYYY-MM-DD HH:mm:ss'
+            }
+        },pushDateToQuery);
+    });
+    
+    function pushDateToQuery(start, end){
+        $scope.selectedTimeframe = "&$resultTime ge " + start.toISOString() + " and resultTime le " + end.toISOString()
+    }
 
 
 });
