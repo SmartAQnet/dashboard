@@ -10,6 +10,7 @@
             <ul>
                 <li>Click the name of a Thing or a Datastream to view its metadata</li>
                 <li>Click the checkboxes of any Datastreams or Things and see the information below the table on how to select Observations</li>
+                <li>Click the "Quick Download" Button to export all results of the selected Thing in the selected timespan (see timespan selector at the bottom of the page. Default is the last 24hr)</li>
             </ul>
         </div>
     </div>
@@ -123,12 +124,16 @@
                 </table>
             </td>
             <!-- Datastreams end -->
-
+            
             <!-- Properties and Export -->
             <td ng-if="selectparams.things['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
-            <td ng-click="checkAllDsOfThing(x['@iot.id'])" style="text-align: center; vertical-align: middle;">
-                <input type="checkbox" ng-model="checkMyDs[x['@iot.id']]" ng-change="checkAllDsOfThing(x['@iot.id'])">
-                <!-- <div class="export-cell"><exportBtn thingid="x['@iot.id']"></exportBtn></div> -->
+            <td style="text-align: center; vertical-align: middle;">
+                <div ng-click="checkAllDsOfThing(x['@iot.id'])" style="text-align: center; vertical-align: middle;">
+                    <input type="checkbox" ng-model="checkMyDs[x['@iot.id']]" ng-change="checkAllDsOfThing(x['@iot.id'])">
+                </div>
+                <div class="export-cell">
+                    <exportBtn thingid="x['@iot.id']" from="timeframe.from" to="timeframe.to" ng-click="$parent.selectedDatastreams={};checkMyDs={}"></exportBtn>
+                </div>
             </td>
             <!-- Properties and Export end -->
         </tr>
@@ -191,21 +196,29 @@
             <ul>
 
                 <li>Select a number of Things or Datastreams by clicking the checkbox in the respective "Export" column</li>
-                <li>Alternatively draw a polygon on the map to select all Things in an area (not implemented yet)</li>
+                <!-- <li>Alternatively draw a polygon on the map to select all Things in an area (not implemented yet)</li> -->
                 <li>Select a timespan from the calendar (default is the past 24 hours)</li>
-                <li>Then click the button below or below the table</li>
+                <li>Then click one of the buttons below to show or export the Observations </li>
             </ul>
 
             <h5>Observations Query Parameters</h5>
         <div class="jumbotron">
-            {{observationsQuery}}
+            /Observations{{observationsQuery}}
         </div>
-        <div>
-            <input type="text" id="calendar" />
+        <div style="margin-left: auto; margin-right: auto;">
+            Choose a timespan: 
+            <input type="text" id="calendar" class="px-2" style="min-width: 300px;"/>
         </div>
         </div>
         <div class="card-footer">
-            <button type="button" class="btn btn-outline-primary btn-block" ng-click="showObservations()">Show Selected Observations</button>
+            <div class="row">
+                <div class="col-6">
+                    <button type="button" class="btn btn-outline-primary btn-block" ng-click="showObservations()">Show Selected Observations</button>
+                </div>
+                <div class="col-6">
+                    <button type="button" class="btn btn-outline-primary btn-block" ng-click="showObservations()">Export Selection</button>
+                </div>
+            </div>
         </div>
     </div>
 
