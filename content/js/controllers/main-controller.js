@@ -17,6 +17,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
 
     /** Functions that enforce FROST query language on dashboard tables */
 
+    $scope.timeframe = {}
     
     //triggering ng-ifs for display
     $scope.dataIsLoaded = {}

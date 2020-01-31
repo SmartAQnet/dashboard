@@ -1,9 +1,5 @@
 <div>
     <div class="entityInfo">
-        <span class="entityInfoHeader">Total Number of Observations selected: </span> <br />
-        <pre class="entityInfoInfo" ng-if="dataIsLoaded.obs==true">{{$parent.count}}</pre>
-        <pre class="entityInfoInfo" ng-if="dataIsLoaded.obs==false">... loading ...</pre>
-        <pre class="entityInfoInfo" ng-if="dataIsLoaded.obs==undefined">please select one or more datastreams to display</pre>
         <span class="entityInfoHeader">Select Parameter: </span>
         <form>
             <label class="checkbox-inline">
@@ -15,12 +11,9 @@
             <label class="checkbox-inline">
                 <input type="checkbox" ng-model="selectparams.obs['phenomenonTime']">Phenomenon Time
             </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.obs['Datastream']">Datastream
-            </label>
-            <label class="checkbox-inline">
+            <!-- <label class="checkbox-inline">
                 <input type="checkbox" ng-model="selectparams.obs['@iot.id']">@iot.id
-            </label>
+            </label> -->
             <label class="checkbox-inline">
                 <input type="checkbox" ng-model="selectparams.obs['FeatureOfInterest']">Feature of Interest
             </label>
@@ -28,117 +21,86 @@
         <span class="entityInfoHeader">Top parameter: </span>
         <form class="form-inline">
             <div class="form-group" style="padding-top: 0">
-                <input type="text" class="form-control text-center" ng-model="$parent.newTop" style="width: 60px">
+                <input type="text" class="form-control text-center" ng-model="obsTop" style="width: 60px">
             </div>
             <div class="form-group mb-2" style="padding-top: 0">
                 <input type="text" readonly class="form-control-plaintext" value="Items per Page">
             </div>
         </form>
-        <span class="entityInfoHeader">Filter parameter: </span>
-
-        <!-- Filter parameter Modal -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filtermodal" ng-click="loadListOfThings()">Select Datastreams</button>
-        <div class="modal fade" id="filtermodal" role="dialog">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header p-3 mb-2 bg-primary text-white">
-                        <h2 class="modal-title"><i class="fa fa-camera"></i>SELECT DATASTREAMS</h2>
-                    </div>
-                    <div class="modal-body">
-                        <table class="table table-bordered table-hover st-table table-striped table-sm">
-                            <thead class="st-thead">
-                            <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Select Thing</th>
-                                <th>Datastreams</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="x in listOfThings"  >
-                                <td ng-click="thingChecked(x['@iot.id'])">{{x["name"]}}</td>
-                                <td ng-click="thingChecked(x['@iot.id'])">{{x["description"]}}</td>
-                                <td><input type="checkbox" ng-click="checkAllDsOfThing(x['@iot.id'])"></td>
-                                <td>
-                                    <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
-                                        <thead class="st-thead">
-                                        <tr class="table-primary">
-                                            <th>Name</th>
-                                            <th>@iot.id</th>
-                                            <th>Select Datastream</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr ng-repeat="y in x['Datastreams']" ng-click="$parent.filterparamsID.obs[y['@iot.id']] = !$parent.filterparamsID.obs[y['@iot.id']]">
-                                        <td>{{y["name"]}}</td>
-                                        <td>{{y["@iot.id"]}}</td>
-                                        <th><input type="checkbox" ng-model="$parent.filterparamsID.obs[y['@iot.id']]"></th>
-                                    </tr>
-                                </tbody>
-                                </table>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    <div id="loading-screen-wrapper" ng-if="!dataIsLoaded.things">
-                        <div id="loading-screen" >
-                                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                            LOADING...
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip" style="margin-left: auto">&laquo; Previous Page</button>
-                        <button ng-if="dataIsLoaded.things" class="btn btn-secondary" disabled>Page {{currentpage}} of {{maxpages}}</button>
-                        <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip" style="margin-right: auto">Next Page &raquo;</button>
-                    </div>
-                    </div>
-                    <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
-                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
-                    </div>
-                </div>
-            </div>
-        </div>
 
 
-        <button ng-if="dataIsLoaded.obs==undefined" type="button" class="btn btn-outline-primary btn-block" ng-click="loadTable(obsquery,'obs')">Load Observations</button>
-        <button ng-if="dataIsLoaded.obs==true" type="button" class="btn btn-outline-primary btn-block" ng-click="updatequery('obs')">Load Observations</button>
-        <button ng-if="dataIsLoaded.obs==false" type="button" class="btn btn-outline-primary btn-block" disabled>Loading... </button>
+
+
+        <button type="button" class="btn btn-outline-primary btn-block" ng-click="refreshObsTable()">Refresh Observations</button>
     </div>
     <pre class="entityInfoInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></pre>
+
     <table class="table table-bordered table-hover st-table table-striped table-sm">
-        <thead class="st-thead">
-        <tr>
-            <th ng-if="selectparams.obs['resultTime']">Result Time</th>
-            <th ng-if="selectparams.obs['result']">Result</th>
-            <th ng-if="selectparams.obs['phenomenonTime']">Phenomenon Time</th>
-            <th ng-if="selectparams.obs['Datastream']">Datastream</th>
-            <th ng-if="selectparams.obs['@iot.id']">@iot.id</th>
-            <th ng-if="selectparams.obs['FeatureOfInterest']">Feature of Interest</th>
-        </tr>
+        <thead>
+            <tr>
+                <th ng-repeat="dsid in datastreamIds" ng-click="linkClicked('datastream',dataListsMeta[dsid]['Thing']['@iot.id'])">{{dataListsMeta[dsid]["Thing"]["name"]}}</th>
+            </tr>
+            <tr>
+                <th ng-repeat="dsid in datastreamIds" ng-click="linkClicked('datastream',dsid)">{{dataListsMeta[dsid]["name"]}}</th>
+            </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="x in dataList">
-            <td ng-if="selectparams.obs['resultTime']">{{x["resultTime"]}}</td>
-            <td ng-if="selectparams.obs['result']">{{x["result"]}}</td>
-            <td ng-if="selectparams.obs['phenomenonTime']">{{x["phenomenonTime"]}}</td>
-            <td ng-if="selectparams.obs['Datastream']" ng-click="linkClicked('datastream',x['Datastream']['@iot.id'])">{{x["Datastream"]["name"]}}</td>
-            <td ng-if="selectparams.obs['@iot.id']">{{x["@iot.id"]}}</td>
-            <td ng-if="selectparams.obs['FeatureOfInterest']">{{x["FeatureOfInterest"]}}</td>
-        </tr>
+            <td ng-repeat="dsid in datastreamIds" style="min-width: 272px;">
+                <table class="table table-bordered table-hover st-table table-striped table-sm">
+                    <thead class="st-thead">
+                    <tr>
+                        <th ng-if="selectparams.obs['resultTime']">Result Time</th>
+                        <th ng-if="selectparams.obs['result']">Result</th>
+                        <th ng-if="selectparams.obs['phenomenonTime']">Phenomenon Time</th>
+                        <!-- <th ng-if="selectparams.obs['@iot.id']">@iot.id</th> -->
+                        <th ng-if="selectparams.obs['FeatureOfInterest']">Feature of Interest</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="x in dataLists[dsid]">
+                        <td ng-if="selectparams.obs['resultTime']">{{x["resultTime"]}}</td>
+                        <td ng-if="selectparams.obs['result']">{{x["result"]}}</td>
+                        <td ng-if="selectparams.obs['phenomenonTime']">{{x["phenomenonTime"]}}</td>
+                        <!-- <td ng-if="selectparams.obs['@iot.id']">{{x["@iot.id"]}}</td> -->
+
+                        <td ng-if="selectparams.obs['FeatureOfInterest']">
+                            <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                    <tr class="table-primary">
+                                        <th>Type</th>
+                                        <th>[lon,lat]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>{{x["FeatureOfInterest"]["feature"]["type"]}}</td>
+                                    <td>{{x["FeatureOfInterest"]["feature"]["coordinates"]}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <div id="loading-screen-wrapper" ng-if="!dataIsLoaded[dsid]">
+                            <div id="loading-screen" >
+                                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                                LOADING...
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <button type="button" class="btn btn-primary" ng-click="previousLinksObservations(dsid)" ng-disabled="onFirstPage[dsid]" style="margin-left: auto">&laquo; Previous Page</button>
+                            <button type="button" class="btn btn-primary" ng-click="nextLinksObservations(dsid)" ng-disabled="onLastPage[dsid]" style="margin-right: auto">Next Page &raquo;</button>
+                        </div>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
         </tbody>
     </table>
-    <div id="loading-screen-wrapper" ng-if="dataIsLoaded.obs==false">
-        <div id="loading-screen" >
-                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-            LOADING...
-        </div>
-    </div>
-    <div class="input-group">
-        <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip" style="margin-left: auto">&laquo; Previous Page</button>
-        <button ng-if="dataIsLoaded.obs==true" class="btn btn-secondary" disabled>Page {{currentpage}} of {{maxpages}}</button>
-        <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip" style="margin-right: auto">Next Page &raquo;</button>
-    </div>
+            
+
     <pre class="entityInfoInfo pb-3 mb-3 border border-primary border-left-0 border-right-0 border-top-0"></pre>
                         
-    <a type="button" class="btn btn-block btn-primary">Download Observations</a>
+    <a type="button" class="btn btn-block btn-primary" ng-click="notYetImplemented()">Download Observations</a>
 </div>

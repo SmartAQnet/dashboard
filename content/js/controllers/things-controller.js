@@ -9,7 +9,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     if($scope.selectparams.things.Locations == undefined){$scope.selectparams.things.Locations = true};
     if($scope.selectparams.things.Datastreams == undefined){$scope.selectparams.things.Datastreams = true};
 
-    //expand stuff per default (expand IS necessarily transported into the query transported into )
+    //expand stuff per default (expand IS necessarily transported into the query)
     $scope.expandparams.things.Locations = true;
     $scope.expandparams.things.HistoricalLocations = true;
     $scope.expandparams.things.Datastreams = true;
@@ -26,8 +26,8 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
     //build query for observations
     $scope.$watch('selectedDatastreams', function () {
-        $scope.selectedDatastreamIds = Object.keys($scope.selectedDatastreams).filter(key => $scope.selectedDatastreams[key] == true)
-        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
+        $scope.$parent.selectedDatastreamIds = Object.keys($scope.selectedDatastreams).filter(key => $scope.selectedDatastreams[key] == true)
+        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.$parent.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
     }, true);
 
     
@@ -41,70 +41,11 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     }
     */
 
-    $scope.checkMyDs = {}
 
-    /*
-    $scope.selectDatastream = function(id){
-        if($scope.selectedDatastreams[id]){
-            $scope.selectedDatastreams[id] = false
-        } else {
-            $scope.selectedDatastreams[id] = true
-        }
-        console.log($scope.selectedDatastreams[id])
-        console.log(id)
-        $scope.selectedDatastreams[id] = !$scope.selectedDatastreams[id]
-    }
-    */
-
-    $scope.checkAllDsOfThing = function(thingid){
-        $scope.checkMyDs[thingid] = !$scope.checkMyDs[thingid]
-        $scope.dataList.forEach(thing => {
-            if(thing["@iot.id"] == thingid){
-                thing["Datastreams"].forEach(datastream => {
-                    $scope.selectedDatastreams[datastream["@iot.id"]] = $scope.checkMyDs[thingid]
-                });
-            };
-        });
-    };
    
     $scope.loadTable(query,'things');
     
 
-
-    //function that builds the observations query and routes to the observations page
-    $scope.showObservations = function(){
-        
-        if($scope.selectedDatastreamIds.length == 0){
-            $.snackbar({content: "Please select at least one Datastream to view Observations"})
-        } else {
-            console.log($scope.selectedDatastreamIds)
-            console.log($scope.selectedTimeframe)
-            //$scope.Page.go("observations" + $scope.observationsQuery);
-        }
-    }
-
-    /*
-    $scope.addNewThing = function(newThing) {
-        var res = $http.post(getUrl() + '/v1.0/Things', newThing);
-        res.success(function(data, status, headers, config) {
-            alert( "added: " + JSON.stringify({data: data}));
-        });
-        res.error(function(data, status, headers, config) {
-            alert( "failure: " + JSON.stringify({data: data}));
-        });
-    };
-
-    $scope.deleteThingClicked = function (entity) {
-        var res = $http.delete(getUrl() + '/v1.0/Things(' + getId(entity["@iot.id"]) + ')');
-        res.success(function(data, status, headers, config) {
-            var index = $scope.thingsList.indexOf(entity);
-            $scope.thingsList.splice(index, 1);
-        });
-        res.error(function(data, status, headers, config) {
-            alert( "failure: " + JSON.stringify({data: data}));
-        });
-    };
-    */
 
 
     $(function() {
@@ -129,14 +70,14 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     });
     
 
-    $scope.timeframe = {}
+    
     
     function pushDateToQuery(start, end){
         console.log("callback")
         $scope.timeframe.from = start.toISOString()
         $scope.timeframe.to = end.toISOString()
         $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.from + " and resultTime le " + $scope.timeframe.to + ")"
-        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
+        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.$parent.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
         //$scope.$digest() cant use digest or apply here because it will throw an error that says cant use two applys. without apply, it doenst update observationsQuery though. put it on a fucking button. 
     }
 

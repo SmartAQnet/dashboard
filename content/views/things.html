@@ -9,7 +9,7 @@
         <div class="card-body">
             <ul>
                 <li>Click the name of a Thing or a Datastream to view its metadata</li>
-                <li>Click the checkboxes of any Datastreams or Things and see the information below the table on how to select Observations</li>
+                <li>Click the checkboxes of any Datastreams and see the information below the table on how to select Observations</li>
                 <li>Click the "Quick Download" Button to export all results of the selected Thing in the selected timespan (see timespan selector at the bottom of the page. Default is the last 24hr)</li>
             </ul>
         </div>
@@ -128,11 +128,8 @@
             <!-- Properties and Export -->
             <td ng-if="selectparams.things['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
             <td style="text-align: center; vertical-align: middle;">
-                <div ng-click="checkAllDsOfThing(x['@iot.id'])" style="text-align: center; vertical-align: middle;">
-                    <input type="checkbox" ng-model="checkMyDs[x['@iot.id']]" ng-change="checkAllDsOfThing(x['@iot.id'])">
-                </div>
                 <div class="export-cell">
-                    <exportBtn thingid="x['@iot.id']" from="timeframe.from" to="timeframe.to" ng-click="$parent.selectedDatastreams={};checkMyDs={}"></exportBtn>
+                    <exportBtn thingid="x['@iot.id']" from="$parent.timeframe.from" to="$parent.timeframe.to" ng-click="$parent.selectedDatastreams={};checkMyDs={}"></exportBtn>
                 </div>
             </td>
             <!-- Properties and Export end -->
@@ -213,10 +210,10 @@
         <div class="card-footer">
             <div class="row">
                 <div class="col-6">
-                    <button type="button" class="btn btn-outline-primary btn-block" ng-click="showObservations()">Show Selected Observations</button>
+                    <a type="button" class="btn btn-outline-primary btn-block" href="#/observations{{observationsQuery}}">Show Selected Observations</a>
                 </div>
                 <div class="col-6">
-                    <button type="button" class="btn btn-outline-primary btn-block" ng-click="showObservations()">Export Selection</button>
+                    <button type="button" class="btn btn-outline-primary btn-block" ng-click="showObservations()" disabled>Export Selection</button>
                 </div>
             </div>
         </div>
