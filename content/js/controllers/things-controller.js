@@ -3,7 +3,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     $scope.Page.setHeaderIcon(iconThing);
 
 
-    //pure table manipulation, select isnt transported into the query
+    //pure table manipulation, select is NOT transported into the query
     if($scope.selectparams.things.name == undefined){$scope.selectparams.things.name = true};
     if($scope.selectparams.things.description == undefined){$scope.selectparams.things.description = true};
     if($scope.selectparams.things.Locations == undefined){$scope.selectparams.things.Locations = true};
@@ -26,11 +26,11 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
     //build query for observations
     $scope.$watch('selectedDatastreams', function () {
+        console.log("query parameter change detected")
         $scope.$parent.selectedDatastreamIds = Object.keys($scope.selectedDatastreams).filter(key => $scope.selectedDatastreams[key] == true)
         $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.$parent.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
     }, true);
 
-    
 
     /* //this has the problem that the query language allows more complex nesting with ";" between $parameters and deeper nesting with e.g. ()...;$expand=...($select=...))
     //the code here takes care of the form "test(buu,baaa,boo),shubada(shwami,shaa),..."
@@ -73,12 +73,18 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     
     
     function pushDateToQuery(start, end){
-        console.log("callback")
-        $scope.timeframe.from = start.toISOString()
-        $scope.timeframe.to = end.toISOString()
-        $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.from + " and resultTime le " + $scope.timeframe.to + ")"
+        //for watch service
+        $scope.timeframe.from = start
+        $scope.timeframe.to = end
+
+        //parameter for the download functonality
+        $scope.timeframe.fromISO = start.toISOString()
+        $scope.timeframe.toISO = end.toISOString()
+
+        //for displaying the query
+        $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.fromISO + " and resultTime le " + $scope.timeframe.toISO + ")"
         $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.$parent.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
-        //$scope.$digest() cant use digest or apply here because it will throw an error that says cant use two applys. without apply, it doenst update observationsQuery though. put it on a fucking button. 
+
     }
 
     pushDateToQuery(moment().subtract(24, 'hour'),window.moment())

@@ -10,23 +10,22 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
 
     let filterarray = $routeParams["$filter"].replace(/\)/g,"").replace(/\(/g,"").split(" and ").join(" SEPARATOR ").split(" or ").join(" SEPARATOR ").split(" SEPARATOR ")
 
-    var starttime
-    var endtime
     $scope.datastreamIds = []
 
     filterarray.forEach(el => {
         if(el.startsWith("resultTime ge ")){
-            starttime = el.slice("resultTime ge ".length)
+            $scope.starttime = el.slice("resultTime ge ".length)
         } else if(el.startsWith("resultTime le ")){
-            endtime = el.slice("resultTime le ".length)
+            $scope.endtime = el.slice("resultTime le ".length)
         } else if(el.startsWith("Datastream/@iot.id eq ")){
             $scope.datastreamIds.push(el.replace("Datastream/@iot.id eq ","").replace(/\'/g,""))
         }
     })
 
-    console.log(starttime)
-    console.log(endtime)
-    console.log($scope.datastreamIds)
+    //set intial start and end time. when adding a daterangepicker need to watch those I guess or make them functions
+    $scope.starttimeReadable = $scope.starttime.split("T")[0].split("-").join("/") + " " + $scope.starttime.split("T")[1].split(".")[0] + " UTC"
+    $scope.endtimeReadable = $scope.endtime.split("T")[0].split("-").join("/") + " " + $scope.endtime.split("T")[1].split(".")[0] + " UTC"
+
 
     $scope.obsTop = 50
 
@@ -43,8 +42,8 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
 
     //initialize the states of the tables in $scope.obsLinkStates[dsid]
     $scope.datastreamIds.forEach(dsid => {
-        let timespan = "resultTime ge " + starttime + " and " + "resultTime le " + endtime
-        $scope.obsLinkStates[dsid] = getUrl() + "/v1.0/Datastreams('" + dsid + "')/Observations" + "?$filter=" + timespan + "&$expand=FeatureOfInterest&$top=" + $scope.obsTop.toString()
+        let timespan = "resultTime ge " + $scope.starttime + " and " + "resultTime le " + $scope.endtime
+        $scope.obsLinkStates[dsid] = getUrl() + "/v1.0/Datastreams('" + dsid + "')/Observations" + "?$filter=" + timespan + "&$expand=FeatureOfInterest&$top=" + $scope.obsTop.toString() + "&$orderby=resultTime asc"
         $scope.onLastPage[dsid] = false
         $scope.onFirstPage[dsid] = true
     });
@@ -63,6 +62,14 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
     $scope.refreshObsTable = function(){
         $scope.datastreamIds.forEach(dsid => {
     
+            //refresh top parameter
+            if($scope.obsLinkStates[dsid].split("$top=")[1].split("&$").splice(1).join("&$") == []){
+                $scope.obsLinkStates[dsid] = $scope.obsLinkStates[dsid].split("$top=")[0] + "$top=" + $scope.obsTop.toString()
+            } else {
+                $scope.obsLinkStates[dsid] = $scope.obsLinkStates[dsid].split("$top=")[0] + "$top=" + $scope.obsTop.toString() + "&$" + $scope.obsLinkStates[dsid].split("$top=")[1].split("&$").splice(1).join("&$")
+            }
+        
+
             $http.get($scope.obsLinkStates[dsid]).then(function (response) {
                 $scope.dataLists[dsid] = response.data.value
                 $scope.dataIsLoaded[dsid] = true
@@ -76,15 +83,14 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
     $scope.refreshObsTable()
 
 
-
     //pagination functions within the table, states are being tracked in $scope.obsLinkStates[dsid]
     $scope.nextLinksObservations = function(dsid){
         $scope.onFirstPage[dsid] = false
 
         $scope.dataLists[dsid] = undefined
         $scope.dataIsLoaded[dsid] = false
-        $http.get(nextLinkObs[dsid]).then(function (response) {
-            $scope.obsLinkStates[dsid] = nextLinkObs[dsid]
+        $http.get($scope.nextLinkObs[dsid]).then(function (response) {
+            $scope.obsLinkStates[dsid] = $scope.nextLinkObs[dsid]
             $scope.dataLists[dsid] = response.data.value
             $scope.dataIsLoaded[dsid] = true
             if(response.data["@iot.nextLink"]){
@@ -100,9 +106,9 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
             let top = parseInt($scope.nextLinkObs[dsid].split("$top=")[1].split("&$")[0])
 
             if(skip-top>0){
-                $scope.previousLinkObs[dsid] = $scope.nextLinkObs[dsid].split("$skip=")[0] + "$skip=" + (skip-top).toString() + $scope.nextLinkObs[dsid].split("$skip=")[1].splice(skip.length)
+                $scope.previousLinkObs[dsid] = $scope.nextLinkObs[dsid].split("$skip=")[0] + "$skip=" + (skip-top).toString() + $scope.nextLinkObs[dsid].split("$skip=")[1].slice(skip.toString().length)
             } else {
-                $scope.previousLinkObs[dsid] = $scope.nextLinkObs[dsid].split("$skip=")[0] + $scope.nextLinkObs[dsid].split("$skip=")[1].splice(skip.length)
+                $scope.previousLinkObs[dsid] = $scope.nextLinkObs[dsid].split("$skip=")[0] + $scope.nextLinkObs[dsid].split("$skip=")[1].slice(skip.toString().length)
             }
         });
     }
@@ -119,14 +125,14 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
             $scope.nextLinkObs[dsid] = response.data["@iot.nextLink"]
 
             //relative to new page
-            if($scope.previousLinkObs[dsid].contains("$skip")){
+            if($scope.previousLinkObs[dsid].includes("$skip")){
                 let skip = parseInt($scope.previousLinkObs[dsid].split("$skip=")[1].split("&$")[0])
                 let top = parseInt($scope.previousLinkObs[dsid].split("$top=")[1].split("&$")[0])
     
                 if(skip-top>0){
-                    $scope.previousLinkObs[dsid] = $scope.previousLinkObs[dsid].split("$skip=")[0] + "$skip=" + (skip-top).toString() + $scope.previousLinkObs[dsid].split("$skip=")[1].splice(skip.length)
+                    $scope.previousLinkObs[dsid] = $scope.previousLinkObs[dsid].split("$skip=")[0] + "$skip=" + (skip-top).toString() + $scope.previousLinkObs[dsid].split("$skip=")[1].slice(skip.toString().length)
                 } else {
-                    $scope.previousLinkObs[dsid] = $scope.previousLinkObs[dsid].split("$skip=")[0] + $scope.previousLinkObs[dsid].split("$skip=")[1].splice(skip.length)
+                    $scope.previousLinkObs[dsid] = $scope.previousLinkObs[dsid].split("$skip=")[0] + $scope.previousLinkObs[dsid].split("$skip=")[1].slice(skip.toString().length)
                 }
 
                 $scope.onFirstPage[dsid] = false
@@ -149,12 +155,7 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
         $.snackbar({content: "Functionality not yet implemented"})
     }
 
-    //expand parameters...
-
-
-    //HAUPTAUFGABE DES OBSERVATIONS CONTROLLER: PARAMETER AUS QUERY LESEN UND ENTSPRECHENDE URL ANFRAGEN
-
-
+    
 
     //selects in /observations beziehen sich direkt darauf was in der csv heruntergeladen wird?
 

@@ -129,7 +129,7 @@
             <td ng-if="selectparams.things['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
             <td style="text-align: center; vertical-align: middle;">
                 <div class="export-cell">
-                    <exportBtn thingid="x['@iot.id']" from="$parent.timeframe.from" to="$parent.timeframe.to" ng-click="$parent.selectedDatastreams={};checkMyDs={}"></exportBtn>
+                    <exportBtn thingid="x['@iot.id']" from="$parent.timeframe.fromISO" to="$parent.timeframe.toISO" ng-click="$parent.selectedDatastreams={};checkMyDs={}"></exportBtn>
                 </div>
             </td>
             <!-- Properties and Export end -->
@@ -204,7 +204,7 @@
         </div>
         <div style="margin-left: auto; margin-right: auto;">
             Choose a timespan: 
-            <input type="text" id="calendar" class="px-2" style="min-width: 300px;"/>
+            <input ng-model="selectedDaterange" type="text" id="calendar" class="px-2" style="min-width: 300px;"/>
         </div>
         </div>
         <div class="card-footer">

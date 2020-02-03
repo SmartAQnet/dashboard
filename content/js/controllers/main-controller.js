@@ -14,6 +14,10 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
         $location.path(path);
     };
 
+    //initialize bootstrap tooltips
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
 
     /** Functions that enforce FROST query language on dashboard tables */
 

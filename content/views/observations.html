@@ -1,6 +1,9 @@
 <div>
     <div class="entityInfo">
-        <span class="entityInfoHeader">Select Parameter: </span>
+        <span class="entityInfoHeader">Selected Timespan: </span> <br />
+        From <pre class="entityInfoInfo mx-1" style="display: inline">{{starttimeReadable}}</pre>
+        to <pre class="entityInfoInfo mx-1" style="display: inline">{{endtimeReadable}}</pre>
+        <div class="entityInfoHeader" style="margin-top: 1.125rem">Select Parameter: </div>
         <form>
             <label class="checkbox-inline">
                 <input type="checkbox" ng-model="selectparams.obs['resultTime']">Result Time
@@ -38,14 +41,15 @@
     <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead>
             <tr>
-                <th ng-repeat="dsid in datastreamIds" ng-click="linkClicked('datastream',dataListsMeta[dsid]['Thing']['@iot.id'])">{{dataListsMeta[dsid]["Thing"]["name"]}}</th>
+                <th ng-repeat="dsid in datastreamIds" ng-click="linkClicked('thing',dataListsMeta[dsid]['Thing']['@iot.id'])" data-toggle="tooltip" data-placement="top" title="Go To Thing Metadata">{{dataListsMeta[dsid]["Thing"]["name"]}}</th>
             </tr>
             <tr>
-                <th ng-repeat="dsid in datastreamIds" ng-click="linkClicked('datastream',dsid)">{{dataListsMeta[dsid]["name"]}}</th>
+                <th ng-repeat="dsid in datastreamIds" ng-click="linkClicked('datastream',dsid)" data-toggle="tooltip" data-placement="top" title="Go To Datastream Metadata">{{dataListsMeta[dsid]["name"]}}</th>
             </tr>
         </thead>
         <tbody>
             <td ng-repeat="dsid in datastreamIds" style="min-width: 272px;">
+                <div>
                 <table class="table table-bordered table-hover st-table table-striped table-sm">
                     <thead class="st-thead">
                     <tr>
@@ -82,19 +86,20 @@
 
                     </tr>
                     <tr>
-                        <div id="loading-screen-wrapper" ng-if="!dataIsLoaded[dsid]">
-                            <div id="loading-screen" >
-                                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                                LOADING...
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <button type="button" class="btn btn-primary" ng-click="previousLinksObservations(dsid)" ng-disabled="onFirstPage[dsid]" style="margin-left: auto">&laquo; Previous Page</button>
-                            <button type="button" class="btn btn-primary" ng-click="nextLinksObservations(dsid)" ng-disabled="onLastPage[dsid]" style="margin-right: auto">Next Page &raquo;</button>
-                        </div>
                     </tr>
                     </tbody>
                 </table>
+                <div id="loading-screen-wrapper" ng-if="!dataIsLoaded[dsid]">
+                    <div id="loading-screen" >
+                            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                        LOADING...
+                    </div>
+                </div>
+                <div class="input-group">
+                    <button type="button" class="btn btn-primary" ng-click="previousLinksObservations(dsid)" ng-disabled="onFirstPage[dsid]" style="margin-left: auto">&laquo; Previous Page</button>
+                    <button type="button" class="btn btn-primary" ng-click="nextLinksObservations(dsid)" ng-disabled="onLastPage[dsid]" style="margin-right: auto">Next Page &raquo;</button>
+                </div>
+            </div>
             </td>
         </tbody>
     </table>
