@@ -5,9 +5,11 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
     //pure table manipulation, select is NOT transported into the query
     if($scope.selectparams.things.name == undefined){$scope.selectparams.things.name = true};
-    if($scope.selectparams.things.description == undefined){$scope.selectparams.things.description = true};
     if($scope.selectparams.things.Locations == undefined){$scope.selectparams.things.Locations = true};
     if($scope.selectparams.things.Datastreams == undefined){$scope.selectparams.things.Datastreams = true};
+
+    if($scope.selectparams.datastreams.name == undefined){$scope.selectparams.datastreams.name = true};
+    if($scope.selectparams.datastreams.phenomenonTime == undefined){$scope.selectparams.datastreams.phenomenonTime = true};
 
     //expand stuff per default (expand IS necessarily transported into the query)
     $scope.expandparams.things.Locations = true;
@@ -27,8 +29,8 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     //build query for observations
     $scope.$watch('selectedDatastreams', function () {
         console.log("query parameter change detected")
-        $scope.$parent.selectedDatastreamIds = Object.keys($scope.selectedDatastreams).filter(key => $scope.selectedDatastreams[key] == true)
-        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.$parent.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
+        $scope.selectedDatastreamIds = Object.keys($scope.selectedDatastreams).filter(key => $scope.selectedDatastreams[key] == true)
+        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
     }, true);
 
 
@@ -41,11 +43,108 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     }
     */
 
+        //function for "update table" button that pushes the user input into the url to trigger the query
+        $scope.updatequery = function(category){
 
-   
+            //transport expand parameters into the query
+            let trueparamsexpand = Object.keys($scope.expandparams[category]).filter(key => $scope.expandparams[category][key] == true)
+    
+            //minimally subexpand stuff in Datastream
+            if(trueparamsexpand.includes("Datastreams"))[
+                trueparamsexpand[trueparamsexpand.indexOf("Datastreams")] = "Datastreams($expand=Sensor,ObservedProperty)"
+            ]
+    
+    
+            let paramUpdate = {}
+    
+            paramUpdate['$top'] = $scope.newTop
+    
+    
+            if(trueparamsexpand.length>0){
+                paramUpdate['$expand'] = trueparamsexpand.join()
+            } else {
+                paramUpdate['$expand'] = null
+            }
+    
+    
+            $route.updateParams(paramUpdate);
+        };
+        // ---
+    
+    
+    
+    
+        $scope.loadTable = function(url,category){
+    
+            $scope.dataIsLoaded[category] = false
+    
+            if(!("$top" in $routeParams)){
+                $scope.newTop = 50;
+                $route.updateParams({'$top':$scope.newTop});
+            } else {$scope.newTop = $routeParams["$top"]}
+    
+            $scope.updatequery(category)
+    
+            $http.get(url).then(function (response) {
+    
+                $scope.dataIsLoaded[category] = true
+                
+                $scope.dataList = response.data.value;
+                
+                /*
+                if($routeParams['$top']){
+                    $scope.newTop = $routeParams['$top']
+                };
+                */
+    
+                //pagination ---
+                if($routeParams['$skip']){
+                    $scope.thisLinkSkip = $routeParams['$skip']
+                };
+    
+                if(response.data["@iot.nextLink"]){
+                    $scope.nextLinkSkip = (response.data['@iot.nextLink']).match(/(?:skip=)([0-9]+)/)[1]
+                } else {
+                    $scope.nextLinkSkip = 0
+                };
+    
+                $scope.count = response.data["@iot.count"]
+                $scope.maxpages = Math.ceil($scope.count/$scope.newTop)
+                if($scope.nextLinkSkip > 0){
+                    $scope.currentpage = Math.ceil($scope.nextLinkSkip/$scope.newTop)
+                } else {
+                    $scope.currentpage = $scope.maxpages
+                }
+                //pagination end ---
+            });
+        };
+    
+    
+        $scope.followNextLink = function(){
+            $route.updateParams({'$skip':$scope.nextLinkSkip});
+        };
+    
+        $scope.followPreviousLink = function(){
+            let skip = $scope.thisLinkSkip - $scope.newTop
+            if(skip < 0){skip = 0}
+            $route.updateParams({'$skip': skip})
+        };
+    
+        $scope.setNewTop = function(){
+            $route.updateParams({'$top':$scope.newTop})
+        };
+
+    $scope.objToArray = function(obj){
+        var ret = []
+        Object.keys(obj).forEach(key => {
+            ret.push(key + ": " + obj[key])
+        })
+        return ret
+    }
+
+    
     $scope.loadTable(query,'things');
     
-
 
 
     $(function() {
@@ -83,7 +182,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
         //for displaying the query
         $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.fromISO + " and resultTime le " + $scope.timeframe.toISO + ")"
-        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.$parent.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
+        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
 
     }
 

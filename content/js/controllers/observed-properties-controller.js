@@ -12,13 +12,7 @@ gostApp.controller('ObservedPropertiesCtrl', function ($scope, $http, $routePara
     $http.get(query).then(function (response) {
         $scope.observedpropertiesList = response.data.value;
     });
-    
-    //Without Query Language
-    /*
-    $http.get(getUrl() + "/v1.0/ObservedProperties").then(function (response) {
-        $scope.observedpropertiesList = response.data.value;
-    });
-    */
+
 
     $scope.observedpropertyClicked = function (observedpropertyID) {
         angular.forEach($scope.observedproperties, function (value, key) {

@@ -52,7 +52,7 @@
                         <tbody>
                         <tr ng-repeat="x in datastreamsList | orderBy:propertyName:reverse" ng-click="datastreamClicked(x['@iot.id'])">
                             <td>
-                                <span title="{{x['name']}}">{{x["name"] | limitTo : 26}}...</span>
+                                <span title="{{x['name']}}">{{x["name"]}}</span>
                             </td>
                             <!--td>{{x["description"]}}</td-->
                             <td>{{x["unitOfMeasurement"]["name"]}}</td>

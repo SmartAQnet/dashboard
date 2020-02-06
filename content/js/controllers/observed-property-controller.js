@@ -12,7 +12,7 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
         $scope.name = response.data["name"];
         $scope.description = response.data["description"];
         $scope.definition = response.data["definition"];
-        $scope.conventions = response.data["properties"]["conventions"];
+        $scope.conventions = response.data["properties"]["conventions"]
         $scope.Page.selectedThing = response.data;
     });
 
@@ -21,6 +21,8 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
 
     $scope.tabPropertiesClicked = function () {
 
+        //add feature to map: request to costly, times out after 1 min
+        /*
         $http.get(getUrl() + "/v1.0/ObservedProperties(" + getId($scope.id) + ")/Datastreams?$expand=Observations($top=1;$orderby=phenomenonTime%20desc),Observations/FeatureOfInterest").then(function (response) {
             $scope.allObsProps = response.data.value
             angular.forEach($scope.observedproperties, function (value, key) {
@@ -31,6 +33,7 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
             });
             
         });
+        */
 
     };
     
@@ -67,7 +70,7 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
         });
         $scope.Page.go("datastream/" + datastreamID);
     };
-    console.log($scope)
+
 //   $scope.sortBy = function(propertyName) {
 //     $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;
 //     $scope.propertyName = propertyName;

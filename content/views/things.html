@@ -44,10 +44,40 @@
                 <input type="checkbox" ng-model="selectparams.things['properties']">Properties
             </label>
         </form>
+        <span class="entityInfoHeader">Select Datastreams Column Display: </span>
+        <form>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams.datastreams['name']">Name
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams.datastreams['description']">Description
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams.datastreams['license']">License
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams.datastreams['phenomenonTime']">Timespan
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams.datastreams['@iot.id']">@iot.id
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams.datastreams['Sensor']">Sensor
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams.datastreams['ObservedProperty']">Observed Property
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams.datastreams['unitOfMeasurement']">Unit of Measurement
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" ng-model="selectparams.datastreams['properties']">Properties
+            </label>
+        </form>
         <span class="entityInfoHeader">Top parameter: </span>
         <form class="form-inline">
             <div class="form-group" style="padding-top: 0">
-                <input type="text" class="form-control text-center" ng-model="$parent.newTop" style="width: 60px">
+                <input type="text" class="form-control text-center" ng-model="newTop" style="width: 60px">
             </div>
             <div class="form-group mb-2" style="padding-top: 0">
                 <input type="text" readonly class="form-control-plaintext" value="Items per Page">
@@ -99,7 +129,7 @@
             <!-- Historical Locations End-->
             
             <!-- Thing id -->
-            <td ng-if="selectparams.things['@iot.id']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["@iot.id"]}}</td>
+            <td ng-if="selectparams.things['@iot.id']">{{x["@iot.id"]}}</td>
             <!-- Thing id end -->
 
             <!-- Datastreams -->
@@ -107,15 +137,34 @@
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
                         <tr class="table-primary">
-                            <th>Name</th>
-                            <th>@iot.id</th>
+                            <th ng-if="selectparams.datastreams['name']">Name</th>
+                            <th ng-if="selectparams.datastreams['description']">Description</th>
+                            <th ng-if="selectparams.datastreams['license']">License</th>
+                            <th ng-if="selectparams.datastreams['phenomenonTime']">Timespan [UTC]</th>
+                            <th ng-if="selectparams.datastreams['@iot.id']">@iot.id</th>
+                            <th ng-if="selectparams.datastreams['Sensor']">Sensor</th>
+                            <th ng-if="selectparams.datastreams['ObservedProperty']">Observed Property</th>
+                            <th ng-if="selectparams.datastreams['unitOfMeasurement']">Unit Of Measurement</th>
+                            <th ng-if="selectparams.datastreams['properties']">Properties</th>
                             <th>Export</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr ng-repeat="y in x['Datastreams']">
-                            <td ng-click="linkClicked('datastream',y['@iot.id'])">{{y["name"]}}</td>
-                            <td ng-click="linkClicked('datastream',y['@iot.id'])">{{y["@iot.id"]}}</td>
+                            <td ng-if="selectparams.datastreams['name']" ng-click="linkClicked('datastream',y['@iot.id'])">{{y["name"]}}</td>
+                            <td ng-if="selectparams.datastreams['description']" ng-click="linkClicked('datastream',y['@iot.id'])">{{y["description"]}}</td>
+                            <td ng-if="selectparams.datastreams['license']">
+                                <table><tr ng-repeat="pair in objToArray(y['properties']['license'])">{{pair}}</tr></table>
+                            </td>
+                            <td ng-if="selectparams.datastreams['phenomenonTime']" style="width: 157px;">{{y["phenomenonTime"] | limitTo : 24 | date:'yyyy-MM-dd HH:mm:ss'}} <br/> {{y["phenomenonTime"] | limitTo : -24 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                            <td ng-if="selectparams.datastreams['@iot.id']" >{{y["@iot.id"]}}</td>
+                            <td ng-if="selectparams.datastreams['Sensor']" ng-click="linkClicked('sensor',y['Sensor']['@iot.id'])" data-toggle="tooltip" data-placement="top" title="{{y['Sensor']['description']}}">{{y["Sensor"]["name"]}}</td>
+                            <td ng-if="selectparams.datastreams['ObservedProperty']" ng-click="linkClicked('observedproperty',y['ObservedProperty']['@iot.id'])" data-toggle="tooltip" data-placement="top" title="{{y['ObservedProperty']['description']}}">{{y["ObservedProperty"]["name"]}}</td>
+                            <td ng-if="selectparams.datastreams['unitOfMeasurement']">
+                                <table><tr ng-repeat="pair in objToArray(y['unitOfMeasurement'])">{{pair}}</tr></table>
+                            </td>
+                            <td ng-if="selectparams.datastreams['properties']" >{{y["properties"]}}</td>
+                            
                             <td ng-click="$parent.selectedDatastreams[y['@iot.id']] = !$parent.selectedDatastreams[y['@iot.id']]" style="text-align: center; vertical-align: middle;">
                                 <input type="checkbox" ng-model="$parent.selectedDatastreams[y['@iot.id']]" ng-click="$parent.selectedDatastreams[y['@iot.id']] = !$parent.selectedDatastreams[y['@iot.id']]">
                             </td>

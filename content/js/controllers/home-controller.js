@@ -4,10 +4,10 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	$scope.Page.setHeaderIcon('');
 
 
-	// fastest but least accurate: get number of observations and count with fixed +1 per 0.5sec up
+	// fastest but least accurate: get number of observations and count with fixed +1 per 0.413 sec up (at ~40 devices)
 	$http.get(getUrl() + "/v1.0/Observations?$top=1&$count=true").then(function (response) {
 	$scope.n_observations=response.data["@iot.count"];
-	interval=500;
+	interval=413;
 
 	$scope.setObservations=function(){
 		$scope.n_observations++
@@ -17,10 +17,6 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	};
 	window.setTimeout($scope.setObservations, 0);
 	});
-
-
-
-
 
 
 

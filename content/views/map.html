@@ -1,7 +1,7 @@
 <div class="card" ng-controller="MapCtrl" id="sensor-map" class="fullscreen-map">
         <div id="calendarHost"></div>
         <div class="card-header"> 
-            <a href="#/things?$expand=Locations&$filter=not Datastreams%2FphenomenonTime lt now() sub duration'P1d'" role="button" class="btn btn-primary btn-block btn-lg gradient-border pulse-button">Active Sensors within the last 24 hours: <span class="text-info">{{active_devices}}</span></a>
+            <a href="{{filterRecentLink}}" role="button" class="btn btn-primary btn-block btn-lg gradient-border pulse-button">Active Sensors within the last 24 hours: <span class="text-info">{{active_devices}}</span></a>
         </div>
         <div class="card-body" id="card-body-map" ng-class="{isLoadingData: isLoadingData}">
             <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}"></div>

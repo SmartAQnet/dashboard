@@ -64,13 +64,16 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
     //not working atm, cant find the functions which are defined in the map controller... maybe add this function to the map controller where the view is centered and check the current scope
     $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")/Locations").then(function (response) {
+        
         $scope.locationsList = response.data.value;
 
+        if($scope.locationsList){
         $scope.patchLocation.name = $scope.locationsList[0]["name"]
         $scope.patchLocation.description = $scope.locationsList[0]["description"]
         $scope.patchLocation.coordinates = $scope.locationsList[0]["location"]["coordinates"]
 
         //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
+        }
     });
     
 
@@ -90,7 +93,6 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
 
     $scope.tabHistoricalLocationsClicked = function () {
-
         $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/HistoricalLocations?$expand=Locations").then(function (response) {
             $scope.historicalLocationsList = response.data.value;
         });
@@ -116,4 +118,49 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;
     $scope.propertyName = propertyName;
   };
+
+
+  $(function() {
+    $('#calendar').daterangepicker({
+        timePicker: true,
+        timePicker24Hour: true,
+        startDate: moment().subtract(24, 'hour'),
+        endDate: moment(),
+        drops: "up",
+                ranges: {
+                    'Last Hour': [moment().subtract(1, 'hours'), moment()],
+                    'Last 3 Hours': [moment().subtract(3, 'hours'), moment()],
+                    'Last 6 Hours': [moment().subtract(6, 'hours'), moment()],
+                    'Last 12 Hours': [moment().subtract(12, 'hours'), moment()],
+                    'Last 24 Hours': [moment().subtract(24, 'hours'), moment()],
+                    'Last 3 Days': [moment().subtract(3, 'days'), moment()]
+                },
+        locale: {
+            format: 'YYYY-MM-DD HH:mm:ss'
+        }
+    },pushDateToQuery);
+});
+
+
+
+
+function pushDateToQuery(start, end){
+    //for watch service
+    $scope.timeframe.from = start
+    $scope.timeframe.to = end
+
+    //parameter for the download functonality
+    $scope.timeframe.fromISO = start.toISOString()
+    $scope.timeframe.toISO = end.toISOString()
+
+    //for displaying the query
+    $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.fromISO + " and resultTime le " + $scope.timeframe.toISO + ")"
+    $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
+
+}
+
+pushDateToQuery(moment().subtract(24, 'hour'),window.moment())
+
+
+
 });
