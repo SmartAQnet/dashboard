@@ -170,7 +170,6 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     
 
     
-    
     function pushDateToQuery(start, end){
         //for watch service
         $scope.timeframe.from = start
@@ -188,5 +187,8 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
     pushDateToQuery(moment().subtract(24, 'hour'),window.moment())
     
+    $scope.downloadInProgress = function(){
+        $.snackbar({content: "Downloading Data. Please Wait. This may take up to a Minute.", timeout: 10000})
+    }
 
 });
