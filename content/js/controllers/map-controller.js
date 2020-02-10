@@ -15,7 +15,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
     //                        set parameters for map and functions
     /************************************************************************************/
     
-    $scope.filterRecent = "$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27%20and%20Datastreams/phenomenonTime%20lt%20now()"
+    $scope.filterRecent = "$filter=overlaps(Datastreams/phenomenonTime,(now()%20sub%20duration%27P1d%27))"
     $scope.filterRecentLink = "#/things/?" + $scope.filterRecent
     $http.get(getUrl() + "/v1.0/Things?" + $scope.filterRecent + "&$count=true&$top=0").then(function (response) {
         $scope.active_devices = response.data["@iot.count"];
