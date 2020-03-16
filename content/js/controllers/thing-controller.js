@@ -104,6 +104,10 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     }
 
 
+
+
+
+
     $scope.tabHistoricalLocationsClicked = function () {
         $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/HistoricalLocations?$expand=Locations").then(function (response) {
             $scope.historicalLocationsList = response.data.value;
@@ -151,28 +155,34 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
             format: 'YYYY-MM-DD HH:mm:ss'
         }
     },pushDateToQuery);
-});
+    });
 
 
 
 
-function pushDateToQuery(start, end){
-    //for watch service
-    $scope.timeframe.from = start
-    $scope.timeframe.to = end
+    function pushDateToQuery(start, end){
+        //for watch service
+        $scope.timeframe.from = start
+        $scope.timeframe.to = end
 
-    //parameter for the download functonality
-    $scope.timeframe.fromISO = start.toISOString()
-    $scope.timeframe.toISO = end.toISOString()
+        //parameter for the download functonality
+        $scope.timeframe.fromISO = start.toISOString()
+        $scope.timeframe.toISO = end.toISOString()
 
-    //for displaying the query
-    $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.fromISO + " and resultTime le " + $scope.timeframe.toISO + ")"
-    $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
+        //for displaying the query
+        $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.fromISO + " and resultTime le " + $scope.timeframe.toISO + ")"
+        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
 
-}
+    }
 
-pushDateToQuery(moment().subtract(24, 'hour'),window.moment())
+    pushDateToQuery(moment().subtract(24, 'hour'),window.moment())
 
+    $scope.testthing = {}
+    $scope.testthing["testkey"] = "testval"
+    
+    $scope.getObjectKey = function(obj){
+        return(obj.keys())
+    }
 
 
 });

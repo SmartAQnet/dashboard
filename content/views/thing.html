@@ -64,6 +64,24 @@
                                         <div class="indent-inputlines">
 
                                             <div ng-repeat="(key, value) in patchThing.properties" ng-hide="(key=='shortname'||key=='operator.domain'||key=='hardware.id')" >
+
+                                                <!-- <div class="row" ng-if=$parent.isTrueObject(value)>
+                                                    <div class="col-12">
+                                                        <div class="col-10 form-group bmd-form-group">
+                                                            <div ng-repeat="(key2, value2) in value">
+                                                                <label class="bmd-label-static" for="{{key2}}Input">{{key2}}</label>
+                                                                <input class="form-control" id="{{key2}}Input" type="text" ng-model="patchThing.properties[key][key2]">
+                                                            </div>
+                                                        </div>
+                                                        <span class="col-2 form-group bmd-form-group"> 
+                                                            <button type="submit" class="btn btn-primary" ng-click="deletekey(key,patchThing.properties)" style="width:32px;padding:5px;">x</button>
+                                                            <button type="submit" class="btn btn-primary" ng-click="addObject(key,patchThing.properties)" style="width:32px;padding:5px;">{}</button>
+                                                        </span>
+                                                    </div>
+                                                </div> -->
+
+                                                
+
                                                 <div class="row" ng-if=$parent.isTrueObject(value)>
                                                     <div class="col-12">
                                                         <div class="col-10 form-group bmd-form-group">
@@ -78,7 +96,6 @@
                                                         </span>
                                                     </div>
                                                 </div>
-
 
                                                 <div class="row" ng-if=!$parent.isTrueObject(value)>
                                                     <div class="col-10 form-group bmd-form-group">
@@ -98,10 +115,10 @@
                                             </div> -->
                                         </div>
 
-                                        <h5 class="modal-title">Add new Property Key: </h5>
+                                        <h5 class="modal-title">Add new Property: </h5>
                                         <div class="row">
                                             <div class="col-lg-8 form-group">
-                                                <label for="addnewpropertykey" class="bmd-label-floating">Key</label>
+                                                <!-- <label for="addnewpropertykey" class="bmd-label-floating">Key</label> -->
                                                 <input type="text" class="form-control" id="addnewpropertykey" ng-model="addnewkey">
                                             </div>
                                             <span class="col-lg-4 form-group bmd-form-group"> 
