@@ -42,7 +42,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         $scope.patchThing.name = $scope.name;
         $scope.patchThing.description = $scope.description;
         $scope.patchThing.properties = $scope.properties;
-        $scope.patchThing.id = $scope.id;
+        //$scope.patchThing.id = $scope.id;
         $scope.patchtarget = $scope.Page.selectedThing["@iot.selfLink"]
         $scope.patchpw = ''
         $scope.pwvalid = ''
@@ -75,15 +75,27 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
         }
     });
-    
 
-    $scope.patchEntity = function(){
-        if(document.getElementById('patchpwcontainer').value == 'smartaqnet'){
+    $scope.patchEntity = function(entity){
+        if(sha1.hex(document.getElementById('patchpw').value) == "9ba4eb7944d7a3a953eb10937d877d0694377286"){
             $scope.pwvalid = "PASSWORD CORRECT";
             document.getElementById('patchpwcontainer').classList.add("text-success");
             document.getElementById('patchpwcontainer').classList.remove("text-danger");
-            console.log(JSON.stringify($scope.patchThing))
-            //$http.patch("https://smartaqnet-dev.dmz.teco.edu/v1.0/Things('saqn%3At%3Acf02643')",$scope.patchThing).then(function (response) {});
+            console.log("----- PATCHING -----")
+            $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")").then(function (response) {
+                console.log("OLD DATA: ")
+                console.log(response.data)
+            })
+            console.log("PATCHING: ")
+            console.log(JSON.stringify(entity))
+            $http.patch(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")",JSON.stringify(entity)).then(function (response) {
+                console.log("response code: " + response.status)
+                $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")").then(function (response) {
+                    console.log("NEW DATA: ")
+                    console.log(response.data)
+                    console.log("----- END PATCHING ----")
+                })
+            });
             } else {
             $scope.pwvalid = "PASSWORD INCORRECT";
             document.getElementById('patchpwcontainer').classList.add("text-danger");

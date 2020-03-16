@@ -1,13 +1,33 @@
-gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
+gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams, $timeout) {
 	$scope.id = "saqn:home:";
 	$scope.Page.setTitle('smartAQnet');
 	$scope.Page.setHeaderIcon('');
 
 
-	// fastest but least accurate: get number of observations and count with fixed +1 per 0.413 sec up (at ~40 devices)
+	var obspersec = 3.92
+	var interval = (1/obspersec)*1000;
+	console.log(interval)
+
+	var unixGauge = 1581943181
+	var countGauge = 76852637
+	
+	//offset when loading the page
+	$scope.n_observations = countGauge + Math.floor((moment().unix() - unixGauge)*obspersec)
+
+	//counting loop
+	$scope.setObservations=function(){
+		$scope.n_observations++
+		$scope.obs_string = $scope.n_observations.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+		$timeout($scope.setObservations, interval);
+	};
+
+	//initiate loop
+	$timeout($scope.setObservations, 0);
+
+
+	/*
 	$http.get(getUrl() + "/v1.0/Observations?$top=1&$count=true").then(function (response) {
 	$scope.n_observations=response.data["@iot.count"];
-	interval=413;
 
 	$scope.setObservations=function(){
 		$scope.n_observations++
@@ -17,8 +37,7 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	};
 	window.setTimeout($scope.setObservations, 0);
 	});
-
-
+	*/
 
 	/*	
 	var interval=60000;
@@ -94,7 +113,7 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams) {
 	});
 	*/
 	$scope.$on('$destroy',function(){
-		interval=0;
+		//interval=0;
 	});
 
 	$scope.mapVisible = true;

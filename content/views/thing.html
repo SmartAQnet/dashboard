@@ -64,15 +64,33 @@
                                         <div class="indent-inputlines">
 
                                             <div ng-repeat="(key, value) in patchThing.properties" ng-hide="(key=='shortname'||key=='operator.domain'||key=='hardware.id')" >
-                                                <div class="row">
+                                                <div class="row" ng-if=$parent.isTrueObject(value)>
+                                                    <div class="col-12">
+                                                        <div class="col-10 form-group bmd-form-group">
+                                                            <div ng-repeat="(key2, value2) in value">
+                                                                <label class="bmd-label-static" for="{{key2}}Input">{{key2}}</label>
+                                                                <input class="form-control" id="{{key2}}Input" type="text" ng-model="patchThing.properties[key][key2]">
+                                                            </div>
+                                                        </div>
+                                                        <span class="col-2 form-group bmd-form-group"> 
+                                                            <button type="submit" class="btn btn-primary" ng-click="deletekey(key,patchThing.properties)" style="width:32px;padding:5px;">x</button>
+                                                            <button type="submit" class="btn btn-primary" ng-click="addObject(key,patchThing.properties)" style="width:32px;padding:5px;">{}</button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="row" ng-if=!$parent.isTrueObject(value)>
                                                     <div class="col-10 form-group bmd-form-group">
-                                                        <label class="bmd-label-static" for="{{key}}{{value}}Input">{{key}}</label>
-                                                        <input class="form-control" id="{{key}}{{value}}Input" type="text" ng-model="patchThing.properties[key]">
+                                                        <label class="bmd-label-static" for="{{key}}Input">{{key}}</label>
+                                                        <input id="{{key}}Input" class="form-control" type="text" ng-model="patchThing.properties[key]">
                                                     </div>
                                                     <span class="col-2 form-group bmd-form-group"> 
-                                                        <button type="submit" class="btn btn-primary" ng-click="deletekey(key,patchThing.properties)">x</button>
+                                                        <button type="submit" class="btn btn-primary" ng-click="deletekey(key,patchThing.properties)" style="width:32px;padding:5px;">x</button>
+                                                        <button type="submit" class="btn btn-primary" ng-click="addObject(key,patchThing.properties)" style="width:32px;padding:5px;">{}</button>
                                                     </span>
                                                 </div>
+
                                             </div>
                                             <!-- <div class="form-group" ng-repeat="(key, value) in patchThing.properties" ng-hide="(key=='shortname'||key=='operator.domain'||key=='hardware.id')" >
                                                 <label for="{{key}}{{value}}Input">{{key}}: </label>
@@ -80,17 +98,13 @@
                                             </div> -->
                                         </div>
 
-                                        <h5 class="modal-title">Add new Properties: </h5>
+                                        <h5 class="modal-title">Add new Property Key: </h5>
                                         <div class="row">
-                                            <div class="col-lg-5 form-group">
+                                            <div class="col-lg-8 form-group">
                                                 <label for="addnewpropertykey" class="bmd-label-floating">Key</label>
                                                 <input type="text" class="form-control" id="addnewpropertykey" ng-model="addnewkey">
                                             </div>
-                                            <div class="col-lg-5 form-group">
-                                                <label for="addnewpropertyvalue" class="bmd-label-floating">Value</label>
-                                                <input type="text" class="form-control" id="addnewpropertyvalue" ng-model="addnewvalue">
-                                            </div>
-                                            <span class="col-lg-2 form-group bmd-form-group"> 
+                                            <span class="col-lg-4 form-group bmd-form-group"> 
                                                 <button type="submit" class="btn btn-primary" ng-click="patchThing.properties[addnewkey]=addnewvalue; addnewkey = ''; addnewvalue = ''">Add to Properties</button>
                                             </span>
                                         </div>
@@ -100,8 +114,8 @@
                                     <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
                                         <form class="form-inline">
                                             <div class="form-group" id="patchpwcontainer">
-                                                <label for="inputpatchthingpw" class="bmd-label-floating">Input patch password</label>
-                                                <input type="password" id="inputpatchthingpw" class="form-control mx-sm-3">
+                                                <label for="patchpw" class="bmd-label-floating">Input patch password</label>
+                                                <input type="password" id="patchpw" class="form-control mx-sm-3">
                                                 <small id="patchpwHelpInline"> 
                                                     {{pwvalid}}
                                                 </small>
@@ -204,8 +218,8 @@
                                 <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
                                     <form class="form-inline">
                                         <div class="form-group" id="patchpwcontainer">
-                                            <label class="bmd-label-floating" for="inputpatchlocationpw">Input patch password</label>
-                                            <input type="password" id="inputpatchlocationpw" class="form-control mx-sm-3">
+                                            <label class="bmd-label-floating" for="patchpw">Input patch password</label>
+                                            <input type="password" id="patchpw" class="form-control mx-sm-3">
                                             <small id="patchpwHelpInline"> 
                                                 {{pwvalid}}
                                             </small>
