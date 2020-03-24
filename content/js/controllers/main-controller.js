@@ -13,7 +13,6 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
         
     
 
-    $scope.isTrueObject = function(obj){return(typeof(obj) ==='object' && obj!==null)}
 
     $http.defaults.headers.post["Content-Type"] = "application/json";
     $http.defaults.headers.post["Accept"] = "application/json";
@@ -71,6 +70,119 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
         $location.search({});
         $scope.Page.go(type + "/" + id);
     };
+
+
+    $scope.isTrueObject = function(obj){return(typeof(obj) ==='object' && obj!==null && !Array.isArray(obj))}
+
+    //function that reads ordinary json into the tree structure. 
+    $scope.traverse = function(obj,target,toplevel=true){
+
+        Object.keys(obj).forEach(function(key){
+            var item = {}
+            item["key"] = key
+            if(toplevel){item["@toplevelcheck"]=true} //at first function call, add an extra key to toplevel to identify in view logic
+
+            if($scope.isTrueObject(obj[key])){ // --> object value is json
+                item["value"] = undefined
+                item["items"] = []
+                target.push(item)
+                $scope.traverse(obj[key],item["items"],false)           
+            } else if(Array.isArray(obj[key]) && $scope.isTrueObject(obj[key][0])){ // --> object value is an array & zeroeth element of array is json -> assume array of objects and traverse
+                
+                item["value"] = "@objectIsArray"
+                item["items"] = []
+                target.push(item)
+                $scope.traverse(obj[key],item["items"],false)   
+
+            } else { // --> object value is simple value or an array with simple entries (no json entries)
+                item["value"] = obj[key]
+                item["items"] = []
+                target.push(item)
+            };
+
+        });
+    };
+
+
+    //function that reads a tree and converts it to a json object. 
+    $scope.esrevart = function(tree,target,listname="items"){
+        tree.forEach(function(entry){
+            if(entry[listname].length == 0){
+                target[entry.key] = entry.value
+            } else if (entry.value === "@objectIsArray") {
+                target[entry.key] = []
+                entry[listname].forEach(function(element, index){
+                    ephtarget = {}
+                    $scope.esrevart(element[listname],ephtarget)
+                    target[entry.key].push(ephtarget)
+                });
+
+            } else {
+                target[entry.key] = {}
+                $scope.esrevart(entry[listname],target[entry.key],listname)
+            }
+        });
+    };
+
+    $scope.deletekey = function(key,obj){
+        delete obj[key]
+    };
+
+
+    $scope.patchRequest = function(entity){
+
+        if(sha1.hex(document.getElementById('patchpw').value) == "9ba4eb7944d7a3a953eb10937d877d0694377286"){
+            $scope.pwvalid = "PASSWORD CORRECT";
+            document.getElementById('patchpwcontainer').classList.add("text-success");
+            document.getElementById('patchpwcontainer').classList.remove("text-danger");
+
+            //convert angularjs readable format back to ordinary json for patching
+            $scope.jsonobj = {}
+            $scope.esrevart(entity,$scope.jsonobj)
+
+            var patchtargetadress = $scope.jsonobj["@iot.selfLink"]
+
+            //drop all keys with @iot as they are immutable such as id, crosslinks etc
+            Object.keys($scope.jsonobj).forEach(function(key){
+                if(key.includes('@iot')){
+                    $scope.deletekey(key,$scope.jsonobj)
+                }     
+            });
+
+            $scope.patchEntity($scope.jsonobj,patchtargetadress)
+        
+        } else {
+            $scope.pwvalid = "PASSWORD INCORRECT";
+            document.getElementById('patchpwcontainer').classList.add("text-danger");
+            document.getElementById('patchpwcontainer').classList.remove("text-success");
+        }
+
+    }
+
+
+    $scope.patchEntity = function(entity,adress){
+
+        $http.get(adress).then(function (response) {
+            console.log("OLD DATA: ")
+            console.log(response.data)
+        })
+
+        console.log("----- PATCHING -----")
+        console.log("target adress: " + adress)
+        console.log(entity)
+
+        $http.patch(adress,JSON.stringify(entity)).then(function (response) {
+            console.log("response code: " + response.status)
+            $http.get(adress).then(function (response) {
+                console.log("NEW DATA: ")
+                console.log(response.data)
+                console.log("----- END PATCHING ----")
+            })
+        });
+
+    };
+    
+
 
 
     //Browser check from https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser

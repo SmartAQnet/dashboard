@@ -1,0 +1,26 @@
+
+<!-- Traversing Nested Arrays with AngularJS, adapted from https://stackoverflow.com/questions/23315679/angularjs-traversing-nested-arrays -->
+
+
+<!-- <table class="table table-bordered table-hover st-table table-striped table-sm">
+    <thead class="st-thead">
+        <tr>
+            <th colspan="2" class="text-center">Properties</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="well" ng-repeat="item in items = item.items | filter : containsNoIot">
+            <td>{{item.key}}</td>
+            <td ng-show="item.items.length===0">{{item.value}}</td>
+            <div ng-include="$window.dashboardSettings.root + 'views/json-table-template.html'"></div>
+        </tr>
+    </tbody>
+</table> -->
+
+<tr class="well" ng-repeat="item in items = item.items | filter : containsNoIot" >
+
+    <td>{{item.key}}</td>
+    <td ng-show="item.items.length === 0">{{item.value}}</td>
+    <td ng-if="item.items.length > 0" ng-include="$window.dashboardSettings.root + 'views/json-table-template.html'"></td>
+
+</tr>

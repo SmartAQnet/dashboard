@@ -1,0 +1,25 @@
+
+<!-- Traversing Nested Arrays with AngularJS, adapted from https://stackoverflow.com/questions/23315679/angularjs-traversing-nested-arrays -->
+
+<div class="well" ng-repeat="item in items = (parent = item).items | filter : containsNoIot | filter : excludeFixedProperties | filter : excludeOthers" ng-init="item.parent = parent; item.level = parent.level + 1">
+    
+    <!-- Item Nr in list accessible via: {{$index + 1}} 
+    Length of current list: {{items.length}} 
+    Current nest level: {{item.level - 1}} -->
+
+    <form ng-if="!item['@toplevelcheck']" class="form-inline">
+        <div class="form-group">
+          <label for="{{item.key}}{{item.value}}" class="bmd-label-floating">{{item.key}}</label>
+          <input ng-show="item.items.length===0" type="text" class="form-control" id="{{item.key}}{{item.value}}" ng-model="item.value">
+        </div>
+        <span class="form-group bmd-form-group">
+            <button ng-show="item.items.length===0" type="submit" class="btn btn-primary" ng-click="deleteMe(items, $index)" style="width:32px;padding:5px;">x</button>
+            <button type="submit" class="btn btn-primary" ng-click="addItem(item)" style="width:32px;padding:5px;">{}</button>
+            <button type="submit" class="btn btn-primary" ng-click="addSiblingItem(items, $index)" style="width:32px;padding:5px;">+</button>
+        </span>
+    </form>
+
+    <div class="indent-inputlines">
+        <div ng-include="$window.dashboardSettings.root + 'views/json-patch-template.html'"></div>
+    </div>
+</div>

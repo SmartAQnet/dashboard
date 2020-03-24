@@ -1,4 +1,4 @@
-gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location, Page) {
+gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location, $timeout, Page) {
     $scope.id = $routeParams.id;
     $scope.Page.setTitle('THING(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
@@ -28,6 +28,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         $scope.location = response.data["Locations"][0]["location"]["coordinates"];
         $scope.showMap = true;
 
+      $scope.thing = response.data;
 
         // let patchjson = {
         //     'name': $scope.patchThing.name, 
@@ -46,13 +47,93 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         $scope.patchtarget = $scope.Page.selectedThing["@iot.selfLink"]
         $scope.patchpw = ''
         $scope.pwvalid = ''
-    });
-    $scope.mapVisible = true;
-    
 
-    $scope.deletekey = function(key,obj){
-        delete obj[key]
+
+    
+    //load entity to patch into format that is readable for angularjs
+    $scope.item = {}
+    $scope.item.items = []
+    $scope.traverse($scope.thing,$scope.item.items)
+    
+    // check gives true that traverse and esrevart are indeed inverse to each other
+    //console.log(JSON.stringify($scope.testthing)==JSON.stringify($scope.jsonobj))
+
+    //add items to item, so that first ng-repeat has same structure to work with as the recursive repeats
+    /*$scope.item = {
+      items: $scope.items
+    }*/
+
+
+    });
+
+        // ----------------------------------------------------------------------------------------------------------------------
+    // Traversing Nested Arrays with AngularJS, adapted from https://stackoverflow.com/questions/23315679/angularjs-traversing-nested-arrays 
+
+    $scope.addItem = function(item) {
+      item.items.push({
+        key: 'my new - key',
+        value: 'my new - value',
+        items: []
+      });
     }
+
+    $scope.addSiblingItem = function(items, position) {
+      items.splice(position + 1, 0, {
+        key: 'sibling - new key',
+        value: 'sibling - new value',
+        items: []
+      });
+    }
+    
+    $scope.deleteMe = function(items, position) {
+      items.splice(position, 1);
+    }
+    $scope.addParentSibling = function(item) {
+      var parentSibling = {
+        key: 'aunt - key',
+        value: 'aunt - value',
+        items: []      
+      };
+      
+      if (item.items)
+      item.items.push(parentSibling);
+      else //root
+      item.push(parentSibling);    
+    }
+
+
+    $scope.addNewProperty = function(key){
+      var newitem = {}
+      newitem["key"] = key
+      newitem["value"] = undefined
+      newitem["items"] = []
+
+      $scope.item.items.forEach(function(obj){
+        if(obj["key"] === 'properties'){
+          obj["items"].push(newitem)
+        }
+      });
+    }
+
+
+    //view filters
+    $scope.containsNoIot = function(obj){
+      return (!obj.key.includes('@iot'))
+    };
+
+    $scope.excludeFixedProperties = function(obj){
+      return((obj.key != "hardware.id") && (obj.key != "shortname") && (obj.key != "operator.domain"))
+    }
+
+    $scope.excludeOthers = function(obj){
+      return(obj.key != "Locations")
+    }
+
+    // ----------------------------------------------------------------------------------------------
+
+
+
+    $scope.mapVisible = true;
 
     $scope.tabPropertiesClicked = function () {
     };
@@ -75,35 +156,6 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
         }
     });
-
-    $scope.patchEntity = function(entity){
-        if(sha1.hex(document.getElementById('patchpw').value) == "9ba4eb7944d7a3a953eb10937d877d0694377286"){
-            $scope.pwvalid = "PASSWORD CORRECT";
-            document.getElementById('patchpwcontainer').classList.add("text-success");
-            document.getElementById('patchpwcontainer').classList.remove("text-danger");
-            console.log("----- PATCHING -----")
-            $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")").then(function (response) {
-                console.log("OLD DATA: ")
-                console.log(response.data)
-            })
-            console.log("PATCHING: ")
-            console.log(JSON.stringify(entity))
-            $http.patch(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")",JSON.stringify(entity)).then(function (response) {
-                console.log("response code: " + response.status)
-                $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")").then(function (response) {
-                    console.log("NEW DATA: ")
-                    console.log(response.data)
-                    console.log("----- END PATCHING ----")
-                })
-            });
-            } else {
-            $scope.pwvalid = "PASSWORD INCORRECT";
-            document.getElementById('patchpwcontainer').classList.add("text-danger");
-            document.getElementById('patchpwcontainer').classList.remove("text-success");
-        }
-    }
-
-
 
 
 
