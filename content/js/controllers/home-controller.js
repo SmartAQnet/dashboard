@@ -6,7 +6,6 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams, $timeout) 
 
 	var obspersec = 3.92
 	var interval = (1/obspersec)*1000;
-	console.log(interval)
 
 	var unixGauge = 1581943181
 	var countGauge = 76852637
@@ -24,6 +23,25 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams, $timeout) 
 	//initiate loop
 	$timeout($scope.setObservations, 0);
 
+	$scope.obscount
+
+	/* get count via looping over all datastreams and requesting their counts... also seems that the server doesnt like that
+	$scope.getCount = function(){
+		$http.get(getUrl() + "/v1.0/Datastreams?$select=@iot.selfLink").then(function (response) {
+			response.data.value.forEach(element => {
+				$http.get(element["@iot.selfLink"]).then(function(resp){
+					$http.get(resp.data["Observations@iot.navigationLink"] + "?$count=true&$top=1").then(function(obslist){
+						$scope.obscount = $scope.obscount + obslist.data["@iot.count"]
+					});
+				});
+			});
+		});
+	}
+
+	$scope.getCount()
+
+	setTimeout(console.log($scope.obscount),5000)
+	*/
 
 	/*
 	$http.get(getUrl() + "/v1.0/Observations?$top=1&$count=true").then(function (response) {

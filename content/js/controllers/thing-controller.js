@@ -69,10 +69,10 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         // ----------------------------------------------------------------------------------------------------------------------
     // Traversing Nested Arrays with AngularJS, adapted from https://stackoverflow.com/questions/23315679/angularjs-traversing-nested-arrays 
 
-    $scope.addItem = function(item) {
+    $scope.addItem = function(item,itemkey) {
       item.items.push({
-        key: 'my new - key',
-        value: 'my new - value',
+        key: itemkey,
+        value: undefined,
         items: []
       });
     }

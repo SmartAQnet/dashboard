@@ -8,14 +8,21 @@
     Current nest level: {{item.level - 1}} -->
 
     <form ng-if="!item['@toplevelcheck']" class="form-inline">
-        <div class="form-group">
-          <label for="{{item.key}}{{item.value}}" class="bmd-label-floating">{{item.key}}</label>
-          <input ng-show="item.items.length===0" type="text" class="form-control" id="{{item.key}}{{item.value}}" ng-model="item.value">
+        <div class="form-group bmd-form-group">
+          <label ng-show="item.items.length===0" for="{{item.key}}{{item.value}}{{item.level - 1}}" class="bmd-label-static">{{item.key}}</label>
+          <input ng-show="item.items.length===0" type="text" class="form-control" id="{{item.key}}{{item.value}}{{item.level - 1}}" ng-model="item.value">
+          <div ng-hide="item.items.length===0" style="padding-bottom: 7.5px; padding-right: 10px">{{item.key}}</div>
         </div>
+        <span class="mx-2 form-group bmd-form-group">
+            <button ng-show="item.items.length===0" type="submit" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Remove Property" ng-click="deleteMe(items, $index)" style="width:32px;padding:5px;">x</button>
+            <button type="submit" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Add Sub-Property" ng-click="newKeyInputFieldToggle=!newKeyInputFieldToggle" style="width:32px;padding:5px;">{...}</button>
+        </span>
         <span class="form-group bmd-form-group">
-            <button ng-show="item.items.length===0" type="submit" class="btn btn-primary" ng-click="deleteMe(items, $index)" style="width:32px;padding:5px;">x</button>
-            <button type="submit" class="btn btn-primary" ng-click="addItem(item)" style="width:32px;padding:5px;">{}</button>
-            <button type="submit" class="btn btn-primary" ng-click="addSiblingItem(items, $index)" style="width:32px;padding:5px;">+</button>
+            <label ng-show="newKeyInputFieldToggle" for="{{newKeyInputField}}id" class="bmd-label-static">Please name the property Key</label>
+            <input ng-show="newKeyInputFieldToggle" id="{{newKeyInputField}}id" type="text" class="form-control" ng-model="newKeyInputField">
+        </span>
+        <span class="form-group bmd-form-group">
+            <button ng-show="newKeyInputFieldToggle" type="submit" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Add Property" ng-click="addItem(item, newKeyInputField); newKeyInputFieldToggle=false" style="width:32px;padding:5px;">+</button>
         </span>
     </form>
 
