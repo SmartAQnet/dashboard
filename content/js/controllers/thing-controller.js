@@ -1,4 +1,4 @@
-gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location, Page) {
+gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location, $timeout, Page) {
     $scope.id = $routeParams.id;
     $scope.Page.setTitle('THING(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
@@ -28,6 +28,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         $scope.location = response.data["Locations"][0]["location"]["coordinates"];
         $scope.showMap = true;
 
+      $scope.thing = response.data;
 
         // let patchjson = {
         //     'name': $scope.patchThing.name, 
@@ -42,17 +43,100 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         $scope.patchThing.name = $scope.name;
         $scope.patchThing.description = $scope.description;
         $scope.patchThing.properties = $scope.properties;
-        $scope.patchThing.id = $scope.id;
+        //$scope.patchThing.id = $scope.id;
         $scope.patchtarget = $scope.Page.selectedThing["@iot.selfLink"]
         $scope.patchpw = ''
         $scope.pwvalid = ''
-    });
-    $scope.mapVisible = true;
-    
 
-    $scope.deletekey = function(key,obj){
-        delete obj[key]
+
+    if(!$scope.thing.hasOwnProperty('properties')){
+      $scope.thing["properties"] = undefined
     }
+    
+    //load entity to patch into format that is readable for angularjs
+    $scope.item = {}
+    $scope.item.items = []
+    $scope.traverse($scope.thing,$scope.item.items)
+    
+    // check gives true that traverse and esrevart are indeed inverse to each other
+    //console.log(JSON.stringify($scope.testthing)==JSON.stringify($scope.jsonobj))
+
+    //add items to item, so that first ng-repeat has same structure to work with as the recursive repeats
+    /*$scope.item = {
+      items: $scope.items
+    }*/
+
+
+    });
+
+        // ----------------------------------------------------------------------------------------------------------------------
+    // Traversing Nested Arrays with AngularJS, adapted from https://stackoverflow.com/questions/23315679/angularjs-traversing-nested-arrays 
+
+    $scope.addItem = function(item,itemkey) {
+      item.items.push({
+        key: itemkey,
+        value: undefined,
+        items: []
+      });
+    }
+
+    $scope.addSiblingItem = function(items, position) {
+      items.splice(position + 1, 0, {
+        key: 'sibling - new key',
+        value: 'sibling - new value',
+        items: []
+      });
+    }
+    
+    $scope.deleteMe = function(items, position) {
+      items.splice(position, 1);
+    }
+    $scope.addParentSibling = function(item) {
+      var parentSibling = {
+        key: 'aunt - key',
+        value: 'aunt - value',
+        items: []      
+      };
+      
+      if (item.items)
+      item.items.push(parentSibling);
+      else //root
+      item.push(parentSibling);    
+    }
+
+
+    $scope.addNewProperty = function(key){
+      var newitem = {}
+      newitem["key"] = key
+      newitem["value"] = undefined
+      newitem["items"] = []
+
+      $scope.item.items.forEach(function(obj){
+        if(obj["key"] === 'properties'){
+          obj["items"].push(newitem)
+        }
+      });
+    }
+
+
+    //view filters
+    $scope.containsNoIot = function(obj){
+      return (!obj.key.includes('@iot'))
+    };
+
+    $scope.excludeFixedProperties = function(obj){
+      return((obj.key != "hardware.id") && (obj.key != "shortname") && (obj.key != "operator.domain"))
+    }
+
+    $scope.excludeOthers = function(obj){
+      return(obj.key != "Locations")
+    }
+
+    // ----------------------------------------------------------------------------------------------
+
+
+
+    $scope.mapVisible = true;
 
     $scope.tabPropertiesClicked = function () {
     };
@@ -75,21 +159,8 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
         }
     });
-    
 
-    $scope.patchEntity = function(){
-        if(document.getElementById('patchpwcontainer').value == 'smartaqnet'){
-            $scope.pwvalid = "PASSWORD CORRECT";
-            document.getElementById('patchpwcontainer').classList.add("text-success");
-            document.getElementById('patchpwcontainer').classList.remove("text-danger");
-            console.log(JSON.stringify($scope.patchThing))
-            //$http.patch("https://smartaqnet-dev.dmz.teco.edu/v1.0/Things('saqn%3At%3Acf02643')",$scope.patchThing).then(function (response) {});
-            } else {
-            $scope.pwvalid = "PASSWORD INCORRECT";
-            document.getElementById('patchpwcontainer').classList.add("text-danger");
-            document.getElementById('patchpwcontainer').classList.remove("text-success");
-        }
-    }
+
 
 
     $scope.tabHistoricalLocationsClicked = function () {
@@ -139,28 +210,34 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
             format: 'YYYY-MM-DD HH:mm:ss'
         }
     },pushDateToQuery);
-});
+    });
 
 
 
 
-function pushDateToQuery(start, end){
-    //for watch service
-    $scope.timeframe.from = start
-    $scope.timeframe.to = end
+    function pushDateToQuery(start, end){
+        //for watch service
+        $scope.timeframe.from = start
+        $scope.timeframe.to = end
 
-    //parameter for the download functonality
-    $scope.timeframe.fromISO = start.toISOString()
-    $scope.timeframe.toISO = end.toISOString()
+        //parameter for the download functonality
+        $scope.timeframe.fromISO = start.toISOString()
+        $scope.timeframe.toISO = end.toISOString()
 
-    //for displaying the query
-    $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.fromISO + " and resultTime le " + $scope.timeframe.toISO + ")"
-    $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
+        //for displaying the query
+        $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.fromISO + " and resultTime le " + $scope.timeframe.toISO + ")"
+        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
 
-}
+    }
 
-pushDateToQuery(moment().subtract(24, 'hour'),window.moment())
+    pushDateToQuery(moment().subtract(24, 'hour'),window.moment())
 
+    $scope.testthing = {}
+    $scope.testthing["testkey"] = "testval"
+    
+    $scope.getObjectKey = function(obj){
+        return(obj.keys())
+    }
 
 
 });

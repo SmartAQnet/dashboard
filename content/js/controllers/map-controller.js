@@ -1,15 +1,11 @@
-gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $interval) {
+gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $interval, $timeout) {
 
 
 
 
 
 
-    /*
-    if(!("$filter" in $routeParams)){
-        $routeParams["$filter"]=filterparamforviewport()
-    };
-    */
+
 
     /************************************ Parameters ************************************/
     //                        set parameters for map and functions
@@ -752,25 +748,120 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         });
     };
 
+    
+    // copied from http://tsauerwein.github.io/ol3/animation-flights/examples/draw-features.html
+    var vectorsource = new ol.source.Vector({wrapX: false});
 
-    olMap.on('click', function (evt) {
-        console.log(filterparamforviewport())
-        var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
-            return feature
-        });
-        if (feature) {
-            $scope.isInfoSidePanelClosed = false;
-            $scope.toggleInfoSidepanel;
-            if (feature.getProperties()['result']) {
-                displayFeatureInfo(feature)
-            } else {
-                displayreducedFeatureInfo(feature)
-            };
-        };
+    var drawrectangle = new ol.interaction.Draw({
+        source: vectorsource,
+        type: /** @type {ol.geom.GeometryType} */ ('LineString'),
+        geometryFunction: ol.interaction.Draw.createBox(),
+        maxPoints: 2
+    });
+    
+    var vectorlayer = new ol.layer.Vector({
+        source: vectorsource,
+        style: new ol.style.Style({
+          fill: new ol.style.Fill({
+            color: 'rgba(255, 255, 255, 0.2)'
+          }),
+          stroke: new ol.style.Stroke({
+            color: '#ffcc33',
+            width: 2
+          }),
+          image: new ol.style.Circle({
+            radius: 7,
+            fill: new ol.style.Fill({
+              color: '#ffcc33'
+            })
+          })
+        })
     });
 
+    togglelayers(vectorlayer,true)
+
+    $scope.drawingactive = false
+
+    $scope.selectGeography = function(arg = 'none'){
+        $scope.geoSelectionType = arg
+        vectorsource.clear();
+        olMap.addInteraction(drawrectangle)
+        $scope.drawingactive = true
+    };
+
+    $scope.selectGeographyCancel = function(){
+        $scope.geoSelectionType = undefined
+        olMap.removeInteraction(drawrectangle)
+        $scope.drawingactive = false
+    };
 
 
+    //on drawend return list of things, store in a main scope parent variable and use in click link to build query and access these things via things page
+
+    olMap.on('click', function (evt) {
+        if(!$scope.drawingactive){
+
+            //console.log(filterparamPolygonextent(getextendPolygon(getcurrentextend())))
+            var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
+                return feature
+            });
+            if (feature) {
+                $scope.isInfoSidePanelClosed = false;
+                $scope.toggleInfoSidepanel;
+                if (feature.getProperties()['result']) {
+                    displayFeatureInfo(feature)
+                } else {
+                    displayreducedFeatureInfo(feature)
+                };
+            };
+        };
+
+    });
+    
+
+    //processes the drawn polygon. the polygon coordinates are stored in $scope.polygonpointsRearranged and $scope.polygonpointsRearranged4 and emitted
+    $scope.loadingGeoSelection = false
+
+    vectorsource.on('addfeature', function(evt){
+        var polygonpoints = []
+        evt.feature.getGeometry().getCoordinates()[0].forEach(pair => {
+            polygonpoints.push(ol.proj.transform(pair, 'EPSG:3857', 'EPSG:4326'))
+        });
+        
+        
+        $scope.polygonpointsRearranged4 = [polygonpoints[2],polygonpoints[3],polygonpoints[0],polygonpoints[1]]
+        $scope.polygonpointsRearranged = [polygonpoints[2],polygonpoints[3],polygonpoints[0],polygonpoints[1],polygonpoints[2]]
+        
+
+        $scope.$emit('drawnPolygonPoints4', $scope.polygonpointsRearranged4);
+        $scope.$emit('drawnPolygonPoints', $scope.polygonpointsRearranged);
+
+        $scope.filterGeography = "$filter=" + filterparamPolygonextent(getextendPolygon($scope.polygonpointsRearranged))
+
+        if($scope.geoSelectionType == 'things'){
+            $scope.filterGeographyLink = "#/things/?" + $scope.filterGeography
+            $scope.loadingGeoSelection = true
+            $http.get(getUrl() + "/v1.0/Things?" + $scope.filterGeography + "&$count=true&$top=0").then(function (response) {
+                $scope.within_geo_devices = response.data["@iot.count"];
+                $scope.loadingGeoSelection = false
+            });
+            $scope.geoSelectionType = undefined
+        }
+        //need timeout because the click event is handled after the add feature and it would immedately trigger click with drawingactive false. angular timeout to apply scope
+        $timeout(function(){
+            olMap.removeInteraction(drawrectangle)
+            $scope.drawingactive = false
+        },0)
+    });
+
+    
+
+
+
+    //click button to draw selection. button to select CAZ
+    //alle filter bei der thingsliste miteinander verheiraten --> things controller muss filterparameter aktuell in query lesen und weiterverwenden
+    //muss der das? geht ja eh nur auf auswahl bestimmter things also eigentlich egal? oder button "gib mir alle" dann sollte wenn KEIN ds ausgewählt ist
+    //der filter übernommen werden. also quasi der defaultfilter ist was im parameter steht, wird überschrieben von ggf auswahl von ds
 
     /* ------------------------------------------------------------------------------------------------------------------------ */
 
@@ -902,11 +993,11 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         return ([topright, topleft, bottomleft, bottomright]);
     };
 
-    function getcurrentextendPolygon(){
-        let topright = getcurrentextend()[0]
-        let topleft = getcurrentextend()[1]
-        let bottomleft = getcurrentextend()[2]
-        let bottomright = getcurrentextend()[3]
+    function getextendPolygon(ext){
+        let topright = ext[0]
+        let topleft = ext[1]
+        let bottomleft = ext[2]
+        let bottomright = ext[3]
         return ( "((" + topright[0].toString() + " " + topright[1].toString() + 
         "," + topleft[0].toString() + " " + topleft[1].toString() +
         "," + bottomleft[0].toString() + " " + bottomleft[1].toString() +
@@ -915,9 +1006,13 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         )
     }
 
-    function filterparamforviewport(){
-        return ("st_within(location,geography'POLYGON" + getcurrentextendPolygon() + "')")
+    function filterparamPolygonextent(polyext){
+        return ("st_within(Locations/location,geography'POLYGON" + polyext + "')")
     }
+
+    //viewport query: 
+    // filterparamPolygonextent(getextendPolygon(getcurrentextend()))
+
 
     function krigstuff(locations, values) {
         var lats = locations.map(function (x) {
@@ -1181,15 +1276,21 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
     /*
         Adds a ractangle to the map that signals area to load data from and loads data from server
     */
-    $scope.confirmHistoricDataSelection = function () {
+
+    $scope.defineOverlayGeometry = function(){
         var viewseekerBoundaries = $("#mapOverlayUI")[0].getBoundingClientRect();
         var mapBoundaries = $("#map")[0].getBoundingClientRect();
-        var viewseekerCoordinates = {
+        let vsC = {
             lt: olMap.getCoordinateFromPixel([viewseekerBoundaries.x - mapBoundaries.x, viewseekerBoundaries.y - mapBoundaries.y]),
             rt: olMap.getCoordinateFromPixel([viewseekerBoundaries.x - mapBoundaries.x + viewseekerBoundaries.width, viewseekerBoundaries.y - mapBoundaries.y]),
             lb: olMap.getCoordinateFromPixel([viewseekerBoundaries.x - mapBoundaries.x, viewseekerBoundaries.y - mapBoundaries.y + viewseekerBoundaries.height]),
             rb: olMap.getCoordinateFromPixel([viewseekerBoundaries.x - mapBoundaries.x + viewseekerBoundaries.width, viewseekerBoundaries.y - mapBoundaries.y + viewseekerBoundaries.height])
         };
+        return vsC
+    }
+
+    $scope.getOverlaySelection = function(){
+        var viewseekerCoordinates = $scope.defineOverlayGeometry()
         $scope.isMapOverlayVisible = false;
         var polygon = new ol.geom.Polygon([
             [viewseekerCoordinates.lt, viewseekerCoordinates.rt, viewseekerCoordinates.rb, viewseekerCoordinates.lb]
@@ -1213,6 +1314,11 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         var polygonString = serverPolygon.map(function (coordinates) {
             return coordinates.join(" ");
         }).join(",");
+    return polygonString
+    }
+
+    $scope.confirmHistoricDataSelection = function () {
+        let polygonString = $scope.getOverlaySelection()
         loadFeaturesFromServer(false, polygonString, false);
     }
 

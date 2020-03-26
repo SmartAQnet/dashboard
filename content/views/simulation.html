@@ -1,0 +1,44 @@
+<div class="main">
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs">
+                <li class="nav-item" ng-click="taboptions1clicked()"><a class="nav-link active show" data-target="#options1" data-toggle="tab">Options 1</a></li>
+                <li class="nav-item" ng-click="taboptions1clicked()"><a class="nav-link" data-target="#options2" data-toggle="tab">Options 2</a></li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
+                <div class="tab-pane active" id="options1">
+                    <div class="entityInfo">
+                        <span class="entityInfoHeader">Show Map</span> <br />
+                        <pre class="entityInfoInfo">{{showMap}}</pre>
+                        <span class="entityInfoHeader">Show Map Controls</span> <br />
+                        <pre class="entityInfoInfo">{{!noMapControls}}</pre>
+                        <span class="entityInfoHeader">Show Simulation Controls</span> <br />
+                        <pre class="entityInfoInfo">{{simulationControl}}</pre>
+                        
+                        <button type="button" class="btn btn-primary" ng-click="showMap=!showMap">Toggle Map</button>
+                        <button type="button" class="btn btn-primary" ng-click="noMapControls=!noMapControls">Toggle Map Controls</button>
+                        <button type="button" class="btn btn-primary" ng-click="simulationControl=!simulationControl">Toggle Simulation Controls</button>
+
+                        <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#collapsibleoption">Collapsible Option</button>
+                         <!-- collapsible option -->
+                         <div id="collapsibleoption" class="collapse" style="overflow:auto">
+                            some collapsible option
+                        </div>
+                        <!-- collapsible end -->
+                    </div>
+                </div>
+                <div class="tab-pane" id="options2">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row py-2">
+        <div class="col-md-12">
+            <div ng-if="showMap" class="map-container" ng-include="$window.dashboardSettings.root + 'views/map.html'">
+            </div>
+        </div>
+    </div>
+</div>
+    

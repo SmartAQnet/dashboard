@@ -1,8 +1,12 @@
 <div class="card" ng-controller="MapCtrl" id="sensor-map" class="fullscreen-map">
-        <div id="calendarHost"></div>
-        <div class="card-header"> 
+        <div ng-if="!noMapControls" id="calendarHost"></div>
+        <div ng-if="!noMapControls" class="card-header"> 
             <a href="{{filterRecentLink}}" role="button" class="btn btn-primary btn-block btn-lg gradient-border pulse-button">Active Sensors within the last 24 hours: <span class="text-info">{{active_devices}}</span></a>
         </div>
+        <div ng-if="simulationControl" class="card-header"> 
+            <h5>Simulation</h5>
+        </div>
+
         <div class="card-body" id="card-body-map" ng-class="{isLoadingData: isLoadingData}">
             <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}"></div>
             <div id="mapOverlay" ng-class="{active: isMapOverlayVisible}">
@@ -124,13 +128,15 @@
                 </div>
             </div>
         </div>
-        <div class="card-body card-body-slider">
+
+        <div ng-if="!noMapControls" class="card-body card-body-slider">
             <div id="loading-screen" ng-if="isLoadingData">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                     <span ng-if="!loadedPercent">LOADING...</span>
                     <span ng-if="loadedPercent">PREPARING DATA ({{loadedPercent}}/100)</span>
             </div>
             <div id="#map-timeline-ui-elements" ng-if="!isLoadingData">
+                <h5 class="mb-4 text-primary">Show Air Quality Data on Map</h5>
                 <div id="slider-container" ng-class="{isAutoPlayActive: isAutoPlayActive}" ng-if="!showOnlyLatest">
                     <rzslider rz-slider-model="slider.minValue"
                         rz-slider-high="slider.maxValue"
@@ -144,7 +150,7 @@
                         <span ng-if="showOnlyLatest">Latest</span>
                         <span ng-if="!showOnlyLatest">{{startDate}} - {{endDate}}</span>
                 </button>
-                <div ng-if="!showOnlyLatest" class="dropdown obspropertyList-dropdown">
+                <div ng-if="!showOnlyLatest" class="dropdown obspropertyList-dropdown col">
                     <button class="btn btn-raised  dropdown-toggle" type="button" id="dropdownDurationButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Displayed data: {{timeRange}}
                     </button>
@@ -152,9 +158,53 @@
                         <a ng-repeat="(label, duration) in selectableDurations" ng-click="selectDuration(duration)" class="dropdown-item" href="javascript:void(0);">{{label}}</a>
                     </div>
                 </div>
+
+            
+                <h5 class="my-4 text-primary">Geographical Selection</h5>
+                <div class="row">
+                    <div class="col-4" style="padding-left: 10px">
+                        <button ng-if="!drawingactive" type="button" class="btn btn-raised" ng-click="selectGeography('things')">Select Things via Map</button>
+                        <button ng-if="drawingactive" type="button" class="btn btn-raised" ng-click="selectGeographyCancel()">Cancel Selection</button>
+                    </div>
+                    <div class="col-4">
+                        <button ng-if="loadingGeoSelection" type="button" class="alert alert-primary">loading selection...</button>
+                        <button ng-if="(!within_geo_devices) && (!loadingGeoSelection)" type="button" class="alert alert-primary">No Things Selected</button>
+                        <button ng-if="(within_geo_devices==1) && (!loadingGeoSelection)" type="button" class="alert alert-primary">{{within_geo_devices}} Thing within Selection</button>
+                        <button ng-if="(within_geo_devices>1) && (!loadingGeoSelection)" type="button" class="alert alert-primary">{{within_geo_devices}} Things within Selection</button>
+                    </div>
+                    <div class="col-4" style="padding-right: 10px">
+                        <a ng-if="(!within_geo_devices) || loadingGeoSelection" type="button" class="btn btn-raised disabled" aria-disabled="true"> </a>
+                        <a ng-if="within_geo_devices && (!loadingGeoSelection)" type="button" class="btn btn-raised" href="{{filterGeographyLink}}">Go To Selection</a>
+                    </div>
+                </div>
+
             </div>
         </div>
-        <div class="card-footer" id="card-footer-map">
+
+        <div ng-if="simulationControl" class="card-body card-body-slider">
+            <div id="loading-screen" ng-if="isLoadingData">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    <span ng-if="!loadedPercent">LOADING...</span>
+                    <span ng-if="loadedPercent">PREPARING DATA ({{loadedPercent}}/100)</span>
+            </div>
+            <div id="#map-simulation-ui-elements" ng-if="!isLoadingData">
+                <h5 class="mb-4 text-primary">Simulation Controls</h5>
+                <div class="row">
+                    <div class="col-4" style="padding-left: 10px">
+                        <button ng-if="!drawingactive" type="button" class="btn btn-raised" ng-click="selectGeography()">Select Simulation Area</button>
+                        <button ng-if="drawingactive" type="button" class="btn btn-raised" ng-click="selectGeographyCancel()">Cancel Selection</button>
+                    </div>
+                    <div class="col-4"></div>
+                    <div class="col-4" style="padding-right: 10px">
+                        <a ng-if="(loadingGeoSelection) || (!polygonpointsRearranged)" type="button" class="btn btn-raised disabled" aria-disabled="true">Simulate</a>
+                        <a ng-if="(!loadingGeoSelection) && (polygonpointsRearranged)" type="button" class="btn btn-raised" ng-click="startSimulation()">Simulate</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div ng-if="!noMapControls" class="card-footer" id="card-footer-map">
             <div class="alert alert-primary" role="alert" ng-class="{nodisplay: !isInfoSidePanelClosed}">
                 Please select a feature on the map above to see more information here.
             </div>
@@ -197,6 +247,7 @@
                 </div>
             </div>
         </div>
+
     </div>
     
     

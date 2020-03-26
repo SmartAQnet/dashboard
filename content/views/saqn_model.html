@@ -1,0 +1,158 @@
+<div class="main">
+
+    <div class="card">
+        <div class="card-header">
+            <h5>The SmartAQnet Model - an implementation of the OGC SensorThings Standard</h5>
+        </div>
+        <div class="card-body">
+            <h5>Example of the SAQN Low Cost Crowdsensor</h5>
+            <div class="row px-5">
+                <div class="col-md-6">
+                    <div class="modelbutton sensorColor" id="sensorbutton" data-toggle="modal" data-target="#sensorModal"><h5>Sensor</h5></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modelbutton obspropColor" id="obspropbutton" data-toggle="modal" data-target="#obspropModal"><h5>Observed Property</h5></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modelbutton thingColor" id="thingbutton" data-toggle="modal" data-target="#thingModal"><h5>Thing</h5></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modelbutton datastreamColor" id="datastreambutton" data-toggle="modal" data-target="#datastreamModal"><h5>Datastream</h5></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modelbutton locationColor" id="locationbutton" data-toggle="modal" data-target="#locationModal"><h5>Location, Historical Location and Feature of Interest</h5></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modelbutton observationColor" id="observationbutton" data-toggle="modal" data-target="#observationModal"><h5>Observation</h5></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SENSOR MODAL -->
+    <div class="modal fade" id="sensorModal" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header sensorColor p-3 mb-2">
+                    <h2 class="modal-title"><i class="fa iconSensor"></i>SENSOR</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="sensorPic">
+                </div>
+                <div class="modal-footer sensorColor">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- THING MODAL -->
+    <div class="modal fade" id="thingModal" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header thingColor p-3 mb-2">
+                    <h2 class="modal-title"><i class="fa iconThing"></i>THING</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="thingPic">
+                </div>
+                <div class="modal-footer thingColor">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATASTREAM MODAL -->
+    <div class="modal fade" id="datastreamModal" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header datastreamColor p-3 mb-2">
+                    <h2 class="modal-title"><i class="fa iconDatastream"></i>DATASTREAM</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="datastreamPic">
+                </div>
+                <div class="modal-footer datastreamColor">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- LOCATION MODAL -->
+    <div class="modal fade" id="locationModal" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header locationColor p-3 mb-2">
+                    <h2 class="modal-title"><i class="fa iconLocation"></i>LOCATION</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="locationPic">
+                </div>
+                <div class="modal-footer locationColor">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- OBSERVEDPROPERTY MODAL -->
+    <div class="modal fade" id="obspropModal" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header obspropColor p-3 mb-2">
+                    <h2 class="modal-title"><i class="fa iconObservedProperty"></i>OBSERVED PROPERTY</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="obspropPic">
+                </div>
+                <div class="modal-footer obspropColor">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- OBSERVATION MODAL -->
+    <div class="modal fade" id="observationModal" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header observationColor p-3 mb-2">
+                    <h2 class="modal-title"><i class="fa iconObservation"></i>OBSERVATION</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="observationPic">
+                </div>
+                <div class="modal-footer observationColor">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+    

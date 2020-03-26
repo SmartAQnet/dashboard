@@ -42,56 +42,41 @@
                                             <input class="form-control" type="text" ng-model="patchThing.description" aria-describedby="thingdescriptionhelpblock"/>
                                             <small id="thingdescriptionhelpblock" class="form-text text-muted">Human readable description of the thing. </small>
                                         </div>
+                                        <div class="form-group">
+                                            <label class="bmd-label-static" for="iotidInput">@iot.id </label>
+                                            <input readonly class="form-control" id="iotidInput" type="text" ng-model="thing['@iot.id']" aria-describedby="thingpropertiesiotidhelpblock" disabled>
+                                            <small id="thingpropertiesiotidhelpblock" class="form-text text-muted">The internal Database ID of the Thing. <span class="text-warning">IDs cannot be changed. </span></small>
+                                        </div>
+
                                         <h5 class="modal-title">Properties: </h5>
                                         <div class="indent-inputlines">
                                             <div class="form-group">
                                                 <label class="bmd-label-static" for="hardwareidInput">hardware.id </label>
-                                                <input readonly class="form-control" id="hardwareidInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="patchThing.properties['hardware.id']" aria-describedby="thingpropertieshardwareidhelpblock" disabled>
+                                                <input readonly class="form-control" id="hardwareidInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="thing.properties['hardware.id']" aria-describedby="thingpropertieshardwareidhelpblock" disabled>
                                                 <small id="thingpropertieshardwareidhelpblock" class="form-text text-muted">Some Identifier of the Thing. <span class="text-warning">Necessary for ID generation. May not be changed. </span></small>
                                             </div>
                                             <div class="form-group">
                                                 <label class="bmd-label-static" for="shortnameInput">shortname</label>
-                                                <input readonly  class="form-control" id="shortnameInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="patchThing.properties['shortname']" aria-describedby="thingpropertiesshortnamehelpblock" disabled> 
+                                                <input readonly  class="form-control" id="shortnameInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="thing.properties['shortname']" aria-describedby="thingpropertiesshortnamehelpblock" disabled> 
                                                 <small id="thingpropertiesshortnamehelpblock" class="form-text text-muted">Short Name of the Thing. <span class="text-warning">Necessary for ID generation. May not be changed. </span></small>
                                             </div>
                                             <div class="form-group">
                                                 <label class="bmd-label-static" for="soperatordomainInput">operator.domain</label>
-                                                <input readonly class="form-control" id="operatordomainInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="patchThing.properties['operator.domain']" aria-describedby="thingpropertiesoperatordomainhelpblock" disabled>
+                                                <input readonly class="form-control" id="operatordomainInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="thing.properties['operator.domain']" aria-describedby="thingpropertiesoperatordomainhelpblock" disabled>
                                                 <small id="thingpropertiesoperatordomainhelpblock" class="form-text text-muted">Operator Web-Domain of the Thing. <span class="text-warning">Necessary for ID generation. May not be changed. </span></small>
                                             </div>
                                         </div>
                                         <h5 class="modal-title">Additional Properties: </h5>
-                                        <div class="indent-inputlines">
+                                        <div id="jsontree" ng-include="$window.dashboardSettings.root + 'views/json-patch-template.html'"></div>
 
-                                            <div ng-repeat="(key, value) in patchThing.properties" ng-hide="(key=='shortname'||key=='operator.domain'||key=='hardware.id')" >
-                                                <div class="row">
-                                                    <div class="col-10 form-group bmd-form-group">
-                                                        <label class="bmd-label-static" for="{{key}}{{value}}Input">{{key}}</label>
-                                                        <input class="form-control" id="{{key}}{{value}}Input" type="text" ng-model="patchThing.properties[key]">
-                                                    </div>
-                                                    <span class="col-2 form-group bmd-form-group"> 
-                                                        <button type="submit" class="btn btn-primary" ng-click="deletekey(key,patchThing.properties)">x</button>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <!-- <div class="form-group" ng-repeat="(key, value) in patchThing.properties" ng-hide="(key=='shortname'||key=='operator.domain'||key=='hardware.id')" >
-                                                <label for="{{key}}{{value}}Input">{{key}}: </label>
-                                                <input class="form-control" id="{{key}}{{value}}Input" type="text" ng-model="patchThing.properties[key]">
-                                            </div> -->
-                                        </div>
-
-                                        <h5 class="modal-title">Add new Properties: </h5>
+                                        <h5 class="modal-title">Add new Property: </h5>
                                         <div class="row">
-                                            <div class="col-lg-5 form-group">
-                                                <label for="addnewpropertykey" class="bmd-label-floating">Key</label>
+                                            <div class="col-lg-8 form-group">
+                                                <!-- <label for="addnewpropertykey" class="bmd-label-floating">Key</label> -->
                                                 <input type="text" class="form-control" id="addnewpropertykey" ng-model="addnewkey">
                                             </div>
-                                            <div class="col-lg-5 form-group">
-                                                <label for="addnewpropertyvalue" class="bmd-label-floating">Value</label>
-                                                <input type="text" class="form-control" id="addnewpropertyvalue" ng-model="addnewvalue">
-                                            </div>
-                                            <span class="col-lg-2 form-group bmd-form-group"> 
-                                                <button type="submit" class="btn btn-primary" ng-click="patchThing.properties[addnewkey]=addnewvalue; addnewkey = ''; addnewvalue = ''">Add to Properties</button>
+                                            <span class="col-lg-4 form-group bmd-form-group"> 
+                                                <button type="submit" class="btn btn-primary" ng-click="addNewProperty(addnewkey); addnewkey = undefined">Add to Properties</button>
                                             </span>
                                         </div>
                                     </div>
@@ -100,14 +85,14 @@
                                     <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
                                         <form class="form-inline">
                                             <div class="form-group" id="patchpwcontainer">
-                                                <label for="inputpatchthingpw" class="bmd-label-floating">Input patch password</label>
-                                                <input type="password" id="inputpatchthingpw" class="form-control mx-sm-3">
+                                                <label for="patchpw" class="bmd-label-floating">Input patch password</label>
+                                                <input type="password" id="patchpw" class="form-control mx-sm-3">
                                                 <small id="patchpwHelpInline"> 
                                                     {{pwvalid}}
                                                 </small>
                                             </div>
                                         </form>
-                                        <input type="submit" class="btn btn-default" ng-click="patchEntity(patchThing)" value="Save" />
+                                        <input type="submit" class="btn btn-default" ng-click="patchRequest(item.items)" value="Save" />
                                         <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
                                     </div>
                                 </div>
@@ -132,6 +117,19 @@
                             </table>
                         </div>
                         <!-- collapsible end -->
+
+
+                        <!-- not working yet as intended using the table template with nested include -->
+                        <!-- <div id="thingproperties" class="collapse">
+                            <table class="table table-bordered table-hover st-table table-striped table-sm">
+                                <thead class="st-thead">
+                                    <tr>
+                                        <th colspan="2" class="text-center">Properties</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-include="$window.dashboardSettings.root + 'views/json-table-template.html'"></tbody>
+                            </table>
+                        </div> -->
 
 
                     </div>
@@ -204,14 +202,14 @@
                                 <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
                                     <form class="form-inline">
                                         <div class="form-group" id="patchpwcontainer">
-                                            <label class="bmd-label-floating" for="inputpatchlocationpw">Input patch password</label>
-                                            <input type="password" id="inputpatchlocationpw" class="form-control mx-sm-3">
+                                            <label class="bmd-label-floating" for="patchpw">Input patch password</label>
+                                            <input type="password" id="patchpw" class="form-control mx-sm-3">
                                             <small id="patchpwHelpInline"> 
                                                 {{pwvalid}}
                                             </small>
                                         </div>
                                     </form>
-                                    <input type="submit" class="btn btn-default" ng-click="patchEntity(patchThing)" value="Save" />
+                                    <input type="submit" class="btn btn-default" ng-click="patchRequest(item.items)" value="Save" />
                                     <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
                                 </div>
                             </div>
