@@ -1,4 +1,4 @@
-gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location, $timeout, Page) {
+gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location, $timeout, $window, Page) {
     $scope.id = $routeParams.id;
     $scope.Page.setTitle('THING(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);

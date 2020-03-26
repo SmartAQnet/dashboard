@@ -45,9 +45,8 @@
                                         <div class="form-group">
                                             <label class="bmd-label-static" for="iotidInput">@iot.id </label>
                                             <input readonly class="form-control" id="iotidInput" type="text" ng-model="thing['@iot.id']" aria-describedby="thingpropertiesiotidhelpblock" disabled>
-                                            <small id="thingpropertiesiotidhelpblock" class="form-text text-muted">The internal Database ID of the Thing. <span class="text-warning">IDs cannot be changed. </span></small>
+                                            <small id="thingpropertiesiotidhelpblock" class="form-text text-muted">The internal Database ID of the Thing. <span class="text-warning">IDs cannot be changed. </span> <a class="text-info" href="http://api.smartaq.net/v1.0/Things('{{thing['@iot.id']}}')" target="_blank">Click here to see Database entry</a></small>
                                         </div>
-
                                         <h5 class="modal-title">Properties: </h5>
                                         <div class="indent-inputlines">
                                             <div class="form-group">
