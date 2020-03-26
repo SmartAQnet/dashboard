@@ -83,7 +83,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
             if(toplevel){item["@toplevelcheck"]=true} //at first function call, add an extra key to toplevel to identify in view logic
 
             if($scope.isTrueObject(obj[key])){ // --> object value is json
-                item["value"] = undefined
+                item["value"] = {}
                 item["items"] = []
                 target.push(item)
                 $scope.traverse(obj[key],item["items"],false)           
@@ -107,9 +107,9 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     //function that reads a tree and converts it to a json object. 
     $scope.esrevart = function(tree,target,listname="items"){
         tree.forEach(function(entry){
-            if(entry[listname].length == 0){
+            if(entry[listname].length == 0){ //if item encodes a "normal" key value pair ({key: some key, value: some value, items: []} --> {some key: some value})
                 target[entry.key] = entry.value
-            } else if (entry.value === "@objectIsArray") {
+            } else if (entry.value === "@objectIsArray") { //if item encodes an array as json value ({key: some key, value: @objectIsArray, items: [ -list of json objects- ]} --> {some key: [ -list of json objects- ]})
                 target[entry.key] = []
                 entry[listname].forEach(function(element, index){
                     ephtarget = {}
@@ -117,7 +117,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
                     target[entry.key].push(ephtarget)
                 });
 
-            } else {
+            } else { //if the item encodes another json object as its value ({key: some key, value: -is ignored-, items: [ -list of json objects- ]} --> {some key: { -list of json objects as object instead of array- }})
                 target[entry.key] = {}
                 $scope.esrevart(entry[listname],target[entry.key],listname)
             }
@@ -139,6 +139,8 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
             //convert angularjs readable format back to ordinary json for patching
             $scope.jsonobj = {}
             $scope.esrevart(entity,$scope.jsonobj)
+            console.log(entity)
+            console.log($scope.jsonobj)
 
             var patchtargetadress = $scope.jsonobj["@iot.selfLink"]
 
@@ -155,6 +157,8 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
             $scope.pwvalid = "PASSWORD INCORRECT";
             document.getElementById('patchpwcontainer').classList.add("text-danger");
             document.getElementById('patchpwcontainer').classList.remove("text-success");
+            alert("PASSWORD INCORRECT")
+            document.getElementById('patchpw').value = ''
         }
 
     }
@@ -169,6 +173,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
 
         console.log("----- PATCHING -----")
         console.log("target adress: " + adress)
+        console.log("DATA SENT FOR PATCHING: ")
         console.log(entity)
 
         $http.patch(adress,JSON.stringify(entity)).then(function (response) {
@@ -177,6 +182,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
                 console.log("NEW DATA: ")
                 console.log(response.data)
                 console.log("----- END PATCHING ----")
+                alert("Patch Request Response: " + response.status + "\n" + response.statusText)
             })
         });
 

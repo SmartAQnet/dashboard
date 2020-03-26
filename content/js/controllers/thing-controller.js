@@ -48,23 +48,23 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         $scope.patchpw = ''
         $scope.pwvalid = ''
 
+      //on page load: if the thing does not have a properties field, set it with key unknown
+      if(!$scope.thing.hasOwnProperty('properties')){
+        $scope.thing["properties"] = {}
+      }
+      
+      //load entity to patch into format that is readable for angularjs
+      $scope.item = {}
+      $scope.item.items = []
+      $scope.traverse($scope.thing,$scope.item.items)
+      
+      // check gives true that traverse and esrevart are indeed inverse to each other
+      //console.log(JSON.stringify($scope.testthing)==JSON.stringify($scope.jsonobj))
 
-    if(!$scope.thing.hasOwnProperty('properties')){
-      $scope.thing["properties"] = undefined
-    }
-    
-    //load entity to patch into format that is readable for angularjs
-    $scope.item = {}
-    $scope.item.items = []
-    $scope.traverse($scope.thing,$scope.item.items)
-    
-    // check gives true that traverse and esrevart are indeed inverse to each other
-    //console.log(JSON.stringify($scope.testthing)==JSON.stringify($scope.jsonobj))
-
-    //add items to item, so that first ng-repeat has same structure to work with as the recursive repeats
-    /*$scope.item = {
-      items: $scope.items
-    }*/
+      //add items to item, so that first ng-repeat has same structure to work with as the recursive repeats
+      /*$scope.item = {
+        items: $scope.items
+      }*/
 
 
     });
@@ -72,14 +72,9 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         // ----------------------------------------------------------------------------------------------------------------------
     // Traversing Nested Arrays with AngularJS, adapted from https://stackoverflow.com/questions/23315679/angularjs-traversing-nested-arrays 
 
-    $scope.addItem = function(item,itemkey) {
-      item.items.push({
-        key: itemkey,
-        value: undefined,
-        items: []
-      });
-    }
 
+    
+    /*unused
     $scope.addSiblingItem = function(items, position) {
       items.splice(position + 1, 0, {
         key: 'sibling - new key',
@@ -87,10 +82,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         items: []
       });
     }
-    
-    $scope.deleteMe = function(items, position) {
-      items.splice(position, 1);
-    }
+
     $scope.addParentSibling = function(item) {
       var parentSibling = {
         key: 'aunt - key',
@@ -103,20 +95,59 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       else //root
       item.push(parentSibling);    
     }
+    */
 
 
-    $scope.addNewProperty = function(key){
+
+    
+    $scope.deleteMe = function(items, position) {
+      console.log("deleting:" + position)
+      items.splice(position, 1);
+    }
+
+
+    //function that checks the items list in the tree representation if a key at that level already exists to prevent adding it --> otherwise adding it would overwrite the old one
+    $scope.propertyKeyExists = function(listofitems, prop){
+      var exists = false
+      listofitems.forEach(function(thisitem){
+        if(thisitem.key==prop){
+          exists = true
+        }
+      });
+      return exists
+    };
+
+    //add item at relative position
+    $scope.addItem = function(item,itemkey) {
+      if(!$scope.propertyKeyExists(item.items, itemkey)){
+        item.items.push({
+          key: itemkey,
+          value: undefined,
+          items: []
+        });
+      } else {
+        alert("Key does already exist!")
+      }
+    }
+
+    //add an item at base level to properties
+    $scope.addNewProperty = function(itemkey){
       var newitem = {}
-      newitem["key"] = key
+      newitem["key"] = itemkey
       newitem["value"] = undefined
       newitem["items"] = []
 
       $scope.item.items.forEach(function(obj){
         if(obj["key"] === 'properties'){
-          obj["items"].push(newitem)
+          if(!$scope.propertyKeyExists(obj["items"], itemkey)){
+            obj["items"].push(newitem)
+          } else {
+            alert("Key does already exist!")
+          }
         }
       });
-    }
+    };
+
 
 
     //view filters
