@@ -49,6 +49,9 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         $scope.pwvalid = ''
 
 
+    if(!$scope.thing.hasOwnProperty('properties')){
+      $scope.thing["properties"] = undefined
+    }
     
     //load entity to patch into format that is readable for angularjs
     $scope.item = {}

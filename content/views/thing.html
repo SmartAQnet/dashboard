@@ -52,17 +52,17 @@
                                         <div class="indent-inputlines">
                                             <div class="form-group">
                                                 <label class="bmd-label-static" for="hardwareidInput">hardware.id </label>
-                                                <input readonly class="form-control" id="hardwareidInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="patchThing.properties['hardware.id']" aria-describedby="thingpropertieshardwareidhelpblock" disabled>
+                                                <input readonly class="form-control" id="hardwareidInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="thing.properties['hardware.id']" aria-describedby="thingpropertieshardwareidhelpblock" disabled>
                                                 <small id="thingpropertieshardwareidhelpblock" class="form-text text-muted">Some Identifier of the Thing. <span class="text-warning">Necessary for ID generation. May not be changed. </span></small>
                                             </div>
                                             <div class="form-group">
                                                 <label class="bmd-label-static" for="shortnameInput">shortname</label>
-                                                <input readonly  class="form-control" id="shortnameInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="patchThing.properties['shortname']" aria-describedby="thingpropertiesshortnamehelpblock" disabled> 
+                                                <input readonly  class="form-control" id="shortnameInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="thing.properties['shortname']" aria-describedby="thingpropertiesshortnamehelpblock" disabled> 
                                                 <small id="thingpropertiesshortnamehelpblock" class="form-text text-muted">Short Name of the Thing. <span class="text-warning">Necessary for ID generation. May not be changed. </span></small>
                                             </div>
                                             <div class="form-group">
                                                 <label class="bmd-label-static" for="soperatordomainInput">operator.domain</label>
-                                                <input readonly class="form-control" id="operatordomainInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="patchThing.properties['operator.domain']" aria-describedby="thingpropertiesoperatordomainhelpblock" disabled>
+                                                <input readonly class="form-control" id="operatordomainInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="thing.properties['operator.domain']" aria-describedby="thingpropertiesoperatordomainhelpblock" disabled>
                                                 <small id="thingpropertiesoperatordomainhelpblock" class="form-text text-muted">Operator Web-Domain of the Thing. <span class="text-warning">Necessary for ID generation. May not be changed. </span></small>
                                             </div>
                                         </div>
@@ -76,7 +76,7 @@
                                                 <input type="text" class="form-control" id="addnewpropertykey" ng-model="addnewkey">
                                             </div>
                                             <span class="col-lg-4 form-group bmd-form-group"> 
-                                                <button type="submit" class="btn btn-primary" ng-click="addNewProperty(addnewkey)">Add to Properties</button>
+                                                <button type="submit" class="btn btn-primary" ng-click="addNewProperty(addnewkey); addnewkey = undefined">Add to Properties</button>
                                             </span>
                                         </div>
                                     </div>
