@@ -17,7 +17,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     //remove query params
     $location.search({})
 
-    $scope.patchThing = {}
+    //$scope.patchThing = {}
     $scope.patchLocation = {}
 
     $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")?$expand=Locations").then(function (response) {
@@ -25,25 +25,17 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         $scope.description = response.data["description"];
         $scope.properties = response.data["properties"];
         $scope.Page.selectedThing = response.data;
-        $scope.location = response.data["Locations"][0]["location"]["coordinates"];
+        //$scope.location = response.data["Locations"][0]["location"]["coordinates"];
         $scope.showMap = true;
 
       $scope.thing = response.data;
 
-        // let patchjson = {
-        //     'name': $scope.patchThing.name, 
-        //     'description': $scope.patchThing.description, 
-        //     'properties': {
-        //         'hardware.id': $scope.patchThing.description['hardware.id'],
-        //         'shortname': $scope.patchThing.description['shortname'],
-        //         'operator.domain': $scope.patchThing.description['operator.domain']
-        //     }
-        // };
-
+        /*
         $scope.patchThing.name = $scope.name;
         $scope.patchThing.description = $scope.description;
         $scope.patchThing.properties = $scope.properties;
-        //$scope.patchThing.id = $scope.id;
+        $scope.patchThing.id = $scope.id;
+        */
         $scope.patchtarget = $scope.Page.selectedThing["@iot.selfLink"]
         $scope.patchpw = ''
         $scope.pwvalid = ''
@@ -101,7 +93,6 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
     
     $scope.deleteMe = function(items, position) {
-      console.log("deleting:" + position)
       items.splice(position, 1);
     }
 
@@ -180,15 +171,16 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     //not working atm, cant find the functions which are defined in the map controller... maybe add this function to the map controller where the view is centered and check the current scope
     $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")/Locations").then(function (response) {
         
-        $scope.locationsList = response.data.value;
+      $scope.locationsList = response.data.value;
 
-        if($scope.locationsList){
-        $scope.patchLocation.name = $scope.locationsList[0]["name"]
-        $scope.patchLocation.description = $scope.locationsList[0]["description"]
-        $scope.patchLocation.coordinates = $scope.locationsList[0]["location"]["coordinates"]
+      if($scope.locationsList.length!= 0){
+      $scope.patchLocation.name = $scope.locationsList[0]["name"]
+      $scope.patchLocation.description = $scope.locationsList[0]["description"]
+      $scope.patchLocation.coordinates = $scope.locationsList[0]["location"]["coordinates"]
 
-        //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
-        }
+      //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
+      }
+
     });
 
 

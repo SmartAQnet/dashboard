@@ -34,12 +34,12 @@
                                         <h3 class="modal-title">Thing</h3>
                                         <div class="input-group">
                                             <span class="input-group-addon" >Name: </span>
-                                            <input class="form-control" type="text" ng-model="patchThing.name" aria-describedby="thingnamehelpblock"/>
+                                            <input class="form-control" type="text" ng-model="thing['name']" aria-describedby="thingnamehelpblock"/>
                                             <small id="thingnamehelpblock" class="form-text text-muted">Human readable name of the thing. </small>
                                         </div>
                                         <div class="input-group">
                                             <span class="input-group-addon" >Description: </span>
-                                            <input class="form-control" type="text" ng-model="patchThing.description" aria-describedby="thingdescriptionhelpblock"/>
+                                            <input class="form-control" type="text" ng-model="thing['description']" aria-describedby="thingdescriptionhelpblock"/>
                                             <small id="thingdescriptionhelpblock" class="form-text text-muted">Human readable description of the thing. </small>
                                         </div>
                                         <div class="form-group">
@@ -48,7 +48,7 @@
                                             <small id="thingpropertiesiotidhelpblock" class="form-text text-muted">The internal Database ID of the Thing. <span class="text-warning">IDs cannot be changed. </span> <a class="text-info" href="http://api.smartaq.net/v1.0/Things('{{thing['@iot.id']}}')" target="_blank">Click here to see Database entry</a></small>
                                         </div>
                                         <h5 class="modal-title">Properties: </h5>
-                                        <div class="indent-inputlines">
+                                        <!-- <div class="indent-inputlines">
                                             <div class="form-group">
                                                 <label class="bmd-label-static" for="hardwareidInput">hardware.id </label>
                                                 <input readonly class="form-control" id="hardwareidInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="thing.properties['hardware.id']" aria-describedby="thingpropertieshardwareidhelpblock" disabled>
@@ -64,8 +64,8 @@
                                                 <input readonly class="form-control" id="operatordomainInput" type="text" onkeyup="this.value = this.value.toLowerCase();" ng-model="thing.properties['operator.domain']" aria-describedby="thingpropertiesoperatordomainhelpblock" disabled>
                                                 <small id="thingpropertiesoperatordomainhelpblock" class="form-text text-muted">Operator Web-Domain of the Thing. <span class="text-warning">Necessary for ID generation. May not be changed. </span></small>
                                             </div>
-                                        </div>
-                                        <h5 class="modal-title">Additional Properties: </h5>
+                                        </div> 
+                                        <h5 class="modal-title">Additional Properties: </h5>-->
                                         <div id="jsontree" ng-include="$window.dashboardSettings.root + 'views/json-patch-template.html'"></div>
 
                                         <h5 class="modal-title">Add new Property: </h5>

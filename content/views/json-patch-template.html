@@ -6,7 +6,7 @@
     <!-- Item Nr in list accessible via: {{$index + 1}} 
     Length of current list: {{items.length}} 
     Current nest level: {{item.level - 1}} -->
-    <div ng-if="excludeFixedProperties(item)">
+    <!-- <div ng-if="excludeFixedProperties(item)"> -->
         <form ng-if="!item['@toplevelcheck']" class="form-inline">
             <div class="form-group bmd-form-group">
             <label ng-show="item.items.length===0" for="{{item.key}}{{item.value}}{{item.level - 1}}" class="bmd-label-static">{{item.key}}</label>
@@ -29,5 +29,5 @@
         <div class="indent-inputlines">
             <div ng-include="$window.dashboardSettings.root + 'views/json-patch-template.html'"></div>
         </div>
-    </div>
+    <!-- </div> -->
 </div>
