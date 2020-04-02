@@ -155,6 +155,72 @@
                     <!-- would need select location from list of existing locations, set pin on map, ... -->
                     <!-- also specifiy timestamp -->
 
+                    <div class="modal fade" id="createLocation" role="dialog">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header p-3 mb-2 bg-primary text-white">
+                                    <h2 class="modal-title"><i class="fa fa-globe"></i>CREATE NEW LOCATION</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <div>
+                                        <h3 class="modal-title">Location</h3>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" >Name: </span>
+                                            <input class="form-control" type="text" ng-model="newLocation.name" aria-describedby="locationnamehelpblock" />
+                                            <small id="locationnamehelpblock" class="form-text text-muted">Human readable name of the location. </small>
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" >Description: </span>
+                                            <input class="form-control" type="text" ng-model="newLocation.description" aria-describedby="locationdescriptionhelpblock"/>
+                                            <small id="locationdescriptionhelpblock" class="form-text text-muted">Human readable description of the location. </small>
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-addon">@iot.id </span>
+                                            <input readonly class="form-control" type="text" ng-model="newLocation['@iot.id']" aria-describedby="locationpropertiesiotidhelpblock" disabled>
+                                            <small id="locationpropertiesiotidhelpblock" class="form-text text-muted">The internal Database ID of the Location. <span class="text-warning">The ID will automatically be generated from entering the coordinates of the Location. </span></small>
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" >Longitude: </span>
+                                            <input class="form-control" type="text" ng-model="newLocation.location.coordinates[0]" aria-describedby="locationlongitudehelpblock"/>
+                                            <small id="locationlongitudehelpblock" class="form-text text-muted">GPS Longitude of the Location (~ 6-15 in Germany). </small>
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" >Latitude: </span>
+                                            <input class="form-control" type="text" ng-model="newLocation.location.coordinates[1]" aria-describedby="locationlatitudehelpblock"/>
+                                            <small id="locationlatitudehelpblock" class="form-text text-muted">GPS Latitude of the Location (~ 47-55 in Germany). </small>
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" >Altitude: </span>
+                                            <input class="form-control" type="text" ng-model="newLocation.location.coordinates[2]" aria-describedby="locationaltitudehelpblock"/>
+                                            <small id="locationaltitudehelpblock" class="form-text text-muted">GPS Altitude of the Location. <span class="text-warning">Providing no altitude is assumed to be the local ground level. </span></small>
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" >Timestamp: </span>
+                                            <input  type="text" id="calendarTimestamp" class="form-control px-2" aria-describedby="locationtimestamphelpblock"/>
+                                            <small id="locationtimestamphelpblock" class="form-text text-muted">When the thing was put to this Location. </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
+                                    <form class="form-inline">
+                                        <div class="form-group" id="patchpwcontainer">
+                                            <label class="bmd-label-floating" for="patchpw">Input patch password</label>
+                                            <input type="password" id="patchpw" class="form-control mx-sm-3">
+                                            <small id="patchpwHelpInline"> 
+                                                {{pwvalid}}
+                                            </small>
+                                        </div>
+                                    </form>
+                                    <input type="submit" class="btn btn-default" ng-click="consoleLog(newHistoricalLocation)" value="Save" />
+                                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <!-- Create Location Modal End-->
+
                     <!-- Location Patch Modal -->
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#patchLocation">Patch Location</button>
                     <div class="modal fade" id="patchLocation" role="dialog">
@@ -176,6 +242,11 @@
                                             <input class="form-control" type="text" ng-model="patchLocation.description" aria-describedby="locationdescriptionhelpblock"/>
                                             <small id="locationdescriptionhelpblock" class="form-text text-muted">Human readable description of the location. </small>
                                         </div>
+                                        <div class="input-group">
+                                            <span class="input-group-addon">@iot.id </span>
+                                            <input readonly class="form-control" type="text" ng-model="patchLocation['@iot.id']" aria-describedby="locationpropertiesiotidhelpblock" disabled>
+                                            <small id="locationpropertiesiotidhelpblock" class="form-text text-muted">The internal Database ID of the Location. <span class="text-warning">IDs cannot be changed. </span> <a class="text-info" href="http://api.smartaq.net/v1.0/Locations('{{patchLocation['@iot.id']}}')" target="_blank">Click here to see Database entry</a></small>
+                                        </div>
                                         <div class="py-4"></div>
 
                                         <div class="jumbotron text-warning text-center">
@@ -183,17 +254,17 @@
                                         </div>
                                         <div class="input-group">
                                             <span class="input-group-addon" >Longitude: </span>
-                                            <input class="form-control" type="text" ng-model="patchLocation.coordinates[0]" aria-describedby="locationlongitudehelpblock" disabled/>
+                                            <input class="form-control" type="text" ng-model="patchLocation.location.coordinates[0]" aria-describedby="locationlongitudehelpblock" disabled/>
                                             <small id="locationlongitudehelpblock" class="form-text text-muted">GPS Longitude of the Location (~ 6-15 in Germany). </small>
                                         </div>
                                         <div class="input-group">
                                             <span class="input-group-addon" >Latitude: </span>
-                                            <input class="form-control" type="text" ng-model="patchLocation.coordinates[1]" aria-describedby="locationlatitudehelpblock" disabled/>
+                                            <input class="form-control" type="text" ng-model="patchLocation.location.coordinates[1]" aria-describedby="locationlatitudehelpblock" disabled/>
                                             <small id="locationlatitudehelpblock" class="form-text text-muted">GPS Latitude of the Location (~ 47-55 in Germany). </small>
                                         </div>
                                         <div class="input-group">
                                             <span class="input-group-addon" >Altitude: </span>
-                                            <input class="form-control" type="text" ng-model="patchLocation.coordinates[2]" aria-describedby="locationaltitudehelpblock" disabled/>
+                                            <input class="form-control" type="text" ng-model="patchLocation.location.coordinates[2]" aria-describedby="locationaltitudehelpblock" disabled/>
                                             <small id="locationaltitudehelpblock" class="form-text text-muted">GPS Altitude of the Location. </small>
                                         </div>
                                     </div>
@@ -208,7 +279,7 @@
                                             </small>
                                         </div>
                                     </form>
-                                    <input type="submit" class="btn btn-default" ng-click="patchRequest(item.items)" value="Save" />
+                                    <input type="submit" class="btn btn-default" ng-click="directPatchRequest(item.items)" value="Save" />
                                     <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
                                 </div>
                             </div>
