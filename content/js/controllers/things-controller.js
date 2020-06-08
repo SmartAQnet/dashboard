@@ -2,19 +2,20 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     $scope.Page.setTitle('THINGS');
     $scope.Page.setHeaderIcon(iconThing);
 
+    $scope.category = "Things" //variable used for in url and table loading and manipulation
 
     //pure table manipulation, select is NOT transported into the query
-    if($scope.selectparams.things.name == undefined){$scope.selectparams.things.name = true};
-    if($scope.selectparams.things.Locations == undefined){$scope.selectparams.things.Locations = true};
-    if($scope.selectparams.things.Datastreams == undefined){$scope.selectparams.things.Datastreams = true};
+    if($scope.selectparams.Things.name == undefined){$scope.selectparams.Things.name = true};
+    if($scope.selectparams.Things.Locations == undefined){$scope.selectparams.Things.Locations = true};
+    if($scope.selectparams.Things.Datastreams == undefined){$scope.selectparams.Things.Datastreams = true};
 
-    if($scope.selectparams.datastreams.name == undefined){$scope.selectparams.datastreams.name = true};
-    if($scope.selectparams.datastreams.phenomenonTime == undefined){$scope.selectparams.datastreams.phenomenonTime = true};
+    if($scope.selectparams.Datastreams.ObservedProperty == undefined){$scope.selectparams.Datastreams.ObservedProperty = true};
+    if($scope.selectparams.Datastreams.phenomenonTime == undefined){$scope.selectparams.Datastreams.phenomenonTime = true};
 
     //expand stuff per default (expand IS necessarily transported into the query)
-    $scope.expandparams.things.Locations = true;
-    $scope.expandparams.things.HistoricalLocations = true;
-    $scope.expandparams.things.Datastreams = true;
+    $scope.expandparams.Things.Locations = true;
+    $scope.expandparams.Things.HistoricalLocations = true;
+    $scope.expandparams.Things.Datastreams = true;
 
 
     //default parameters that used in the query but hidden from the url 
@@ -23,9 +24,6 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     // ---
 
     
-    //Implement Server Query Language in Static urls
-    var query=getUrl() + "/v1.0/Things" + Object.keys($routeParams).reduce((a, i) => a + i + "=" + $routeParams[i] + "&","?").slice(0,-1) 
-
     //build query for observations
     $scope.$watch('selectedDatastreams', function () {
         console.log("query parameter change detected")
@@ -43,96 +41,108 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     }
     */
 
-        //function for "update table" button that pushes the user input into the url to trigger the query
-        $scope.updatequery = function(category){
+    //Implement Server Query Language in Static urls
+    $scope.query=getUrl() + "/v1.0/" + $scope.category + Object.keys($routeParams).reduce((a, i) => a + i + "=" + $routeParams[i] + "&","?").slice(0,-1) 
+    
+    
+    $scope.loadTable = function(){
 
-            //transport expand parameters into the query
-            let trueparamsexpand = Object.keys($scope.expandparams[category]).filter(key => $scope.expandparams[category][key] == true)
-    
-            //minimally subexpand stuff in Datastream
-            if(trueparamsexpand.includes("Datastreams"))[
-                trueparamsexpand[trueparamsexpand.indexOf("Datastreams")] = "Datastreams($expand=Sensor,ObservedProperty)"
-            ]
-    
-    
-            let paramUpdate = {}
-    
-            paramUpdate['$top'] = $scope.newTop
-    
-    
-            if(trueparamsexpand.length>0){
-                paramUpdate['$expand'] = trueparamsexpand.join()
+        //initiate loading animation
+        $scope.dataIsLoaded[$scope.category] = false
+
+        //transport expand parameters into the query
+        let trueparamsexpand = Object.keys($scope.expandparams[$scope.category]).filter(key => $scope.expandparams[$scope.category][key] == true)
+
+        //minimally subexpand stuff in Datastream
+        if(trueparamsexpand.includes("Datastreams")){
+            trueparamsexpand[trueparamsexpand.indexOf("Datastreams")] = "Datastreams($expand=Sensor,ObservedProperty)"
+        }
+
+        let paramUpdate = {}
+
+        //if nothing changed possibly no need to reload the page
+
+        if(trueparamsexpand.length>0){
+            paramUpdate['$expand'] = trueparamsexpand.join()
+        } else {
+            paramUpdate['$expand'] = null
+        }
+
+
+        //default top if no top in route --> first page load
+        if(!('$top' in $routeParams)){
+            paramUpdate['$top'] = 50; 
+            $scope.newTop = 50;
+        } else {
+            //mirror routing value
+            $scope.newTop = $routeParams['$top']
+        };
+
+
+
+        if(!("$skip" in $routeParams)){
+            paramUpdate['$skip'] = 0;
+        };
+
+        $route.updateParams(paramUpdate);
+
+
+        $http.get($scope.query).then(function (response) {
+
+            $scope.dataIsLoaded[$scope.category] = true
+            
+            $scope.dataList = response.data.value;
+
+            //pagination ---
+            if($routeParams['$skip']){
+                $scope.thisLinkSkip = $routeParams['$skip']
             } else {
-                paramUpdate['$expand'] = null
+                $scope.thisLinkSkip = 0
+            };
+
+            if(response.data["@iot.nextLink"]){
+                $scope.nextLinkSkip = (response.data['@iot.nextLink']).match(/(?:skip=)([0-9]+)/)[1]
+            } else {
+                $scope.nextLinkSkip = 0
+            };
+
+            $scope.count = response.data["@iot.count"]
+            $scope.maxpages = Math.ceil($scope.count/$scope.newTop)
+            if($scope.nextLinkSkip > 0){
+                $scope.currentpage = Math.ceil($scope.nextLinkSkip/$scope.newTop)
+            } else {
+                $scope.currentpage = $scope.maxpages
             }
+            //pagination end ---
+        });
+    };
     
     
-            $route.updateParams(paramUpdate);
-        };
-        // ---
-    
-    
-    
-    
-        $scope.loadTable = function(url,category){
-    
-            $scope.dataIsLoaded[category] = false
-    
-            if(!("$top" in $routeParams)){
-                $scope.newTop = 50;
-                $route.updateParams({'$top':$scope.newTop});
-            } else {$scope.newTop = $routeParams["$top"]}
-    
-            $scope.updatequery(category)
-    
-            $http.get(url).then(function (response) {
-    
-                $scope.dataIsLoaded[category] = true
-                
-                $scope.dataList = response.data.value;
-                
-                /*
-                if($routeParams['$top']){
-                    $scope.newTop = $routeParams['$top']
-                };
-                */
-    
-                //pagination ---
-                if($routeParams['$skip']){
-                    $scope.thisLinkSkip = $routeParams['$skip']
-                };
-    
-                if(response.data["@iot.nextLink"]){
-                    $scope.nextLinkSkip = (response.data['@iot.nextLink']).match(/(?:skip=)([0-9]+)/)[1]
-                } else {
-                    $scope.nextLinkSkip = 0
-                };
-    
-                $scope.count = response.data["@iot.count"]
-                $scope.maxpages = Math.ceil($scope.count/$scope.newTop)
-                if($scope.nextLinkSkip > 0){
-                    $scope.currentpage = Math.ceil($scope.nextLinkSkip/$scope.newTop)
-                } else {
-                    $scope.currentpage = $scope.maxpages
-                }
-                //pagination end ---
-            });
-        };
-    
-    
-        $scope.followNextLink = function(){
-            $route.updateParams({'$skip':$scope.nextLinkSkip});
-        };
-    
-        $scope.followPreviousLink = function(){
-            let skip = $scope.thisLinkSkip - $scope.newTop
-            if(skip < 0){skip = 0}
-            $route.updateParams({'$skip': skip})
-        };
-    
-        $scope.setNewTop = function(){
-            $route.updateParams({'$top':$scope.newTop})
-        };
+    $scope.followNextLink = function(){
+        $route.updateParams({'$skip':$scope.nextLinkSkip});
+    };
+
+    $scope.followPreviousLink = function(){
+        let skip = $scope.thisLinkSkip - $scope.newTop
+        if(skip < 0){skip = 0}
+        $route.updateParams({'$skip': skip})
+    };
+
+    $scope.setNewTop = function(){
+        $route.updateParams({'$top':$scope.newTop})
+    };
+
+
+    $scope.goToPage = function(topage){
+        let skip = (topage-1)*$scope.newTop
+
+        //page 1 skip = 0
+        //page 2 skip = top
+        //page 3 skip = 2xtop
+        //...
+
+        $route.updateParams({'$skip': skip})
+    };
 
     $scope.objToArray = function(obj){
         var ret = []
@@ -143,7 +153,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     }
 
     
-    $scope.loadTable(query,'things');
+    $scope.loadTable();
     
 
 

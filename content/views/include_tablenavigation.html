@@ -1,0 +1,14 @@
+<div role="toolbar" aria-label="Navigation Toolbar of the Table" style="text-align: center;">
+    <div class="btn-group" role="group" aria-label="Previous Page">
+        <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip" style="margin-left: auto">&laquo; Previous Page</button>
+    </div>
+    <div class="btn-group" role="group" aria-label="Pages of the Table">
+        <!-- <button ng-if="dataIsLoaded.Things" class="btn btn-secondary" disabled>Page {{currentpage}} of {{maxpages}}</button> -->
+        <button ng-disabled="$index*newTop==thisLinkSkip" class="btn btn-primary" ng-repeat="x in [].constructor(maxpages) track by $index" ng-click="goToPage($index+1)" data-toggle="tooltip" data-placement="top" title="Show {{(newTop*($index))+1}} to {{(newTop*($index+1))}}">
+            {{ $index+1 }}
+        </button>
+    </div>
+    <div class="btn-group" role="group" aria-label="Next Page">
+        <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip" style="margin-right: auto">Next Page &raquo;</button>
+    </div>
+</div>
