@@ -4,7 +4,7 @@
     </div>
     <div class="btn-group" role="group" aria-label="Pages of the Table">
         <!-- <button ng-if="dataIsLoaded.Things" class="btn btn-secondary" disabled>Page {{currentpage}} of {{maxpages}}</button> -->
-        <button ng-disabled="$index*newTop==thisLinkSkip" class="btn btn-primary" ng-repeat="x in [].constructor(maxpages) track by $index" ng-click="goToPage($index+1)" data-toggle="tooltip" data-placement="top" title="Show {{(newTop*($index))+1}} to {{(newTop*($index+1))}}">
+        <button ng-disabled="$index*newTop==thisLinkSkip" class="btn btn-primary" ng-repeat="x in [].constructor(maxpages) track by $index" ng-click="goToPage($index+1)" data-toggle="tooltip" data-placement="top" title="Show {{(newTop*($index))+1}} to {{(newTop*($index+1)) < count ? (newTop*($index+1)) : count }}">
             {{ $index+1 }}
         </button>
     </div>
@@ -12,3 +12,6 @@
         <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip" style="margin-right: auto">Next Page &raquo;</button>
     </div>
 </div>
+
+
+

@@ -84,7 +84,16 @@
             </div>
             <button type="button" class="btn btn-outline-primary" ng-click="setNewTop()">Refresh Table</button>
         </form>
+        <span class="entityInfoHeader">Filter this page by Name: </span>
+        <form class="form-inline">
+            <div class="form-group" style="padding-top: 0">
+                <input type="text" class="form-control text-center" ng-model="filterparameter.name">
+            </div>
+        </form>
     </div>
+
+    <button class="btn btn-primary" ng-click="prepareThingsPropertiesFilter('Things')">Filter Request</button>
+
     <div class="pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
 
     <!-- Table Start -->
@@ -103,7 +112,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="x in dataList" >
+        <tr ng-repeat="x in dataList | filter: filterparameter">
             <!-- Name Description Location -->
             <td ng-if="selectparams.Things['name']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["name"]}}</td>
             <td ng-if="selectparams.Things['description']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["description"]}}</td>

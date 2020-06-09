@@ -4,6 +4,11 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
     $scope.category = "Things" //variable used for in url and table loading and manipulation
 
+
+    var defaulttop = 50;
+
+
+
     //pure table manipulation, select is NOT transported into the query
     if($scope.selectparams.Things.name == undefined){$scope.selectparams.Things.name = true};
     if($scope.selectparams.Things.Locations == undefined){$scope.selectparams.Things.Locations = true};
@@ -31,6 +36,30 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
     }, true);
 
+    //for query filters: we use properties which at least 80% of entities have. This way it stays generic but useful at the same time
+
+    
+    function flattenDeep(arr1) {
+        return arr1.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
+    };
+
+    $scope.prepareThingsPropertiesFilter = function(category){
+        let thingspropcounts = {}
+        let thingsproplist = flattenDeep($scope.dataList.map(th => Object.keys(th.properties)));
+        
+        [...new Set(thingsproplist)].forEach(
+            thisproperty => $http.get(getUrl() + "/v1.0/" + category + "?$filter=properties/" + thisproperty + " ne 'somethingabsurd'&$top=1&$count=true").then(function(response){
+                thingspropcounts[thisproperty] = response.data["@iot.count"]
+                console.log(response.data["@iot.count"]/$scope.count)
+
+                //fehler hier, füllt das array thingspropcounts nicht auf
+            })
+        );
+
+        let listvalidproperties = Object.keys(thingspropcounts) //.filter(key => thingspropcounts[key]/$scope.count > 0.8);
+        console.log(thingspropcounts)
+        
+    };
 
     /* //this has the problem that the query language allows more complex nesting with ";" between $parameters and deeper nesting with e.g. ()...;$expand=...($select=...))
     //the code here takes care of the form "test(buu,baaa,boo),shubada(shwami,shaa),..."
@@ -71,8 +100,8 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
         //default top if no top in route --> first page load
         if(!('$top' in $routeParams)){
-            paramUpdate['$top'] = 50; 
-            $scope.newTop = 50;
+            paramUpdate['$top'] = defaulttop; 
+            $scope.newTop = defaulttop;
         } else {
             //mirror routing value
             $scope.newTop = $routeParams['$top']
@@ -114,10 +143,20 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
                 $scope.currentpage = $scope.maxpages
             }
             //pagination end ---
+
+
+
         });
     };
     
-    
+    //filter for properties
+    //https://api.smartaq.net/v1.0/Datastreams?$filter=properties/operator_url%20eq%20%27lfu.bayern.de%27&$select=@iot.id
+    //https://api.smartaq.net/v1.0/Things?$filter=Datastreams/Sensor/properties/manufacturer.domain%20eq%20%27grimm-aerosol.com%27
+
+    $scope.applyQueryFilter = function(){
+        $route.updateParams({'$filter':$scope.queryFilter});
+    }
+
     $scope.followNextLink = function(){
         $route.updateParams({'$skip':$scope.nextLinkSkip});
     };

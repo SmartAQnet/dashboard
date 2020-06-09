@@ -13,6 +13,8 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
         
     var patchhash = "9ba4eb7944d7a3a953eb10937d877d0694377286"
 
+    //from https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array/flat#Alternative
+
 
     $http.defaults.headers.post["Content-Type"] = "application/json";
     $http.defaults.headers.post["Accept"] = "application/json";
@@ -60,8 +62,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     $scope.expandparams.Things = {}
 
     
-    
-
+    $scope.filterparameter = {}
 
 
     $scope.linkClicked = function (type, id) {
