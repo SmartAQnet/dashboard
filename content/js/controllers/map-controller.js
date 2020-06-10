@@ -1,6 +1,4 @@
-gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $interval, $timeout) {
-
-
+gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $interval, $timeout, $rootScope) {
 
 
 
@@ -1812,6 +1810,12 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
             $interval.cancel(intervalAutoPlay);
         }
     }
+
+
+    olMap.on('click', function (evt) {
+        let gpscoords = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326')
+        $rootScope.$broadcast("mapClickCoordinates",gpscoords)
+    });
 
     /************************************ Obsproperty Selection ******************************/
     //                  creates the dropdown menu to select a observed property

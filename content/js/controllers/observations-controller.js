@@ -162,7 +162,7 @@ gostApp.controller('ObservationsCtrl', function ($scope, $http, $routeParams, $r
 
     
     /* //faas sollte hier "einfach" die ganze tabelle runterladen mit datastream name/id/...? (auswählbar?) als column header
-    $scope.faasurl = "http://193.196.36.99:8080/function/thing-to-csv?thingid={{thingid}}&from_date={{from}}&to_date={{to}}&download={{thingid}}"
+    $scope.faasurl = "faasUrl() + /thing-to-csv?thingid={{thingid}}&from_date={{from}}&to_date={{to}}&download={{thingid}}"
 
     $scope.faasquery = {}
     $scope.faasquery.thingid

@@ -83,15 +83,15 @@
 
                                     <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
                                         <form class="form-inline">
-                                            <div class="form-group" id="patchpwcontainer">
-                                                <label for="patchpw" class="bmd-label-floating">Input patch password</label>
-                                                <input type="password" id="patchpw" class="form-control mx-sm-3">
+                                            <div class="form-group patchpwcontainer">
+                                                <label for="locationpatchpw" class="bmd-label-floating">Input patch password</label>
+                                                <input type="password" id="locationpatchpw" class="form-control mx-sm-3" ng-model="$parent.pwUserInput">
                                                 <small id="patchpwHelpInline"> 
                                                     {{pwvalid}}
                                                 </small>
                                             </div>
                                         </form>
-                                        <input type="submit" class="btn btn-default" ng-click="patchRequest(item.items)" value="Save" />
+                                        <input type="submit" class="btn btn-default" ng-click="treePatchRequest(item.items)" value="Save" />
                                         <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
                                     </div>
                                 </div>
@@ -203,9 +203,9 @@
                                 </div>
                                 <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
                                     <form class="form-inline">
-                                        <div class="form-group" id="patchpwcontainer">
-                                            <label class="bmd-label-floating" for="patchpw">Input patch password</label>
-                                            <input type="password" id="patchpw" class="form-control mx-sm-3">
+                                        <div class="form-group patchpwcontainer">
+                                            <label class="bmd-label-floating" for="createlocationpw">Input patch password</label>
+                                            <input type="password" id="createlocationpw" class="form-control mx-sm-3" ng-model="$parent.pwUserInput">
                                             <small id="patchpwHelpInline"> 
                                                 {{pwvalid}}
                                             </small>
@@ -271,15 +271,15 @@
                                 </div>
                                 <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
                                     <form class="form-inline">
-                                        <div class="form-group" id="patchpwcontainer">
-                                            <label class="bmd-label-floating" for="patchpw">Input patch password</label>
-                                            <input type="password" id="patchpw" class="form-control mx-sm-3">
+                                        <div class="form-group patchpwcontainer">
+                                            <label class="bmd-label-floating" for="thingpatchpw">Input patch password</label>
+                                            <input type="password" id="thingpatchpw" class="form-control mx-sm-3" ng-model="$parent.pwUserInput">
                                             <small id="patchpwHelpInline"> 
                                                 {{pwvalid}}
                                             </small>
                                         </div>
                                     </form>
-                                    <input type="submit" class="btn btn-default" ng-click="directPatchRequest(item.items)" value="Save" />
+                                    <input type="submit" class="btn btn-default" ng-click="jsonPatchRequest(patchLocation)" value="Save" />
                                     <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
                                 </div>
                             </div>

@@ -6,6 +6,7 @@ gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, Page
     $scope.showMap = true;
     $scope.noMapControls = true;
     $scope.simulationControl = true;
+    $scope.showGraph = false
 
     var polygonPoints;
 

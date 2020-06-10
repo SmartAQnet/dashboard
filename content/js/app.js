@@ -74,6 +74,13 @@ function getUrl() {
 	return "";
 }
 
+function faasUrl() {
+	if (window.location.protocol.localeCompare("file:"  !== '0')) {
+		return "http://api.smartaq.net/function"
+	}
+	return "";
+}
+
 function getId(id) {
 	return isNaN(id)?"'"+encodeURIComponent(id)+"'":id;
 }

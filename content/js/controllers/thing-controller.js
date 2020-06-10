@@ -177,6 +177,8 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       //display current thing location in another color --> change color of the respective pin
       //not working atm, cant find the functions which are defined in the map controller... maybe add this function to the map controller where the view is centered and check the current scope
       //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
+      } else {
+        alert("no location defined, please use 'move to new location' to define one")
       }
 
     });
