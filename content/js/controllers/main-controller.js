@@ -14,6 +14,8 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     var patchhash = "9ba4eb7944d7a3a953eb10937d877d0694377286"
     $scope.pwUserInput = ''
 
+    //from https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array/flat#Alternative
+
 
     var patchhconfig = {headers: {"Content-Type": "application/json"}}
 
@@ -45,7 +47,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     
     //triggering ng-ifs for display
     $scope.dataIsLoaded = {}
-    $scope.dataIsLoaded.things = undefined
+    $scope.dataIsLoaded.Things = undefined
     $scope.dataIsLoaded.obs = undefined
 
 
@@ -56,17 +58,16 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     //select for table manipulation. NOT transported into query
     $scope.selectparams = {}
     $scope.selectparams.obs = {}
-    $scope.selectparams.datastreams = {}
-    $scope.selectparams.things = {}
+    $scope.selectparams.Datastreams = {}
+    $scope.selectparams.Things = {}
 
     //expand parameters. ARE transported into the query
     $scope.expandparams = {}
     $scope.expandparams.obs = {}
-    $scope.expandparams.things = {}
+    $scope.expandparams.Things = {}
 
     
-    
-
+    $scope.filterparameter = {}
 
 
     $scope.linkClicked = function (type, id) {
