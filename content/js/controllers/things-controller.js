@@ -3,7 +3,12 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     $scope.Page.setHeaderIcon(iconThing);
 
     $scope.category = "Things" //variable used for in url and table loading and manipulation
+    $scope.entitycount = {} //used to hold counts for things, sensors, ...
+    $scope.entityfilter = {} //used to hold valid filter names for view
+    $scope.entityfiltervalues = {} //used to toggle filters on and off
 
+    $scope.entityfiltervalues.Things = {}
+    $scope.entityfiltervalues.Sensors = {}
 
     var defaulttop = 50;
 
@@ -22,6 +27,21 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     $scope.expandparams.Things.HistoricalLocations = true;
     $scope.expandparams.Things.Datastreams = true;
 
+    $scope.filterpropertieson = false
+    $scope.filterpropertiesdisabled = true
+
+    $scope.filterproperties = function(item){
+        let valid = !$scope.filterpropertieson
+        if(item.properties && $scope.filterpropertieson){
+            Object.keys(item.properties).forEach(function(el){
+                if($scope.entityfilter['Things'].includes(el)){
+                    valid=true
+                }
+            })
+        }
+        return valid
+        
+    }
 
     //default parameters that used in the query but hidden from the url 
     if(!("$orderby" in $routeParams)) $routeParams["$orderby"]="name asc";
@@ -43,22 +63,55 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         return arr1.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
     };
 
-    $scope.prepareThingsPropertiesFilter = function(category){
-        let thingspropcounts = {}
-        let thingsproplist = flattenDeep($scope.dataList.map(th => Object.keys(th.properties)));
-        
-        [...new Set(thingsproplist)].forEach(
-            thisproperty => $http.get(getUrl() + "/v1.0/" + category + "?$filter=properties/" + thisproperty + " ne 'somethingabsurd'&$top=1&$count=true").then(function(response){
-                thingspropcounts[thisproperty] = response.data["@iot.count"]
-                console.log(response.data["@iot.count"]/$scope.count)
+    $scope.prepareThingsPropertiesFilter = function(cat){
 
-                //fehler hier, füllt das array thingspropcounts nicht auf
-            })
-        );
+        let threshold = 0.8
 
-        let listvalidproperties = Object.keys(thingspropcounts) //.filter(key => thingspropcounts[key]/$scope.count > 0.8);
-        console.log(thingspropcounts)
+        $http.get(getUrl() + "/v1.0/" + cat + "?$select=properties&$count=true&$top=1000").then(function(response){
+            var thelist = response.data.value
+            var thecount = response.data["@iot.count"]
+
+            if(response.data["@iot.nextLink"]){
+                alert("Too many entities. Next Link present, filter may not be set up accurately")
+            };
         
+            //list of all property keys
+            let proplist = flattenDeep(
+                thelist.reduce(function(acc, th){
+                    th.properties ? acc = acc.concat(Object.keys(th.properties)) : acc = acc
+                    return acc
+                },[])
+            );
+
+            //json of all property keys and their number of occurrence of the form {key1 : count1, key2 : count2, ...}
+            var propcounts = proplist.reduce(function (acc, item) {
+                acc[item] ? acc[item]++ : acc[item] = 1
+                return acc
+            }, {});
+
+            //list of properties which occur in more than xx% of things (threshold)
+            let listvalidproperties = Object.keys(propcounts).filter(key => propcounts[key]/thecount > threshold);
+
+            $scope.entityfilter[cat] = listvalidproperties
+
+            /**
+             * fills $scope.entityfiltervalues[cat] with a json with boolean values for each valid keys values
+             * e.g. : {key A: {val1 : false, val2 : false, val3 : false}, keyB: {...}, ...}
+             * these boolean values are accessed by checkboxes in the view and then read out
+             * to define the query filter for properties
+             */
+            
+            listvalidproperties.forEach(function(el){
+                $scope.entityfiltervalues[cat][el] = thelist.reduce(function(acc,item){
+                    item.properties && item.properties[el] ? acc[item.properties[el]]=false : acc=acc
+                    return acc
+                },{})
+            });
+
+            //enable the filter in the view
+            $scope.filterpropertiesdisabled = false
+            
+        }); 
     };
 
     /* //this has the problem that the query language allows more complex nesting with ";" between $parameters and deeper nesting with e.g. ()...;$expand=...($select=...))
@@ -135,7 +188,9 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
                 $scope.nextLinkSkip = 0
             };
 
-            $scope.count = response.data["@iot.count"]
+            $scope.entitycount[$scope.category] = response.data["@iot.count"]
+            $scope.count = response.data["@iot.count"] //shorthand for accessibility
+
             $scope.maxpages = Math.ceil($scope.count/$scope.newTop)
             if($scope.nextLinkSkip > 0){
                 $scope.currentpage = Math.ceil($scope.nextLinkSkip/$scope.newTop)
