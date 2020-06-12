@@ -17,7 +17,7 @@
 
 
     <div class="entityInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0">
-        <span class="entityInfoHeader">Total Number of Things in List: </span> <br />
+        <span class="entityInfoHeader">Total Number of Things: </span> <br />
         <pre class="entityInfoInfo" ng-if="dataIsLoaded.Things">{{count}}</pre>
         <pre class="entityInfoInfo" ng-if="!dataIsLoaded.Things">... loading ...</pre>
         <span class="entityInfoHeader">Select Things Column Display: </span>
@@ -86,35 +86,53 @@
             </div>
             <button type="button" class="btn btn-outline-primary" ng-click="setNewTop()">Refresh Table</button>
         </form>
-        <span class="entityInfoHeader">Filter this page by Name: </span>
-        <form class="form-inline">
-            <div class="form-group" style="padding-top: 0">
-                <input type="text" class="form-control text-center" placeholder="Type name here..." ng-model="filterparameter.name">
-            </div>
-        </form>
     </div>
 
 
-
-    <!-- <button type="button" class="btn btn-primary" ng-click="prepareThingsPropertiesFilter('Things')">Filter Request</button>
-
-    <div id="Thingsfilter">
-        <label class="checkbox-inline">
-            <input type="checkbox" ng-disabled="filterpropertiesdisabled" ng-model="filterpropertieson">Filter this page by Property: 
-        </label>
-        <span></span>
-        <div ng-repeat="prop in entityfilter.Things">
-            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#{{prop}}filter">{{prop}}</button>
-            <div class="collapse" id="{{prop}}filter">
-                <div class="pl-3 py-1" ng-repeat="(val,bool) in entityfiltervalues.Things[prop]">
-                    <span class="checkbox-inline">
-                        <input type="checkbox" ng-model="entityfiltervalues.Things[prop][val]"> {{val}}
-                    </span>
+    <div class="card">
+        <div class="card-header">
+            <span class="entityInfoHeader">Filter this page by Name: </span>
+            <form class="form-inline">
+                <div class="form-group" style="padding-top: 0">
+                    <input type="text" class="form-control text-center" placeholder="Type name here..." ng-model="filterparameter.name">
                 </div>
+            </form>
+            <div>Things matching Filter:
+                <span class="badge badge-secondary" ng-if="filteredlist.length!=undefined">{{filteredlist.length}}</span>
+                <span class="badge badge-secondary" ng-if="filteredlist.length==undefined">{{newTop > count ? count : newTop}}</span> 
+            </div>   
+        </div>
+
+        <div class="card-body container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <button type="button" class="btn btn-primary" ng-click="prepareThingsPropertiesFilter('Things'); filterpropertiesdisabled=!filterpropertiesdisabled">Filter List 
+                        <i ng-if="filterpropertiesdisabled" class="fa fa-caret-down" aria-hidden="true"></i>
+                        <i ng-if="!filterpropertiesdisabled" class="fa fa-caret-up" aria-hidden="true"></i>
+                    </button>
+                    <div ng-hide="filterpropertiesdisabled">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" ng-model="filterpropertieson">Filter this page by Thing Properties 
+                        </label>
+                        <div ng-repeat="prop in entityfilter.Things">
+                            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#{{prop}}filter">{{prop}}</button>
+                            <div class="collapse" id="{{prop}}filter">
+                                <div class="pl-3 py-1" ng-repeat="(val,bool) in entityfiltervalues.Things[prop]">
+                                    <span class="checkbox-inline">
+                                        <input type="checkbox" ng-model="entityfiltervalues.Things[prop][val]"> {{val}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    Filter by Sensor
+                </div>
+
             </div>
         </div>
-   </div> -->
-
+    </div>
 
 
     <div class="pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
@@ -135,7 +153,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="x in dataList | filter: filterparameter"> <!-- | filter: filterproperties"-->
+        <tr ng-repeat="x in dataList | filter: filterparameter | filter: filterproperties as filteredlist"> <!-- | filter: filterproperties"-->
             <!-- Name Description Location -->
             <td ng-if="selectparams.Things['name']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["name"]}}</td>
             <td ng-if="selectparams.Things['description']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["description"]}}</td>

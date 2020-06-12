@@ -10,7 +10,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     $scope.entityfiltervalues.Things = {}
     $scope.entityfiltervalues.Sensors = {}
 
-    var defaulttop = 50;
+    var defaulttop = 200;
 
 
 
@@ -31,10 +31,10 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     $scope.filterpropertiesdisabled = true
 
     $scope.filterproperties = function(item){
-        let valid = !$scope.filterpropertieson
+        let valid = !$scope.filterpropertieson //filter off --> nothing is filtered, valid = true by default
         if(item.properties && $scope.filterpropertieson){
-            Object.keys(item.properties).forEach(function(el){
-                if($scope.entityfilter['Things'].includes(el)){
+            Object.keys(item.properties).forEach(function(el){ //el is the property key, e.g. "shortname"
+                if(item.properties[el] && el in $scope.entityfiltervalues['Things'] && $scope.entityfiltervalues['Things'][el][item.properties[el]]){
                     valid=true
                 }
             })
@@ -108,8 +108,6 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
                 },{})
             });
 
-            //enable the filter in the view
-            $scope.filterpropertiesdisabled = false
             
         }); 
     };
