@@ -3,6 +3,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     $scope.Page.setTitle('THING(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
 
+    $scope.category = 'Thing'
 
     //pagination example for ng-repeat tables
     //http://jsfiddle.net/2ZzZB/56/
@@ -44,12 +45,12 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       if(!$scope.thing.hasOwnProperty('properties')){
         $scope.thing["properties"] = {}
       }
-      
+
       //Initiate Tree: load entity to patch into format that is readable for angularjs
       $scope.item = {}
       $scope.item.items = []
       $scope.traverse($scope.thing,$scope.item.items)
-      
+      console.log($scope.item.items)
       // check gives true that traverse and esrevart are indeed inverse to each other
       //console.log(JSON.stringify($scope.testthing)==JSON.stringify($scope.jsonobj))
 
@@ -152,6 +153,10 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
     $scope.excludeOthers = function(obj){
       return(obj.key != "Locations")
+    }
+
+    $scope.excludeAllProperties = function(obj){
+      return(obj.key != "properties")
     }
 
     // ----------------------------------------------------------------------------------------------

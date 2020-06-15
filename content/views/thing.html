@@ -28,19 +28,16 @@
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header p-3 mb-2 bg-primary text-white">
-                                        <h2 class="modal-title"><i class="fa fa-cube"></i>PATCH THING</h2>
+                                        <h2 class="modal-title"><i class="fa fa-cube"></i>PATCH {{category | uppercase}}</h2>
                                     </div>
-                                <div class="modal-body">
-                                        <h3 class="modal-title">Thing</h3>
-                                        <div class="input-group">
-                                            <span class="input-group-addon" >Name: </span>
-                                            <input class="form-control" type="text" ng-model="thing['name']" aria-describedby="thingnamehelpblock"/>
-                                            <small id="thingnamehelpblock" class="form-text text-muted">Human readable name of the thing. </small>
-                                        </div>
-                                        <div class="input-group">
-                                            <span class="input-group-addon" >Description: </span>
-                                            <input class="form-control" type="text" ng-model="thing['description']" aria-describedby="thingdescriptionhelpblock"/>
-                                            <small id="thingdescriptionhelpblock" class="form-text text-muted">Human readable description of the thing. </small>
+                                    <div class="modal-body">
+                                        <h3 class="modal-title">{{category}}</h3>
+                                        <div ng-repeat="descr in descrs=item.items | filter: excludeAllProperties | filter: containsNoIot | filter: excludeOthers">
+                                            <div class="input-group">
+                                                <span class="input-group-addon" >{{descr.key}} </span>
+                                                <input class="form-control" type="text" ng-model="descr.value" aria-describedby="{{category}}{{descr.key}}helpblock"/>
+                                                <small id="{{category}}{{descr.key}}helpblock" class="form-text text-muted">Human readable {{descr.key}} of the Thing. </small>
+                                            </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="bmd-label-static" for="iotidInput">@iot.id </label>
