@@ -45,7 +45,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         $scope.thing["properties"] = {}
       }
       
-      //load entity to patch into format that is readable for angularjs
+      //Initiate Tree: load entity to patch into format that is readable for angularjs
       $scope.item = {}
       $scope.item.items = []
       $scope.traverse($scope.thing,$scope.item.items)

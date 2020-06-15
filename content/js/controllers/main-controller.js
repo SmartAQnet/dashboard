@@ -86,7 +86,7 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     // -------------------------- Patch and Post Logic --------------------------
     // --------------------------------------------------------------------------
 
-    
+
     $scope.deletekey = function(key,obj){delete obj[key]};
     $scope.isTrueObject = function(obj){return(typeof(obj) ==='object' && obj!==null && !Array.isArray(obj))}
 
@@ -149,10 +149,11 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
         $scope.patchRequest($scope.jsonobj)
     };
 
-
+    //add function that adds top level name descirption etc changes before patching --> not in item items so far!
     $scope.treePatchRequest = function(entity){
         $scope.jsonobj = {}
         $scope.esrevart(entity,$scope.jsonobj)  //convert angularjs readable format back to ordinary json for patching
+        console.log($scope.jsonobj)
         $scope.patchRequest($scope.jsonobj)
 
     };
