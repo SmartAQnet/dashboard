@@ -17,63 +17,65 @@
 
 
     <div class="entityInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0">
-        <span class="entityInfoHeader">Total Number of Things in List: </span> <br />
-        <pre class="entityInfoInfo" ng-if="dataIsLoaded.things">{{count}}</pre>
-        <pre class="entityInfoInfo" ng-if="!dataIsLoaded.things">... loading ...</pre>
+        <span class="entityInfoHeader">Total Number of Things: </span> <br />
+        <pre class="entityInfoInfo" ng-if="dataIsLoaded.Things">{{count}}</pre>
+        <pre class="entityInfoInfo" ng-if="!dataIsLoaded.Things">... loading ...</pre>
         <span class="entityInfoHeader">Select Things Column Display: </span>
         <form>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.things['name']">Name
+                <input type="checkbox" ng-model="selectparams.Things['name']">Name
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.things['description']">Description
+                <input type="checkbox" ng-model="selectparams.Things['description']">Description
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.things['Locations']">Location
+                <input type="checkbox" ng-model="selectparams.Things['Locations']">Location
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.things['HistoricalLocations']">Historical Locations
+                <input type="checkbox" ng-model="selectparams.Things['HistoricalLocations']">Historical Locations
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.things['@iot.id']">@iot.id
+                <input type="checkbox" ng-model="selectparams.Things['@iot.id']">@iot.id
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.things['Datastreams']">Datastreams
+                <input type="checkbox" ng-model="selectparams.Things['Datastreams']">Datastreams
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.things['properties']">Properties
+                <input type="checkbox" ng-model="selectparams.Things['properties']">Properties
             </label>
         </form>
-        <span class="entityInfoHeader">Select Datastreams Column Display: </span>
-        <form>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.datastreams['name']">Name
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.datastreams['description']">Description
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.datastreams['license']">License
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.datastreams['phenomenonTime']">Timespan
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.datastreams['@iot.id']">@iot.id
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.datastreams['Sensor']">Sensor
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.datastreams['ObservedProperty']">Observed Property
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.datastreams['unitOfMeasurement']">Unit of Measurement
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.datastreams['properties']">Properties
-            </label>
-        </form>
+        <div ng-show="selectparams.Things['Datastreams']">
+            <span class="entityInfoHeader">Select Datastreams Column Display: </span>
+            <form>
+                <label class="checkbox-inline">
+                    <input type="checkbox" ng-model="selectparams.Datastreams['name']">Name
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" ng-model="selectparams.Datastreams['description']">Description
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" ng-model="selectparams.Datastreams['license']">License
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" ng-model="selectparams.Datastreams['phenomenonTime']">Timespan
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" ng-model="selectparams.Datastreams['@iot.id']">@iot.id
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" ng-model="selectparams.Datastreams['Sensor']">Sensor
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" ng-model="selectparams.Datastreams['ObservedProperty']">Observed Property
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" ng-model="selectparams.Datastreams['unitOfMeasurement']">Unit of Measurement
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" ng-model="selectparams.Datastreams['properties']">Properties
+                </label>
+            </form>
+        </div>
         <span class="entityInfoHeader">Top parameter: </span>
         <form class="form-inline">
             <div class="form-group" style="padding-top: 0">
@@ -82,35 +84,110 @@
             <div class="form-group mb-2" style="padding-top: 0">
                 <input type="text" readonly class="form-control-plaintext" value="Items per Page">
             </div>
-            <button type="button" class="btn btn-outline-primary" ng-click="updatequery('things')">Refresh Table</button>
+            <button type="button" class="btn btn-outline-primary" ng-click="setNewTop()">Refresh Table</button>
         </form>
     </div>
+
+
+    <div class="card">
+        <div class="card-header">
+            <span class="entityInfoHeader">Filter this page by Name: </span>
+            <form class="form-inline">
+                <div class="form-group" style="padding-top: 0">
+                    <input type="text" class="form-control text-center" placeholder="Type name here..." ng-model="filterparameter.name">
+                </div>
+            </form>
+            <div>Things matching Filter:
+                <span class="badge badge-secondary" ng-if="filteredlist.length!=undefined">{{filteredlist.length}}</span>
+                <span class="badge badge-secondary" ng-if="filteredlist.length==undefined">{{newTop > count ? count : newTop}}</span> 
+            </div>   
+        </div>
+
+        <div class="card-body container">
+            
+            <button type="button" class="btn btn-primary" ng-click="prepareThingsPropertiesFilter('Things'); prepareThingsPropertiesFilter('Sensors'); prepareObsPropFilter(); filterpropertiesdisabled=!filterpropertiesdisabled">Filter List 
+                <i ng-if="filterpropertiesdisabled" class="fa fa-caret-down" aria-hidden="true"></i>
+                <i ng-if="!filterpropertiesdisabled" class="fa fa-caret-up" aria-hidden="true"></i>
+            </button>
+            <div class="row my-2">
+                <div ng-hide="filterpropertiesdisabled" class="col-12 col-lg-6">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="filterpropertieson.Things">Filter this page by Thing Properties 
+                    </label>
+                    <div ng-repeat="prop in entityfilter.Things">
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#Things{{prop}}filter">{{prop}}</button>
+                        <div class="collapse" id="Things{{prop}}filter">
+                            <div class="pl-3 py-1" ng-repeat="(val,bool) in entityfiltervalues.Things[prop]">
+                                <span class="checkbox-inline">
+                                    <input type="checkbox" ng-model="entityfiltervalues.Things[prop][val]"> {{val}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-hide="filterpropertiesdisabled" class="col-12 col-lg-6">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="filterpropertieson.Sensors">Filter this page by Sensor Properties
+                    </label>
+                    <div ng-repeat="prop in entityfilter.Sensors">
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#Sensors{{prop}}filter">{{prop}}</button>
+                        <div class="collapse" id="Sensors{{prop}}filter">
+                            <div class="pl-3 py-1" ng-repeat="(val,bool) in entityfiltervalues.Sensors[prop]">
+                                <span class="checkbox-inline">
+                                    <input type="checkbox" ng-model="entityfiltervalues.Sensors[prop][val]"> {{val}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div ng-hide="filterpropertiesdisabled" class="col-12 col-lg-6">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="filterpropertieson.ObservedProperties">Filter this page by Observed Properties
+                    </label>
+                    <div ng-repeat="prop in entityfilter.ObservedProperties">
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#ObservedProperties{{prop}}filter">{{prop}}</button>
+                        <div class="collapse" id="ObservedProperties{{prop}}filter">
+                            <div class="pl-3 py-1" ng-repeat="(val,bool) in entityfiltervalues.ObservedProperties[prop]">
+                                <span class="checkbox-inline">
+                                    <input type="checkbox" ng-model="entityfiltervalues.ObservedProperties[prop][val]"> {{val}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+
     <div class="pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
 
     <!-- Table Start -->
+    <div ng-include="$window.dashboardSettings.root + 'views/include_tablenavigation.html'"></div>
     <table class="table table-bordered table-hover st-table table-striped table-sm">
         <thead class="st-thead">
         <tr>
-            <th ng-if="selectparams.things['name']">Name</th>
-            <th ng-if="selectparams.things['description']">Description</th>
-            <th ng-if="selectparams.things['Locations']">Location</th>
-            <th ng-if="selectparams.things['HistoricalLocations']">Historical Locations</th>
-            <th ng-if="selectparams.things['@iot.id']">@iot.id</th>
-            <th ng-if="selectparams.things['Datastreams']">Datastreams</th>
-            <th ng-if="selectparams.things['properties']">Properties</th>
+            <th ng-if="selectparams.Things['name']">Name</th>
+            <th ng-if="selectparams.Things['description']">Description</th>
+            <th ng-if="selectparams.Things['Locations']">Location</th>
+            <th ng-if="selectparams.Things['HistoricalLocations']">Historical Locations</th>
+            <th ng-if="selectparams.Things['@iot.id']">@iot.id</th>
+            <th ng-if="selectparams.Things['Datastreams']">Datastreams</th>
+            <th ng-if="selectparams.Things['properties']">Properties</th>
             <th>Export</th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="x in dataList" >
+        <tr ng-repeat="x in dataList | filter: filterparameter | filter: filterproperties as filteredlist"> <!-- | filter: filterproperties"-->
             <!-- Name Description Location -->
-            <td ng-if="selectparams.things['name']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["name"]}}</td>
-            <td ng-if="selectparams.things['description']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["description"]}}</td>
-            <td ng-if="selectparams.things['Locations']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
+            <td ng-if="selectparams.Things['name']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["name"]}}</td>
+            <td ng-if="selectparams.Things['description']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["description"]}}</td>
+            <td ng-if="selectparams.Things['Locations']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
             <!-- Name Description Location end -->
             
             <!-- Historical Locations -->
-            <td ng-if="selectparams.things['HistoricalLocations']" ng-click="linkClicked('thing',x['@iot.id'])">
+            <td ng-if="selectparams.Things['HistoricalLocations']" ng-click="linkClicked('thing',x['@iot.id'])">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
                         <tr class="table-primary">
@@ -129,41 +206,41 @@
             <!-- Historical Locations End-->
             
             <!-- Thing id -->
-            <td ng-if="selectparams.things['@iot.id']">{{x["@iot.id"]}}</td>
+            <td ng-if="selectparams.Things['@iot.id']">{{x["@iot.id"]}}</td>
             <!-- Thing id end -->
 
             <!-- Datastreams -->
-            <td ng-if="selectparams.things['Datastreams']">
+            <td ng-if="selectparams.Things['Datastreams']">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
                     <thead class="st-thead">
                         <tr class="table-primary">
-                            <th ng-if="selectparams.datastreams['name']">Name</th>
-                            <th ng-if="selectparams.datastreams['description']">Description</th>
-                            <th ng-if="selectparams.datastreams['license']">License</th>
-                            <th ng-if="selectparams.datastreams['phenomenonTime']">Timespan [UTC]</th>
-                            <th ng-if="selectparams.datastreams['@iot.id']">@iot.id</th>
-                            <th ng-if="selectparams.datastreams['Sensor']">Sensor</th>
-                            <th ng-if="selectparams.datastreams['ObservedProperty']">Observed Property</th>
-                            <th ng-if="selectparams.datastreams['unitOfMeasurement']">Unit Of Measurement</th>
-                            <th ng-if="selectparams.datastreams['properties']">Properties</th>
+                            <th ng-if="selectparams.Datastreams['name']">Name</th>
+                            <th ng-if="selectparams.Datastreams['ObservedProperty']">Observed Property</th>
+                            <th ng-if="selectparams.Datastreams['description']">Description</th>
+                            <th ng-if="selectparams.Datastreams['license']">License</th>
+                            <th ng-if="selectparams.Datastreams['phenomenonTime']">Timespan [UTC]</th>
+                            <th ng-if="selectparams.Datastreams['@iot.id']">@iot.id</th>
+                            <th ng-if="selectparams.Datastreams['Sensor']">Sensor</th>
+                            <th ng-if="selectparams.Datastreams['unitOfMeasurement']">Unit Of Measurement</th>
+                            <th ng-if="selectparams.Datastreams['properties']">Properties</th>
                             <th>Export</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr ng-repeat="y in x['Datastreams']">
-                            <td ng-if="selectparams.datastreams['name']" ng-click="linkClicked('datastream',y['@iot.id'])">{{y["name"]}}</td>
-                            <td ng-if="selectparams.datastreams['description']" ng-click="linkClicked('datastream',y['@iot.id'])">{{y["description"]}}</td>
-                            <td ng-if="selectparams.datastreams['license']">
+                            <td ng-if="selectparams.Datastreams['name']" ng-click="linkClicked('datastream',y['@iot.id'])">{{y["name"]}}</td>
+                            <td ng-if="selectparams.Datastreams['ObservedProperty']" ng-click="linkClicked('datastream',y['@iot.id'])" data-toggle="tooltip" data-placement="top" title="{{y['ObservedProperty']['description']}}">{{y["ObservedProperty"]["name"]}}</td>
+                            <td ng-if="selectparams.Datastreams['description']" ng-click="linkClicked('datastream',y['@iot.id'])">{{y["description"]}}</td>
+                            <td ng-if="selectparams.Datastreams['license']">
                                 <table><tr ng-repeat="pair in objToArray(y['properties']['license'])">{{pair}}</tr></table>
                             </td>
-                            <td ng-if="selectparams.datastreams['phenomenonTime']" style="width: 157px;">{{y["phenomenonTime"] | limitTo : 24 | date:'yyyy-MM-dd HH:mm:ss'}} <br/> {{y["phenomenonTime"] | limitTo : -24 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-                            <td ng-if="selectparams.datastreams['@iot.id']" >{{y["@iot.id"]}}</td>
-                            <td ng-if="selectparams.datastreams['Sensor']" ng-click="linkClicked('sensor',y['Sensor']['@iot.id'])" data-toggle="tooltip" data-placement="top" title="{{y['Sensor']['description']}}">{{y["Sensor"]["name"]}}</td>
-                            <td ng-if="selectparams.datastreams['ObservedProperty']" ng-click="linkClicked('observedproperty',y['ObservedProperty']['@iot.id'])" data-toggle="tooltip" data-placement="top" title="{{y['ObservedProperty']['description']}}">{{y["ObservedProperty"]["name"]}}</td>
-                            <td ng-if="selectparams.datastreams['unitOfMeasurement']">
+                            <td ng-if="selectparams.Datastreams['phenomenonTime']" style="width: 157px;">{{y["phenomenonTime"] | limitTo : 24 | date:'yyyy-MM-dd HH:mm:ss'}} <br/> {{y["phenomenonTime"] | limitTo : -24 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                            <td ng-if="selectparams.Datastreams['@iot.id']" >{{y["@iot.id"]}}</td>
+                            <td ng-if="selectparams.Datastreams['Sensor']" ng-click="linkClicked('sensor',y['Sensor']['@iot.id'])" data-toggle="tooltip" data-placement="top" title="{{y['Sensor']['description']}}">{{y["Sensor"]["name"]}}</td>
+                            <td ng-if="selectparams.Datastreams['unitOfMeasurement']">
                                 <table><tr ng-repeat="pair in objToArray(y['unitOfMeasurement'])">{{pair}}</tr></table>
                             </td>
-                            <td ng-if="selectparams.datastreams['properties']" >{{y["properties"]}}</td>
+                            <td ng-if="selectparams.Datastreams['properties']" >{{y["properties"]}}</td>
                             
                             <td ng-click="$parent.selectedDatastreams[y['@iot.id']] = !$parent.selectedDatastreams[y['@iot.id']]" style="text-align: center; vertical-align: middle;">
                                 <input type="checkbox" ng-model="$parent.selectedDatastreams[y['@iot.id']]" ng-click="$parent.selectedDatastreams[y['@iot.id']] = !$parent.selectedDatastreams[y['@iot.id']]">
@@ -175,7 +252,7 @@
             <!-- Datastreams end -->
             
             <!-- Properties and Export -->
-            <td ng-if="selectparams.things['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
+            <td ng-if="selectparams.Things['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
             <td style="text-align: center; vertical-align: middle;">
                 <div class="export-cell">
                     <exportBtn thingid="x['@iot.id']" from="$parent.timeframe.fromISO" to="$parent.timeframe.toISO" ng-click="$parent.selectedDatastreams={};checkMyDs={}; downloadInProgress()"></exportBtn>
@@ -187,17 +264,13 @@
     </table>
     <!-- Table end -->
 
-    <div id="loading-screen-wrapper" ng-if="!dataIsLoaded.things">
+    <div id="loading-screen-wrapper" ng-if="!dataIsLoaded.Things">
         <div id="loading-screen" >
                 <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
             LOADING...
         </div>
     </div>
-    <div class="input-group">
-        <button type="button" class="btn btn-primary" ng-click="followPreviousLink()" ng-disabled="!thisLinkSkip" style="margin-left: auto">&laquo; Previous Page</button>
-        <button ng-if="dataIsLoaded.things" class="btn btn-secondary" disabled>Page {{currentpage}} of {{maxpages}}</button>
-        <button type="button" class="btn btn-primary" ng-click="followNextLink()" ng-disabled="!nextLinkSkip" style="margin-right: auto">Next Page &raquo;</button>
-    </div>
+    <div ng-include="$window.dashboardSettings.root + 'views/include_tablenavigation.html'"></div>
 
     <!-- Modal -->
     <div class="modal fade" id="newThing" role="dialog">

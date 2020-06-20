@@ -3,6 +3,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     $scope.Page.setTitle('THING(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
 
+    $scope.category = 'Thing'
 
     //pagination example for ng-repeat tables
     //http://jsfiddle.net/2ZzZB/56/
@@ -44,12 +45,12 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       if(!$scope.thing.hasOwnProperty('properties')){
         $scope.thing["properties"] = {}
       }
-      
-      //load entity to patch into format that is readable for angularjs
+
+      //Initiate Tree: load entity to patch into format that is readable for angularjs
       $scope.item = {}
       $scope.item.items = []
       $scope.traverse($scope.thing,$scope.item.items)
-      
+      console.log($scope.item.items)
       // check gives true that traverse and esrevart are indeed inverse to each other
       //console.log(JSON.stringify($scope.testthing)==JSON.stringify($scope.jsonobj))
 
@@ -61,7 +62,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
     });
 
-        // ----------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------------
     // Traversing Nested Arrays with AngularJS, adapted from https://stackoverflow.com/questions/23315679/angularjs-traversing-nested-arrays 
 
 
@@ -154,6 +155,10 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       return(obj.key != "Locations")
     }
 
+    $scope.excludeAllProperties = function(obj){
+      return(obj.key != "properties")
+    }
+
     // ----------------------------------------------------------------------------------------------
 
 
@@ -166,24 +171,37 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     $scope.tabLocationsClicked = function () {
     };
 
-    //display current thing location in another color --> change color of the respective pin
 
-    //not working atm, cant find the functions which are defined in the map controller... maybe add this function to the map controller where the view is centered and check the current scope
     $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")/Locations").then(function (response) {
         
       $scope.locationsList = response.data.value;
 
       if($scope.locationsList.length!= 0){
-      $scope.patchLocation.name = $scope.locationsList[0]["name"]
-      $scope.patchLocation.description = $scope.locationsList[0]["description"]
-      $scope.patchLocation.coordinates = $scope.locationsList[0]["location"]["coordinates"]
+      $scope.patchLocation = $scope.locationsList[0]
 
+      //display current thing location in another color --> change color of the respective pin
+      //not working atm, cant find the functions which are defined in the map controller... maybe add this function to the map controller where the view is centered and check the current scope
       //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
+      } else {
+        alert("no location defined, please use 'move to new location' to define one")
       }
 
     });
 
+    $scope.newLocation = {
+      "name": "",
+      "description": "",
+      "encodingType": "application/vnd.geo+json",
+      "location": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "@iot.id": ""
+    };
 
+    $scope.$watch('newLocation.location.coordinates', function () {
+      $scope.newLocation['@iot.id'] = "geo:" + $scope.newLocation.location.coordinates[1] + "," + $scope.newLocation.location.coordinates[0] + "," + $scope.newLocation.location.coordinates[2]
+    }, true);
 
 
     $scope.tabHistoricalLocationsClicked = function () {
@@ -233,34 +251,66 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
             format: 'YYYY-MM-DD HH:mm:ss'
         }
     },pushDateToQuery);
-    });
+  });
 
 
 
 
-    function pushDateToQuery(start, end){
-        //for watch service
-        $scope.timeframe.from = start
-        $scope.timeframe.to = end
+  function pushDateToQuery(start, end){
+    //for watch service
+    $scope.timeframe.from = start
+    $scope.timeframe.to = end
 
-        //parameter for the download functonality
-        $scope.timeframe.fromISO = start.toISOString()
-        $scope.timeframe.toISO = end.toISOString()
+    //parameter for the download functonality
+    $scope.timeframe.fromISO = start.toISOString()
+    $scope.timeframe.toISO = end.toISOString()
 
-        //for displaying the query
-        $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.fromISO + " and resultTime le " + $scope.timeframe.toISO + ")"
-        $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
+    //for displaying the query
+    $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.fromISO + " and resultTime le " + $scope.timeframe.toISO + ")"
+    $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
 
-    }
+  }
 
-    pushDateToQuery(moment().subtract(24, 'hour'),window.moment())
+  pushDateToQuery(moment().subtract(24, 'hour'),window.moment())
 
-    $scope.testthing = {}
-    $scope.testthing["testkey"] = "testval"
-    
-    $scope.getObjectKey = function(obj){
-        return(obj.keys())
-    }
+  $scope.testthing = {}
+  $scope.testthing["testkey"] = "testval"
+  
+  $scope.getObjectKey = function(obj){
+      return(obj.keys())
+  }
+
+
+
+  $(function() {
+    $('#calendarTimestamp').daterangepicker({
+        singleDatePicker: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        startDate: moment(),
+        drops: "up",
+        locale: {
+            format: 'YYYY-MM-DD HH:mm:ss'
+        }
+    },pushTimestamp);
+  });
+  
+  
+  
+  
+  function pushTimestamp(start){
+    //for watch service
+    $scope.newHistoricalLocation = start.toISOString()
+  }
+
+  pushTimestamp(moment())
+
+
+
+
+  
+
+
 
 
 });

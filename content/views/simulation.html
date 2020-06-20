@@ -16,10 +16,13 @@
                         <pre class="entityInfoInfo">{{!noMapControls}}</pre>
                         <span class="entityInfoHeader">Show Simulation Controls</span> <br />
                         <pre class="entityInfoInfo">{{simulationControl}}</pre>
+                        <span class="entityInfoHeader">Show Graph Controls</span> <br />
+                        <pre class="entityInfoInfo">{{showGraph}}</pre>
                         
                         <button type="button" class="btn btn-primary" ng-click="showMap=!showMap">Toggle Map</button>
                         <button type="button" class="btn btn-primary" ng-click="noMapControls=!noMapControls">Toggle Map Controls</button>
                         <button type="button" class="btn btn-primary" ng-click="simulationControl=!simulationControl">Toggle Simulation Controls</button>
+                        <button type="button" class="btn btn-primary" ng-click="showGraph=!showGraph">Toggle Graph</button>
 
                         <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#collapsibleoption">Collapsible Option</button>
                          <!-- collapsible option -->
@@ -40,5 +43,24 @@
             </div>
         </div>
     </div>
+
+    <div class="row py-2">
+        <div class="col-md-12">
+            <div ng-controller="GraphCtrl">
+                <div class="card" id="graph-container" ng-show="showGraph">
+                    <div class="card-header"> 
+                        <div class="card-header">
+                            <h5>Graph</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="simulationGraph"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
     
+
+<!--  -->
