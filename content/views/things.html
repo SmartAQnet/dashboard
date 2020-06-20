@@ -104,33 +104,59 @@
         </div>
 
         <div class="card-body container">
-            <div class="row">
-                <div class="col-sm-12">
-                    <button type="button" class="btn btn-primary" ng-click="prepareThingsPropertiesFilter('Things'); filterpropertiesdisabled=!filterpropertiesdisabled">Filter List 
-                        <i ng-if="filterpropertiesdisabled" class="fa fa-caret-down" aria-hidden="true"></i>
-                        <i ng-if="!filterpropertiesdisabled" class="fa fa-caret-up" aria-hidden="true"></i>
-                    </button>
-                    <div ng-hide="filterpropertiesdisabled">
-                        <label class="checkbox-inline">
-                            <input type="checkbox" ng-model="filterpropertieson">Filter this page by Thing Properties 
-                        </label>
-                        <div ng-repeat="prop in entityfilter.Things">
-                            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#{{prop}}filter">{{prop}}</button>
-                            <div class="collapse" id="{{prop}}filter">
-                                <div class="pl-3 py-1" ng-repeat="(val,bool) in entityfiltervalues.Things[prop]">
-                                    <span class="checkbox-inline">
-                                        <input type="checkbox" ng-model="entityfiltervalues.Things[prop][val]"> {{val}}
-                                    </span>
-                                </div>
+            
+            <button type="button" class="btn btn-primary" ng-click="prepareThingsPropertiesFilter('Things'); prepareThingsPropertiesFilter('Sensors'); prepareObsPropFilter(); filterpropertiesdisabled=!filterpropertiesdisabled">Filter List 
+                <i ng-if="filterpropertiesdisabled" class="fa fa-caret-down" aria-hidden="true"></i>
+                <i ng-if="!filterpropertiesdisabled" class="fa fa-caret-up" aria-hidden="true"></i>
+            </button>
+            <div class="row my-2">
+                <div ng-hide="filterpropertiesdisabled" class="col-12 col-lg-6">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="filterpropertieson.Things">Filter this page by Thing Properties 
+                    </label>
+                    <div ng-repeat="prop in entityfilter.Things">
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#Things{{prop}}filter">{{prop}}</button>
+                        <div class="collapse" id="Things{{prop}}filter">
+                            <div class="pl-3 py-1" ng-repeat="(val,bool) in entityfiltervalues.Things[prop]">
+                                <span class="checkbox-inline">
+                                    <input type="checkbox" ng-model="entityfiltervalues.Things[prop][val]"> {{val}}
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-12">
-                    Filter by Sensor
+                <div ng-hide="filterpropertiesdisabled" class="col-12 col-lg-6">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="filterpropertieson.Sensors">Filter this page by Sensor Properties
+                    </label>
+                    <div ng-repeat="prop in entityfilter.Sensors">
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#Sensors{{prop}}filter">{{prop}}</button>
+                        <div class="collapse" id="Sensors{{prop}}filter">
+                            <div class="pl-3 py-1" ng-repeat="(val,bool) in entityfiltervalues.Sensors[prop]">
+                                <span class="checkbox-inline">
+                                    <input type="checkbox" ng-model="entityfiltervalues.Sensors[prop][val]"> {{val}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
             </div>
+            <div class="row my-2">
+                <div ng-hide="filterpropertiesdisabled" class="col-12 col-lg-6">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="filterpropertieson.ObservedProperties">Filter this page by Observed Properties
+                    </label>
+                    <div ng-repeat="prop in entityfilter.ObservedProperties">
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#ObservedProperties{{prop}}filter">{{prop}}</button>
+                        <div class="collapse" id="ObservedProperties{{prop}}filter">
+                            <div class="pl-3 py-1" ng-repeat="(val,bool) in entityfiltervalues.ObservedProperties[prop]">
+                                <span class="checkbox-inline">
+                                    <input type="checkbox" ng-model="entityfiltervalues.ObservedProperties[prop][val]"> {{val}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         </div>
     </div>
 

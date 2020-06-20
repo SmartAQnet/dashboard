@@ -9,6 +9,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
     $scope.entityfiltervalues.Things = {}
     $scope.entityfiltervalues.Sensors = {}
+    $scope.entityfiltervalues.ObservedProperties = {}
 
     var defaulttop = 200;
 
@@ -27,21 +28,50 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     $scope.expandparams.Things.HistoricalLocations = true;
     $scope.expandparams.Things.Datastreams = true;
 
-    $scope.filterpropertieson = false
+
+    $scope.filterpropertieson = {}
+    $scope.filterpropertieson.Things = false
+    $scope.filterpropertieson.Sensors = false
+    $scope.filterpropertieson.ObservedProperties = false
     $scope.filterpropertiesdisabled = true
 
     $scope.filterproperties = function(item){
-        let valid = !$scope.filterpropertieson //filter off --> nothing is filtered, valid = true by default
-        if(item.properties && $scope.filterpropertieson){
+
+        //filter off --> nothing is filtered, valid = true by default
+        let validByThing = !$scope.filterpropertieson.Things
+        let validBySensor = !$scope.filterpropertieson.Sensors
+        let validByObsProp = !$scope.filterpropertieson.ObservedProperties
+
+        if(item.properties && $scope.filterpropertieson.Things){
             Object.keys(item.properties).forEach(function(el){ //el is the property key, e.g. "shortname"
                 if(item.properties[el] && el in $scope.entityfiltervalues['Things'] && $scope.entityfiltervalues['Things'][el][item.properties[el]]){
-                    valid=true
+                    validByThing=true
                 }
             })
-        }
-        return valid
-        
-    }
+        };
+
+        if(item.Datastreams && $scope.filterpropertieson.Sensors){
+            item.Datastreams.forEach(function(ds){
+                if(ds.Sensor.properties){
+                    Object.keys(ds.Sensor.properties).forEach(function(el){ //el is the property key, e.g. "shortname"
+                        if(ds.Sensor.properties[el] && el in $scope.entityfiltervalues['Sensors'] && $scope.entityfiltervalues['Sensors'][el][ds.Sensor.properties[el]]){
+                            validBySensor=true
+                        }
+                    })
+                };
+            })
+        };
+
+        if(item.Datastreams && $scope.filterpropertieson.ObservedProperties){
+            item.Datastreams.forEach(function(ds){
+                if(ds.ObservedProperty.name && $scope.entityfiltervalues['ObservedProperties']["name"][ds.ObservedProperty.name]){
+                    validByObsProp=true
+                }
+            })
+        };
+
+        return validByThing && validBySensor && validByObsProp
+    };
 
     //default parameters that used in the query but hidden from the url 
     if(!("$orderby" in $routeParams)) $routeParams["$orderby"]="name asc";
@@ -62,6 +92,27 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     function flattenDeep(arr1) {
         return arr1.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
     };
+
+
+    $scope.prepareObsPropFilter=function(){
+        $http.get(getUrl() + "/v1.0/ObservedProperties?$select=name&$count=true&$top=1000").then(function(response){
+            var thelist = response.data.value
+            var thecount = response.data["@iot.count"]
+
+            if(response.data["@iot.nextLink"]){
+                alert("Too many entities. Next Link present, filter may not be set up accurately")
+            };
+
+
+            listvalidproperties = ["name"]
+            $scope.entityfilter.ObservedProperties = listvalidproperties
+
+            listvalidproperties.forEach(function(el){
+                $scope.entityfiltervalues.ObservedProperties[el] = thelist.reduce(function(acc,item){acc[item[el]]=false; return acc},{})
+            });
+
+        })
+    }
 
     $scope.prepareThingsPropertiesFilter = function(cat){
 
