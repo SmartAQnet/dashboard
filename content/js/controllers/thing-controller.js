@@ -5,6 +5,9 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
     $scope.category = 'Thing'
 
+    //toggle map displays
+    $scope.noMapControls = true
+
     //pagination example for ng-repeat tables
     //http://jsfiddle.net/2ZzZB/56/
 
@@ -50,7 +53,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       $scope.item = {}
       $scope.item.items = []
       $scope.traverse($scope.thing,$scope.item.items)
-      console.log($scope.item.items)
+      //console.log($scope.item.items)
       // check gives true that traverse and esrevart are indeed inverse to each other
       //console.log(JSON.stringify($scope.testthing)==JSON.stringify($scope.jsonobj))
 
@@ -307,10 +310,94 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
 
 
+  $scope.displayLocationTrace = false;
+  $scope.displayHL = true;
 
-  
+  $scope.loadLocationTrace = function(){
 
+    //ggf in zwei http anfragen teilen
+    if($scope.displayHL){
+      var urlToLoad = getUrl() + "/v1.0/Things(" + getId($scope.id) + ")/HistoricalLocations?$expand=Locations";
+    } else {
+      var urlToLoad = ''
+    }
 
+    // get information and construct the graph
+    $http.get(urlToLoad).then(function(response){
 
+      var res = response.data.value;
+
+      $scope.resLon = res.map(el => el.Locations[0]["location"]["coordinates"][0]);
+      $scope.resLat = res.map(el => el.Locations[0]["location"]["coordinates"][1]);
+      $scope.resAlt = res.map(function(el){
+        if(el.Locations[0]["location"]["coordinates"][2]){
+          return el.Locations[0]["location"]["coordinates"][2]
+        } else {
+          return undefined
+        }
+      });
+
+      var resLabels = res.map(el => el["time"]);
+
+      var ctx = document.getElementById('LocationGraph').getContext('2d');
+      locationChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: resLabels,
+              datasets:[{
+                label: "Lat", 
+                steppedLine: "after", 
+                data: $scope.resLat, 
+                borderColor: "rgba(115,135,156,1)",
+                fill: false, 
+              },{
+                label: "Lon", 
+                steppedLine: "after", 
+                data: $scope.resLon, 
+                borderColor: "rgba(156,115,135,1)",
+                fill: false, 
+              },{
+                label: "Alt", 
+                steppedLine: "after", 
+                data: $scope.resAlt, 
+                borderColor: "rgba(135,156,115,1)",
+                fill: false, 
+              }
+            ]
+          }, 
+          options: {
+              responsive: true,
+              aspectRatio: 2,
+              title: {
+                  display: true,
+                  text: "Historical Locations",
+              },
+              scales: {
+                  xAxes: [{
+                      type: 'time'
+                  }]
+              }
+          }
+      });
+    });
+  }
+
+  $scope.loadLocationTrace()
+
+  $scope.addData = function(label, data) {
+    locationChart.data.labels.push(label);
+    locationChart.data.datasets.forEach((dataset) => {
+      dataset.data.push(data);
+    });
+    locationChart.update();
+  }
+
+  $scope.removeData = function() {
+    locationChart.data.labels.pop();
+    locationChart.data.datasets.forEach((dataset) => {
+      dataset.data.pop();
+    });
+    locationChart.update();
+  }
 
 });

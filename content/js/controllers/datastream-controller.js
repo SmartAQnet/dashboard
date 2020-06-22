@@ -6,6 +6,10 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, $loc
     //remove query params
     $location.search({})
     
+    //toggle map displays
+    $scope.noMapControls = true
+
+
 /*
     $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")/Observations?$orderby=resultTime%20desc&$expand=FeatureOfInterest&$top=1").then(function (response) {
         $scope.latestResultValue = response.data.value[0]["result"];
@@ -106,14 +110,18 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, $loc
     //     $scope.thingId = response.data["@iot.id"];
     //     $scope.thingName = response.data["name"];
     // });
-    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")").then(function (response) {
+    $http.get(getUrl() + "/v1.0/Datastreams(" + getId($scope.id) + ")?$expand=Thing").then(function (response) {
+
+        $scope.Page.selectedDatastream = response.data;
 
         $scope.name = response.data["name"];
         $scope.description = response.data["description"];
         $scope.unitOfMeasurement = response.data["unitOfMeasurement"];
         $scope.observedArea = response.data["observedArea"];
         $scope.properties = response.data["properties"];
-        $scope.Page.selectedDatastream = response.data;
+
+        $scope.thingId = response.data.Thing["@iot.id"];
+        $scope.thingName = response.data.Thing["name"];
 
         $scope.showMap = true;
     });
