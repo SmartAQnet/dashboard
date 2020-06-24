@@ -193,8 +193,9 @@
                         </div>
                     </div>
                     <div id="observationChartWrapper" class="card" >
-                        <div class="card-header py-3 text-primary">
-                            <span style="margin-left: auto; margin-right: auto;">{{name}}</span>
+                        <div class="card-header py-3">
+                            <span class="text-primary" ng-if="datastreams.state != Datastreams.states['secondary_loaded']" style="margin-left: auto; margin-right: auto;">{{name}}</span>
+                            <span class="text-danger" ng-if="datastreams.state == Datastreams.states['secondary_loaded']" style="margin-left: auto; margin-right: auto;">Be careful when comparing measurements: The Timestamps of the Datastreams may not coincide!</span>
                         </div>
                         <div class="card-header">
                             <span>RESULTS</span>

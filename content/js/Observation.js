@@ -1,5 +1,7 @@
 function Stream(id, isLive) {
     this.baseURL = getUrl() + "/v1.0/Datastreams(" + getId(id) + ")";
+    this.aggregateParameter = "$aggregate=60"
+    this.basePath =  "/Datastreams(" + getId(id) + ")"
     this.dataset = [];
     this.datasetDownsampled = [];
     this.isLive = typeof isLive === "undefined" ? true : isLive;
@@ -37,6 +39,7 @@ Stream.prototype.getFromServer = function($http, handleHttpError, callback){
 }
 
 Stream.prototype.getFromServerDateTime = function($http, handleHttpError, start, end, callback){
+    //$http.get(getUrl() + "/function/aggregator" + this.basePath + "/Observations?$filter=phenomenonTime gt " + start.toISOString() + " and phenomenonTime lt "+ end.toISOString() +"&$orderby=phenomenonTime desc&$top=10000" + "&" + this.aggregateParameter).then(function (response) {
     $http.get(this.baseURL + "/Observations?$filter=phenomenonTime gt " + start.toISOString() + " and phenomenonTime lt "+ end.toISOString() +"&$orderby=phenomenonTime desc&$top=10000").then(function (response) {
         this.dataset.length = 0;
         response.data.value.forEach(function (value, key) {
@@ -494,16 +497,33 @@ Datastreams.prototype.toChart = function(htmlSelector){
 		type: 'scatter',
 		data: chartData,
 		options: {
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
+            hover: {
+                mode: 'index',
+                intersect: false
+            },
 			scales: {
 				yAxes: yAxes,
 				xAxes: [{
-					type: 'time',
-					time: {
-						displayFormats: {
-							minute: 'kk:mm'
-						}
-					}
-				}]
+                    type: 'time',
+                    time: {
+                      tooltipFormat: 'YYYY-MM-DD hh:mm:ss', 
+                      displayFormats: {
+                        'millisecond': 'YYYY-MM-DD hh:mm:ss',
+                        'second': 'YYYY-MM-DD hh:mm:ss',
+                        'minute': 'YYYY-MM-DD hh:mm:ss',
+                        'hour': 'YYYY-MM-DD hh:mm:ss',
+                        'day': 'YYYY-MM-DD hh:mm:ss',
+                        'week': 'YYYY-MM-DD hh:mm:ss',
+                        'month': 'YYYY-MM-DD',
+                        'quarter': 'YYYY-MM',
+                        'year': 'YYYY-MM'
+                     }
+                    }
+                }],
 			}
 		}
     });

@@ -313,6 +313,10 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
   $scope.displayLocationTrace = false;
   $scope.displayHL = true;
 
+  var datalon
+  var datalat
+  var dataalt
+
   $scope.loadLocationTrace = function(){
 
     //ggf in zwei http anfragen teilen
@@ -322,50 +326,64 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       var urlToLoad = ''
     }
 
+    //for FoI: let user choose the datastream via radio button or checkboxes. loading all by default is too much and unnecessary
+    //limit? 10000 and a next button? or a calendar? 
+
+
     // get information and construct the graph
     $http.get(urlToLoad).then(function(response){
 
       var res = response.data.value;
 
-      $scope.resLon = res.map(el => el.Locations[0]["location"]["coordinates"][0]);
-      $scope.resLat = res.map(el => el.Locations[0]["location"]["coordinates"][1]);
-      $scope.resAlt = res.map(function(el){
-        if(el.Locations[0]["location"]["coordinates"][2]){
-          return el.Locations[0]["location"]["coordinates"][2]
-        } else {
-          return undefined
-        }
-      });
 
       var resLabels = res.map(el => el["time"]);
+
+      datalon={
+        label: "Longitude", 
+        steppedLine: "after", 
+        data: res.map(el => el.Locations[0]["location"]["coordinates"][0]),
+        borderColor: "rgba(156,115,135,1)",
+        fill: false, 
+      }
+
+      datalat={
+        label: "Latitude", 
+        steppedLine: "after", 
+        data: res.map(el => el.Locations[0]["location"]["coordinates"][1]),
+        borderColor: "rgba(115,135,156,1)",
+        fill: false, 
+      }
+
+      dataalt = {
+        label: "Altitude", 
+        steppedLine: "after", 
+        data: res.map(function(el){
+          if(el.Locations[0]["location"]["coordinates"][2]){
+            return el.Locations[0]["location"]["coordinates"][2]
+          } else {
+            return undefined
+          }
+        }), 
+        borderColor: "rgba(135,156,115,1)",
+        fill: false, 
+      }
 
       var ctx = document.getElementById('LocationGraph').getContext('2d');
       locationChart = new Chart(ctx, {
           type: 'line',
           data: {
               labels: resLabels,
-              datasets:[{
-                label: "Lat", 
-                steppedLine: "after", 
-                data: $scope.resLat, 
-                borderColor: "rgba(115,135,156,1)",
-                fill: false, 
-              },{
-                label: "Lon", 
-                steppedLine: "after", 
-                data: $scope.resLon, 
-                borderColor: "rgba(156,115,135,1)",
-                fill: false, 
-              },{
-                label: "Alt", 
-                steppedLine: "after", 
-                data: $scope.resAlt, 
-                borderColor: "rgba(135,156,115,1)",
-                fill: false, 
-              }
-            ]
+              datasets:[datalat,datalon,dataalt]
           }, 
           options: {
+            tooltips: {
+              mode: 'index',
+              intersect: false
+              },
+              hover: {
+                  mode: 'index',
+                  intersect: false
+              },
               responsive: true,
               aspectRatio: 2,
               title: {
@@ -374,7 +392,28 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
               },
               scales: {
                   xAxes: [{
-                      type: 'time'
+                      type: 'time',
+                      time: {
+                        tooltipFormat: 'YYYY-MM-DD hh:mm:ss', 
+                        displayFormats: {
+                          'millisecond': 'YYYY-MM-DD hh:mm:ss',
+                          'second': 'YYYY-MM-DD hh:mm:ss',
+                          'minute': 'YYYY-MM-DD hh:mm:ss',
+                          'hour': 'YYYY-MM-DD hh:mm:ss',
+                          'day': 'YYYY-MM-DD hh:mm:ss',
+                          'week': 'YYYY-MM-DD hh:mm:ss',
+                          'month': 'YYYY-MM-DD hh:mm:ss',
+                          'quarter': 'YYYY-MM-DD hh:mm:ss',
+                          'year': 'YYYY-MM-DD hh:mm:ss'
+                       }
+                      }
+                  }],
+                  yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                      display: true,
+                      labelString: 'Coordinate'
+                    }
                   }]
               }
           }
@@ -384,20 +423,32 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
   $scope.loadLocationTrace()
 
-  $scope.addData = function(label, data) {
-    locationChart.data.labels.push(label);
-    locationChart.data.datasets.forEach((dataset) => {
-      dataset.data.push(data);
+  $scope.addData = function(name) {
+    // locationChart.data.labels.push(label);
+    [datalon,datalat,dataalt].forEach(function(el){
+      if(el.label == name){
+        locationChart.data.datasets.push(el)
+      }
     });
+    locationChart.update();
+  };
+
+  $scope.removeData = function(name) {
+    // locationChart.data.labels.pop();
+    let filteredarray = locationChart.data.datasets.filter(function(el){return el.label!=name})
+    locationChart.data.datasets=filteredarray
+    // locationChart.data.datasets.forEach((dataset) => {
+    //   dataset.pop();
+    // });
     locationChart.update();
   }
 
-  $scope.removeData = function() {
-    locationChart.data.labels.pop();
-    locationChart.data.datasets.forEach((dataset) => {
-      dataset.data.pop();
-    });
-    locationChart.update();
+  $scope.toggleData = function(name){
+    if(locationChart.data.datasets.map(el => el.label).includes(name)){
+      $scope.removeData(name)
+    } else {
+      $scope.addData(name)
+    }
   }
 
 });
