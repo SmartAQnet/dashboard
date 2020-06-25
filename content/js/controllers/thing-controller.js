@@ -327,7 +327,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     }
 
     //for FoI: let user choose the datastream via radio button or checkboxes. loading all by default is too much and unnecessary
-    //limit? 10000 and a next button? or a calendar? 
+    //limit? 10000 and a next button? or a calendar? possibility to edit historical locations?
 
 
     // get information and construct the graph
