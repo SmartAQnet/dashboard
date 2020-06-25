@@ -1,9 +1,9 @@
 <div class="main">
     <div class="card">
         <div class="card-header">
-            <!--button class="backbutton"-->
-            <!-- <a class="backbutton" ng-href="#/thing/{{thingId}}"><span class="entityInfoHeader"><i class="fas fa-arrow-left mr-3"></i>Back to Thing: {{thingName}}</span></a> -->
-            <!--button-->
+            <!-- <button class="backbutton"> -->
+                <a class="backbutton" ng-href="#/thing/{{thingId}}"><span class="entityInfoHeader"><i class="fas fa-arrow-left mr-3"></i>Back to Thing: {{thingName}}</span></a>
+            <!-- </button> -->
             <ul class="nav nav-tabs mt-4">
                 <li class="nav-item" ng-click="tabPropertiesClicked()"><a class="nav-link" data-target="#properties" data-toggle="tab">Properties</a></li>
                 <li class="nav-item" ng-click="tabThingClicked()"><a class="nav-link" data-target="#thing" data-toggle="tab">Thing</a></li>
@@ -193,6 +193,10 @@
                         </div>
                     </div>
                     <div id="observationChartWrapper" class="card" >
+                        <div class="card-header py-3">
+                            <span class="text-primary" ng-if="datastreams.state != Datastreams.states['secondary_loaded']" style="margin-left: auto; margin-right: auto;">{{name}}</span>
+                            <span class="text-danger" ng-if="datastreams.state == Datastreams.states['secondary_loaded']" style="margin-left: auto; margin-right: auto;">Be careful when comparing measurements: The Timestamps of the Datastreams may not coincide!</span>
+                        </div>
                         <div class="card-header">
                             <span>RESULTS</span>
                             <button type="button" ng-if="datastreams.state == Datastreams.states['main_loaded']" ng-click="showActiveThingsSelection()" class="compare-to-btn btn btn-primary" data-toggle="modal" data-target="#thingSelection">Compare to ...</a>

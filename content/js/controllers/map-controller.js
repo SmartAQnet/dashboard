@@ -583,7 +583,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
             "locationname": FixUTF8(thinglocationname),
             "@iot.id": thingid,
             "thingname": thingname,
-            "tooltip": "Located at: " + FixUTF8(thinglocationname)
+            "tooltip": thingname//"Located at: " + FixUTF8(thinglocationname)
         };
         return featureinfo;
     }

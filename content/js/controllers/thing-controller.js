@@ -5,6 +5,9 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
     $scope.category = 'Thing'
 
+    //toggle map displays
+    $scope.noMapControls = true
+
     //pagination example for ng-repeat tables
     //http://jsfiddle.net/2ZzZB/56/
 
@@ -50,7 +53,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       $scope.item = {}
       $scope.item.items = []
       $scope.traverse($scope.thing,$scope.item.items)
-      console.log($scope.item.items)
+      //console.log($scope.item.items)
       // check gives true that traverse and esrevart are indeed inverse to each other
       //console.log(JSON.stringify($scope.testthing)==JSON.stringify($scope.jsonobj))
 
@@ -307,10 +310,145 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
 
 
+  $scope.displayLocationTrace = false;
+  $scope.displayHL = true;
 
-  
+  var datalon
+  var datalat
+  var dataalt
+
+  $scope.loadLocationTrace = function(){
+
+    //ggf in zwei http anfragen teilen
+    if($scope.displayHL){
+      var urlToLoad = getUrl() + "/v1.0/Things(" + getId($scope.id) + ")/HistoricalLocations?$expand=Locations";
+    } else {
+      var urlToLoad = ''
+    }
+
+    //for FoI: let user choose the datastream via radio button or checkboxes. loading all by default is too much and unnecessary
+    //limit? 10000 and a next button? or a calendar? possibility to edit historical locations?
 
 
+    // get information and construct the graph
+    $http.get(urlToLoad).then(function(response){
 
+      var res = response.data.value;
+
+
+      var resLabels = res.map(el => el["time"]);
+
+      datalon={
+        label: "Longitude", 
+        steppedLine: "after", 
+        data: res.map(el => el.Locations[0]["location"]["coordinates"][0]),
+        borderColor: "rgba(156,115,135,1)",
+        fill: false, 
+      }
+
+      datalat={
+        label: "Latitude", 
+        steppedLine: "after", 
+        data: res.map(el => el.Locations[0]["location"]["coordinates"][1]),
+        borderColor: "rgba(115,135,156,1)",
+        fill: false, 
+      }
+
+      dataalt = {
+        label: "Altitude", 
+        steppedLine: "after", 
+        data: res.map(function(el){
+          if(el.Locations[0]["location"]["coordinates"][2]){
+            return el.Locations[0]["location"]["coordinates"][2]
+          } else {
+            return undefined
+          }
+        }), 
+        borderColor: "rgba(135,156,115,1)",
+        fill: false, 
+      }
+
+      var ctx = document.getElementById('LocationGraph').getContext('2d');
+      locationChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: resLabels,
+              datasets:[datalat,datalon,dataalt]
+          }, 
+          options: {
+            tooltips: {
+              mode: 'index',
+              intersect: false
+              },
+              hover: {
+                  mode: 'index',
+                  intersect: false
+              },
+              responsive: true,
+              aspectRatio: 2,
+              title: {
+                  display: true,
+                  text: "Historical Locations",
+              },
+              scales: {
+                  xAxes: [{
+                      type: 'time',
+                      time: {
+                        tooltipFormat: 'YYYY-MM-DD hh:mm:ss', 
+                        displayFormats: {
+                          'millisecond': 'YYYY-MM-DD hh:mm:ss',
+                          'second': 'YYYY-MM-DD hh:mm:ss',
+                          'minute': 'YYYY-MM-DD hh:mm:ss',
+                          'hour': 'YYYY-MM-DD hh:mm:ss',
+                          'day': 'YYYY-MM-DD hh:mm:ss',
+                          'week': 'YYYY-MM-DD hh:mm:ss',
+                          'month': 'YYYY-MM-DD hh:mm:ss',
+                          'quarter': 'YYYY-MM-DD hh:mm:ss',
+                          'year': 'YYYY-MM-DD hh:mm:ss'
+                       }
+                      }
+                  }],
+                  yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                      display: true,
+                      labelString: 'Coordinate'
+                    }
+                  }]
+              }
+          }
+      });
+    });
+  }
+
+  $scope.loadLocationTrace()
+
+  $scope.addData = function(name) {
+    // locationChart.data.labels.push(label);
+    [datalon,datalat,dataalt].forEach(function(el){
+      if(el.label == name){
+        locationChart.data.datasets.push(el)
+      }
+    });
+    locationChart.update();
+  };
+
+  $scope.removeData = function(name) {
+    // locationChart.data.labels.pop();
+    let filteredarray = locationChart.data.datasets.filter(function(el){return el.label!=name})
+    locationChart.data.datasets=filteredarray
+    // locationChart.data.datasets.forEach((dataset) => {
+    //   dataset.pop();
+    // });
+    locationChart.update();
+  }
+
+  $scope.toggleData = function(name){
+    if(locationChart.data.datasets.map(el => el.label).includes(name)){
+      $scope.removeData(name)
+    } else {
+      $scope.addData(name)
+    }
+  }
 
 });
