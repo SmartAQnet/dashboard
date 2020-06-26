@@ -1,5 +1,3 @@
-<div>
-
     <div class="card mb-4">
         <div class="card-header">
             <h3>
@@ -9,9 +7,13 @@
         <div class="card-body">
             <ul>
                 <li>Click the name of a Thing or a Datastream to view its metadata</li>
-                <li>Click the checkboxes of any Datastreams and see the information below the table on how to select Observations</li>
-                <li>Click the "Quick Download" Button to export all results of the selected Thing in the selected timespan (see timespan selector at the bottom of the page. Default is the last 24hr)</li>
+                <li>Click the Download-Button to export all results of the selected Thing in the selected timespan (see timespan selector below)</li>
             </ul>
+
+            <div style="margin-left: auto; margin-right: auto;">
+                Choose a timespan for the Download: 
+                <input ng-model="selectedDaterange" type="text" id="calendar" class="px-2" style="min-width: 300px;"/>
+            </div>
         </div>
     </div>
 
@@ -223,7 +225,7 @@
                             <th ng-if="selectparams.Datastreams['Sensor']">Sensor</th>
                             <th ng-if="selectparams.Datastreams['unitOfMeasurement']">Unit Of Measurement</th>
                             <th ng-if="selectparams.Datastreams['properties']">Properties</th>
-                            <th>Export</th>
+                            <!-- <th>Export</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -242,9 +244,9 @@
                             </td>
                             <td ng-if="selectparams.Datastreams['properties']" >{{y["properties"]}}</td>
                             
-                            <td ng-click="$parent.selectedDatastreams[y['@iot.id']] = !$parent.selectedDatastreams[y['@iot.id']]" style="text-align: center; vertical-align: middle;">
+                            <!-- <td ng-click="$parent.selectedDatastreams[y['@iot.id']] = !$parent.selectedDatastreams[y['@iot.id']]" style="text-align: center; vertical-align: middle;">
                                 <input type="checkbox" ng-model="$parent.selectedDatastreams[y['@iot.id']]" ng-click="$parent.selectedDatastreams[y['@iot.id']] = !$parent.selectedDatastreams[y['@iot.id']]">
-                            </td>
+                            </td> -->
                         </tr>
                     </tbody>
                 </table>
@@ -255,7 +257,7 @@
             <td ng-if="selectparams.Things['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
             <td style="text-align: center; vertical-align: middle;">
                 <div class="export-cell">
-                    <exportBtn thingid="x['@iot.id']" from="$parent.timeframe.fromISO" to="$parent.timeframe.toISO" ng-click="$parent.selectedDatastreams={};checkMyDs={}; downloadInProgress()"></exportBtn>
+                    <exportBtn thingid="x['@iot.id']" from="$parent.timeframe.fromISO" to="$parent.timeframe.toISO" ng-click="$parent.selectedDatastreams={};checkMyDs={}; downloadInProgress()" data-toggle="modal" data-target="#downloaddisclaimer"></exportBtn>
                 </div>
             </td>
             <!-- Properties and Export end -->
@@ -263,6 +265,27 @@
         </tbody>
     </table>
     <!-- Table end -->
+
+    <!-- download disclaimer modal-->
+    <div class="modal fade" id="downloaddisclaimer" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header p-3 mb-2 bg-primary text-white">
+                    <h2 class="modal-title"><i class="fa fa-globe"></i>DISCLAIMER</h2>
+                </div>
+                <div class="modal-body">
+                    <h5 class="text-danger">Bitte beachten: </h5>
+
+                    Die Bewertung der Luftqualität erfolgt nach der EU-Luftqualitätsrichtlinie 2008/50/EG, die in Deutschland im Wesentlichen mit der 39. Verordnung zur Durchführung des Bundes-Immissionsschutzgesetzes (Verordnung über Luftqualitätsstandards und Emissionshöchstmengen - 39. BImSchV) in nationales Recht umgesetzt wurde. Die hier heruntergeladenen Messdaten können nicht zur Bewertung der Luftqualität gemäß 39. BImSchV herangezogen werden. 
+                
+                </div>
+                <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
+                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- download disclaimer modale end -->
 
     <div id="loading-screen-wrapper" ng-if="!dataIsLoaded.Things">
         <div id="loading-screen" >
@@ -303,9 +326,9 @@
     </div>
 
 
-    <div class="pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
+    <!-- <div class="pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div> -->
 
-    <div class="card">
+    <!-- <div class="card">
         <div class="card-header">
             <h3>
                 How to customize a table of Observations for downloading
@@ -315,7 +338,7 @@
             <ul>
 
                 <li>Select a number of Things or Datastreams by clicking the checkbox in the respective "Export" column</li>
-                <!-- <li>Alternatively draw a polygon on the map to select all Things in an area (not implemented yet)</li> -->
+                <li>Alternatively draw a polygon on the map to select all Things in an area (not implemented yet)</li>
                 <li>Select a timespan from the calendar (default is the past 24 hours)</li>
                 <li>Then click one of the buttons below to show or export the Observations </li>
             </ul>
@@ -339,6 +362,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
 </div>
+
