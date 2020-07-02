@@ -187,7 +187,6 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     };
 
 
-
     $scope.patchRequest = function(entity){        
         if($scope.checkPWcontainer()){
 
