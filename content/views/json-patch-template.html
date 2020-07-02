@@ -1,7 +1,7 @@
 
 <!-- Traversing Nested Arrays with AngularJS, adapted from https://stackoverflow.com/questions/23315679/angularjs-traversing-nested-arrays -->
 
-<div class="well" ng-repeat="item in items = (parent = item).items | filter : containsNoIot | filter : excludeOthers" ng-init="item.parent = parent; item.level = parent.level + 1">
+<div class="well" ng-repeat="item in items = (parent = item).items | filter : containsNoIot" ng-init="item.parent = parent; item.level = parent.level + 1">
     
     <!-- Item Nr in list accessible via: {{$index + 1}} 
     Length of current list: {{items.length}} 

@@ -32,7 +32,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <h3 class="modal-title">{{category}}</h3>
-                                        <div ng-repeat="descr in descrs=item.items | filter: excludeAllProperties | filter: containsNoIot | filter: excludeOthers">
+                                        <div ng-repeat="descr in descrs=item.items | filter: excludeAllProperties | filter: containsNoIot">
                                             <div class="input-group">
                                                 <span class="input-group-addon" >{{descr.key}} </span>
                                                 <input class="form-control" type="text" ng-model="descr.value" aria-describedby="{{category}}{{descr.key}}helpblock"/>
@@ -302,35 +302,42 @@
                     
                     <!-- Graph Content -->
                     <div id="locationtrace">
-                        <div class="entityInfo">
-                            <span class="entityInfoHeader">General Information</span> <br />
-                            <pre class="entityInfoInfo mb-1">'Historical Location' refers to the Locations of the Thing </pre>
-                            <pre class="entityInfoInfo">'Feature of Interest' refers to the Locations of the Observations</pre>
-                        </div>
-                        <form>
-                            <div class="switch ml-3">
-                                <label>
-                                <input type="checkbox" ng-model="displayFoI">
-                                <span ng-if="displayFoI">Switch to Historical Location</span>
-                                <span ng-if="!displayFoI">Switch to Feature of Interest</span>
-                                </label>
-                            </div>
-                        </form>
-
                         <div class="card" id="location-graph-container">
-                            <div class="card-header"> 
-                                <div class="card-header">
-                                    <h5>Historical Locations Graph</h5>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="LocationGraph"></canvas>
+                            <div class="card-header">
+                                <h5>Locations Graph</h5>
+                                <div class="pl-3 mx-2 mt-3">
+                                    <form>
+                                        <div class="form-group">
+                                            <div class="row pb-2 mb-2 border border-secondary border-left-0 border-right-0 border-top-0">
+                                                <div class="col">
+                                                    <input id="histlocdisplay" type="checkbox" class="form-check-input" ng-model="locationtracedisplay['HistoricalLocations']" ng-click="toggleSource('HistoricalLocations')">
+                                                    <label for="histlocdisplay" class="form-check-label">Historical Locations</label>
+                                                </div>
+                                            </div>
+                                            <div class="row" ng-repeat="ds in datastreamsList track by ds['@iot.id']">
+                                                <div class="col">
+                                                    <input id="{{ds['@iot.id']}}display" type="checkbox" class="form-check-input" ng-model="locationtracedisplay[ds['@iot.id']]" ng-click="toggleSource(ds['@iot.id'])">
+                                                    <label for="{{ds['@iot.id']}}display" class="form-check-label">{{ds["name"]}}</label>
+                                                </div>
+                                                <div class="col-md-4 col-6">
+                                                    <button ng-if="!requestIsLoading[ds['@iot.id']]" ng-disabled="!locationtracedisplay[ds['@iot.id']]" class="btn btn-primary" ng-click="loadFoITrace(ds['@iot.id'])">Load more Data</button>
+                                                    <button ng-if="requestIsLoading[ds['@iot.id']]" class="btn btn-primary" disabled>
+                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                        Loading..
+                                                      </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-                        
+                            <div class="card-body">
+                                <canvas id="LocationGraph"></canvas>
+                            </div>
                             <div class="card-footer">
-                                <button type="button" class="btn btn-primary" ng-click="toggleData('Latitude')">Toggle Latitude</button>
-                                <button type="button" class="btn btn-primary" ng-click="toggleData('Longitude')">Toggle Longitude</button>
-                                <button type="button" class="btn btn-primary" ng-click="toggleData('Altitude')">Toggle Altitude</button>
+                                <button type="button" class="btn btn-primary" ng-click="toggleCoordinates('Latitude')">Toggle Latitude</button>
+                                <button type="button" class="btn btn-primary" ng-click="toggleCoordinates('Longitude')">Toggle Longitude</button>
+                                <button type="button" class="btn btn-primary" ng-click="toggleCoordinates('Altitude')">Toggle Altitude</button>
                             </div>
                         </div>
                     </div>
