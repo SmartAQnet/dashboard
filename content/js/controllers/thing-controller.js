@@ -482,7 +482,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
     $.snackbar({content: "Requesting Data. This may take a bit.", timeout: 5000})
     // get information and add to dataset
-    $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")/Datastreams('" + dsid + "')/Observations?$expand=FeatureOfInterest($select=feature)&$select=resultTime,FeatureOfInterest&$top=" + $scope.FoItop + "&$skip=" + skip).then(function(response){
+    $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")/Datastreams('" + dsid + "')/Observations?$orderby=resultTime asc&$expand=FeatureOfInterest($select=feature)&$select=resultTime,FeatureOfInterest&$top=" + $scope.FoItop + "&$skip=" + skip).then(function(response){
       
       let res=response.data.value
 
