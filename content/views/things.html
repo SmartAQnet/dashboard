@@ -257,7 +257,8 @@
             <td ng-if="selectparams.Things['properties']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["properties"]}}</td>
             <td style="text-align: center; vertical-align: middle;">
                 <div class="export-cell">
-                    <exportBtn thingid="x['@iot.id']" from="$parent.timeframe.fromISO" to="$parent.timeframe.toISO" ng-click="$parent.selectedDatastreams={};checkMyDs={}; downloadInProgress()" data-toggle="modal" data-target="#downloaddisclaimer"></exportBtn>
+                    <exportBtn ng-if="thingtimes[x['@iot.id']]" thingid="x['@iot.id']" from="$parent.timeframe.fromISO" to="$parent.timeframe.toISO" ng-click="$parent.selectedDatastreams={};checkMyDs={}; downloadInProgress()" data-toggle="modal" data-target="#downloaddisclaimer"></exportBtn>
+                    <button class="btn btn-outline-primary" ng-if="!thingtimes[x['@iot.id']]" disabled>No Data in selected Timeframe</button>
                 </div>
             </td>
             <!-- Properties and Export end -->
