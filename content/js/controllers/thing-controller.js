@@ -447,18 +447,18 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     $scope.updateChart()
   }
 
-    //function that checks all "show" flags in locationData and updates the chart
-    $scope.updateChart = function(){
-      locationChart.data.datasets = []
-      Object.keys(locationData).forEach(function(key){
-        Object.keys(locationData[key]).forEach(function(coordinateType){
-          if(locationData[key][coordinateType]["show"]){
-            locationChart.data.datasets.push(locationData[key][coordinateType])
-          }
-        })
+  //function that checks all "show" flags in locationData and updates the chart
+  $scope.updateChart = function(){
+    locationChart.data.datasets = []
+    Object.keys(locationData).forEach(function(key){
+      Object.keys(locationData[key]).forEach(function(coordinateType){
+        if(locationData[key][coordinateType]["show"]){
+          locationChart.data.datasets.push(locationData[key][coordinateType])
+        }
       })
-      locationChart.update();
-    };
+    })
+    locationChart.update();
+  };
 
 
 
@@ -472,7 +472,29 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
   $scope.FoItop=1000
 
+  $scope.accumulationThreshold = 500 //in meters. change functions so that a threshold can be used
 
+  var geocompare = function(x1,x2){
+    return (x1==x2)
+  };
+
+  var accumulator = function(arr){
+    let res=arr.reduce(function(acc,i){
+      if(!geocompare(i["y"],acc[acc.length-1]["y"])){
+        acc.push(i)
+      }
+      return(acc)
+    },[arr[0]])
+
+    return (res)
+  }
+
+
+
+
+  $scope.accumulateCoordinates(dsid){
+    //need to work with looping through result times to identify which coordinates belong together and then reduce. also rework above functions to work with that
+  }
 
   
   $scope.loadFoITrace = function(dsid){
