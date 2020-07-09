@@ -173,34 +173,36 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         var intstart
         var intend
         [intstart, intend] = interval.split("/")
-        thingslist.map(function(thisthing){
-            var thingstart;
-            var thingend;
-            thisthing["Datastreams"].forEach(function(ds){
-                if(ds["phenomenonTime"]){
-                    var start;
-                    var end;
-                    [start, end] = ds["phenomenonTime"].split("/")
+        if(thingslist){
+            thingslist.map(function(thisthing){
+                var thingstart;
+                var thingend;
+                thisthing["Datastreams"].forEach(function(ds){
+                    if(ds["phenomenonTime"]){
+                        var start;
+                        var end;
+                        [start, end] = ds["phenomenonTime"].split("/")
 
-                    if(!thingstart){
-                        thingstart = start
-                    } else if(moment(start) < moment(thingstart)){
-                        thingstart = start
-                    }
+                        if(!thingstart){
+                            thingstart = start
+                        } else if(moment(start) < moment(thingstart)){
+                            thingstart = start
+                        }
 
-                    if(!thingend){
-                        thingend = end
-                    } else if(moment(end) > moment(thingend)){
-                        thingend = end
+                        if(!thingend){
+                            thingend = end
+                        } else if(moment(end) > moment(thingend)){
+                            thingend = end
+                        }
                     }
+                });
+                if((moment(intstart) > moment(thingend)) | (moment(thingstart) > moment(intend))){
+                    $scope.thingtimes[thisthing["@iot.id"]] = false
+                } else {
+                    $scope.thingtimes[thisthing["@iot.id"]] = true
                 }
-            });
-            if((moment(intstart) > moment(thingend)) | (moment(thingstart) > moment(intend))){
-                $scope.thingtimes[thisthing["@iot.id"]] = false
-            } else {
-                $scope.thingtimes[thisthing["@iot.id"]] = true
-            }
-        })
+            })
+        }
     }
 
 
@@ -228,6 +230,11 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         //minimally subexpand stuff in Datastream
         if(trueparamsexpand.includes("Datastreams")){
             trueparamsexpand[trueparamsexpand.indexOf("Datastreams")] = "Datastreams($expand=Sensor,ObservedProperty)"
+        }
+
+        //minimally subexpand stuff in HistLocs
+        if(trueparamsexpand.includes("HistoricalLocations")){
+            trueparamsexpand[trueparamsexpand.indexOf("HistoricalLocations")] = "HistoricalLocations($expand=Locations)"
         }
 
         let paramUpdate = {}
@@ -379,7 +386,6 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         if(thingtimesready){
             $scope.checkThingsTimes($scope.dataList,$scope.timeframe.fromISO + "/" + $scope.timeframe.toISO)
         }
-        console.log($scope.thingtimes)
 
         /*
         //for displaying the query

@@ -194,13 +194,17 @@
                     <thead class="st-thead">
                         <tr class="table-primary">
                             <th>Time</th>
-                            <th>@iot.id</th>
+                            <th>Name</th>
                         </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="y in x['HistoricalLocations']">
-                        <td>{{y["time"]}}</td>
-                        <td>{{y["@iot.id"]}}</td>
+                    <tr ng-repeat="y in x['HistoricalLocations'] | limitTo:5">
+                        <td style="width: 157px;">{{y["time"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                        <td>{{y["Locations"][0]["name"]}}</td>
+                    </tr>
+                    <tr ng-if="x['HistoricalLocations'].length > 5">
+                        <td style="width: 157px;">...</td>
+                        <td>...</td>
                     </tr>
                     </tbody>
                 </table>
