@@ -78,13 +78,17 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     if(!("$count" in $routeParams)) $routeParams["$count"]="true";
     // ---
 
-    
+    /*
     //build query for observations
     $scope.$watch('selectedDatastreams', function () {
         console.log("query parameter change detected")
         $scope.selectedDatastreamIds = Object.keys($scope.selectedDatastreams).filter(key => $scope.selectedDatastreams[key] == true)
         $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
     }, true);
+    */
+
+
+
 
     //for query filters: we use properties which at least 80% of entities have. This way it stays generic but useful at the same time
 
@@ -163,6 +167,45 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         }); 
     };
 
+    var thingtimesready;
+    $scope.thingtimes = {}
+    $scope.checkThingsTimes = function(thingslist,interval){
+        var intstart
+        var intend
+        [intstart, intend] = interval.split("/")
+        if(thingslist){
+            thingslist.map(function(thisthing){
+                var thingstart;
+                var thingend;
+                thisthing["Datastreams"].forEach(function(ds){
+                    if(ds["phenomenonTime"]){
+                        var start;
+                        var end;
+                        [start, end] = ds["phenomenonTime"].split("/")
+
+                        if(!thingstart){
+                            thingstart = start
+                        } else if(moment(start) < moment(thingstart)){
+                            thingstart = start
+                        }
+
+                        if(!thingend){
+                            thingend = end
+                        } else if(moment(end) > moment(thingend)){
+                            thingend = end
+                        }
+                    }
+                });
+                if((moment(intstart) > moment(thingend)) | (moment(thingstart) > moment(intend))){
+                    $scope.thingtimes[thisthing["@iot.id"]] = false
+                } else {
+                    $scope.thingtimes[thisthing["@iot.id"]] = true
+                }
+            })
+        }
+    }
+
+
     /* //this has the problem that the query language allows more complex nesting with ";" between $parameters and deeper nesting with e.g. ()...;$expand=...($select=...))
     //the code here takes care of the form "test(buu,baaa,boo),shubada(shwami,shaa),..."
     $scope.keyIsExpandSelected = function(key, def=true){
@@ -187,6 +230,11 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         //minimally subexpand stuff in Datastream
         if(trueparamsexpand.includes("Datastreams")){
             trueparamsexpand[trueparamsexpand.indexOf("Datastreams")] = "Datastreams($expand=Sensor,ObservedProperty)"
+        }
+
+        //minimally subexpand stuff in HistLocs
+        if(trueparamsexpand.includes("HistoricalLocations")){
+            trueparamsexpand[trueparamsexpand.indexOf("HistoricalLocations")] = "HistoricalLocations($expand=Locations)"
         }
 
         let paramUpdate = {}
@@ -223,6 +271,9 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
             $scope.dataIsLoaded[$scope.category] = true
             
             $scope.dataList = response.data.value;
+
+            thingtimesready = true
+            $scope.checkThingsTimes($scope.dataList,$scope.timeframe.fromISO + "/" + $scope.timeframe.toISO)
 
             //pagination ---
             if($routeParams['$skip']){
@@ -332,10 +383,15 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         $scope.timeframe.fromISO = start.toISOString()
         $scope.timeframe.toISO = end.toISOString()
 
+        if(thingtimesready){
+            $scope.checkThingsTimes($scope.dataList,$scope.timeframe.fromISO + "/" + $scope.timeframe.toISO)
+        }
+
+        /*
         //for displaying the query
         $scope.selectedTimeframe = "(resultTime ge " + $scope.timeframe.fromISO + " and resultTime le " + $scope.timeframe.toISO + ")"
         $scope.observationsQuery = "?$filter=" + $scope.selectedTimeframe + " and " + "(" + $scope.selectedDatastreamIds.map(id => "Datastream/@iot.id eq '" + id + "'").join(' or ') + ")"
-
+        */
     }
 
     pushDateToQuery(moment().subtract(24, 'hour'),window.moment())

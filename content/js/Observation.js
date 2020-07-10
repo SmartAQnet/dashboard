@@ -510,14 +510,14 @@ Datastreams.prototype.toChart = function(htmlSelector){
 				xAxes: [{
                     type: 'time',
                     time: {
-                      tooltipFormat: 'YYYY-MM-DD hh:mm:ss', 
+                      tooltipFormat: 'YYYY-MM-DD HH:mm:ss', 
                       displayFormats: {
-                        'millisecond': 'YYYY-MM-DD hh:mm:ss',
-                        'second': 'YYYY-MM-DD hh:mm:ss',
-                        'minute': 'YYYY-MM-DD hh:mm:ss',
-                        'hour': 'YYYY-MM-DD hh:mm:ss',
-                        'day': 'YYYY-MM-DD hh:mm:ss',
-                        'week': 'YYYY-MM-DD hh:mm:ss',
+                        'millisecond': 'YYYY-MM-DD HH:mm:ss',
+                        'second': 'YYYY-MM-DD HH:mm:ss',
+                        'minute': 'YYYY-MM-DD HH:mm:ss',
+                        'hour': 'YYYY-MM-DD HH:mm:ss',
+                        'day': 'YYYY-MM-DD HH:mm:ss',
+                        'week': 'YYYY-MM-DD HH:mm:ss',
                         'month': 'YYYY-MM-DD',
                         'quarter': 'YYYY-MM',
                         'year': 'YYYY-MM'
