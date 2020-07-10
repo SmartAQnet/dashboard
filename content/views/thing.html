@@ -310,7 +310,7 @@
                                         <div class="form-group">
                                             <div class="row pb-2 mb-2 border border-secondary border-left-0 border-right-0 border-top-0">
                                                 <div class="col">
-                                                    <input id="histlocdisplay" type="checkbox" class="form-check-input" ng-model="locationtracedisplay['HistoricalLocations']" ng-click="toggleSource('HistoricalLocations')">
+                                                    <input id="histlocdisplay" type="checkbox" class="form-check-input" ng-model="locationtracedisplay['HistoricalLocations']" ng-click="onToggleSource('HistoricalLocations')">
                                                     <label for="histlocdisplay" class="form-check-label">Historical Locations</label>
                                                 </div>
                                                 <div class="col">
@@ -318,7 +318,12 @@
                                                     <input ng-model="FoItop" type="number" min="1" max="999999" />
                                                 </div>
                                                 <div class="col-6 col-md-5 col-xl-4">
+                                                    Time Frame
                                                     <input ng-model="selectFoIrange" id="FoIcalendar" type="text" placeholder="pick a time frame..." value="" autocomplete="off" class="px-2 mr-4"/>
+                                                </div>
+                                                <div class="col">
+                                                    Accumulation Threshold [m]
+                                                    <input ng-model="accumulationThreshold" type="number" min="1" max="999999"/>
                                                 </div>
                                                 <!-- <div class="col-1"> -->
                                                     <!-- <span><button type="button" class="input-group-text badge badge-info infobadge" title="For a large timespan it is recommended that you load the data in chunks. Too large data requests may end in a timeout."><i class="fas fa-question-circle"></i></button></span> -->
@@ -327,25 +332,34 @@
                                             <div ng-repeat="ds in datastreamsList track by ds['@iot.id']">
                                                 <div class="row">
                                                     <div class="col">
-                                                        <input id="{{ds['@iot.id']}}display" type="checkbox" class="form-check-input" ng-model="locationtracedisplay[ds['@iot.id']]" ng-click="toggleSource(ds['@iot.id'])">
+                                                        <input id="{{ds['@iot.id']}}display" type="checkbox" class="form-check-input" ng-model="locationtracedisplay[ds['@iot.id']]" ng-click="onToggleSource(ds['@iot.id'])">
                                                         <label for="{{ds['@iot.id']}}display" class="form-check-label">{{ds["name"]}}</label>
                                                     </div>
                                                     <div class="col-md-3 col-6">
                                                         <button ng-if="!requestIsLoading[ds['@iot.id']]" ng-disabled="!locationtracedisplay[ds['@iot.id']]" class="btn btn-primary" ng-click="loadFoITrace(ds['@iot.id'])">Load Chunk</button>
                                                         <button ng-if="requestIsLoading[ds['@iot.id']]" class="btn btn-primary" disabled>
                                                             <span class="spinner-border spinner-border-sm"></span>
-                                                            Loading..
+                                                            Loading...
                                                         </button>
                                                     </div>
 
                                                 </div>
                                                 <div ng-if="locationtracedisplay[ds['@iot.id']]" class="row">
                                                     <div class="col" style="margin-top: -5px; margin-bottom: 20px;">
-                                                        * Datapoints Loaded/Total: {{FoIdisplay.datalist[ds['@iot.id']].length | number}}/{{FoIdisplay.count[ds['@iot.id']] | number}} ({{ FoIdisplay.skip[ds['@iot.id']] / FoIdisplay.count[ds['@iot.id']] * 100 | number:0}}%)
+                                                        * Datapoints Loaded/Total: {{FoIdisplay.currentcount[ds['@iot.id']] | number}}/{{FoIdisplay.count[ds['@iot.id']] | number}} ({{ FoIdisplay.currentcount[ds['@iot.id']] / FoIdisplay.count[ds['@iot.id']] * 100 | number:0}}%)
                                                     </div>
                                                     <div class="col-md-4 col-6">
                                                         <button ng-disabled="!locationtracedisplay[ds['@iot.id']]" class="btn btn-primary" ng-click="accumulateCoordinates(ds['@iot.id'])">Accumulate Data</button>
                                                     </div>
+                                                    <div class="col-1">
+                                                        <button type="button" class="input-group-text badge badge-info infobadge" title="The Accumulator will consider points equal that are within the specified horizontal distance threshold (in meters. Altitude will be ignored!) and remove subsequent duplicates."><i class="fas fa-question-circle"></i></button>
+                                                    </div>
+                                                </div>
+                                                <div ng-if="locationtracedisplay[ds['@iot.id']]" class="row">
+                                                    <div class="col" style="margin-top: -5px; margin-bottom: 20px;">
+                                                        * Datapoints after Accumulation: {{FoIdisplay.datalist[ds['@iot.id']].length | number}}
+                                                    </div>
+                                                    <div class="col-md-4 col-6"></div>
                                                     <div class="col-1"></div>
                                                 </div>
                                             </div>

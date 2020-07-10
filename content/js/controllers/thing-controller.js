@@ -282,12 +282,46 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
   pushTimestamp(moment())
 
 
+  /**
+   * Next is the block that deals with the GPS Graphs under the "Historical Location" card of the thing
+   */
+
+
+  //initiate variables 
 
   $scope.locationtracedisplay = {"Latitude": true, "Longitude": true, "Altitude": true, "HistoricalLocations": true}
   var locationData = {"HistoricalLocations": {"Longitude": {}, "Latitude": {}, "Altitude": {}}}
   $scope.requestIsLoading={}
 
-  //basic intiation stuff
+  $scope.FoItop=1000
+  $scope.FoIstart = ''
+  $scope.FoIend = ''
+
+  $scope.FoIdisplay = {}
+  $scope.FoIdisplay.datalist = {}
+  $scope.FoIdisplay.count = {}
+  $scope.FoIdisplay.skip = {}
+  $scope.FoIdisplay.currentcount = {}
+  $scope.FoIdisplay.nextLink = {}
+
+  $scope.accumulationThreshold = 500 //in meters. change functions so that a threshold can be used
+
+
+  $scope.refreshTop = function(dsid){
+    if($scope.FoIdisplay.nextLink[dsid].includes("$top")){
+      let firsthalf = $scope.FoIdisplay.nextLink[dsid].split("$top=")[0]
+      let remainder = $scope.FoIdisplay.nextLink[dsid].split("$top=")[1].split("&$").slice(1).join("&$")
+
+      $scope.FoIdisplay.nextLink[dsid] = firsthalf + "$top=" + $scope.FoItop + "&$" + remainder
+    } else {
+      $scope.FoIdisplay.nextLink[dsid] = $scope.FoIdisplay.nextLink[dsid] + "&" + "$top=" + $scope.FoItop
+    }
+    console.log("Top has been updated")
+    console.log($scope.FoIdisplay.nextLink[dsid])
+
+  }
+
+  //intiate datastream specific variables
   $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")/Datastreams").then(function(response){
 
     $scope.datastreamsList = response.data.value;
@@ -295,6 +329,10 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       
       var dsid = ds["@iot.id"]
 
+      $scope.FoIdisplay.nextLink[dsid] = getUrl() + "/v1.0/Datastreams('" + dsid + "')/Observations?$orderby=resultTime asc&$expand=FeatureOfInterest($select=feature)&$select=resultTime,FeatureOfInterest&$top=" + $scope.FoItop + "&$skip=0"
+      $scope.FoIdisplay.currentcount[dsid] = 0
+      $scope.FoIdisplay.datalist[dsid]=[]
+      
       locationData[dsid]={}
 
       $scope.requestIsLoading[dsid] = false
@@ -310,7 +348,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
           coordinateType: name,
           sourceType: dsid,
           show: false,
-          steppedLine: "after", 
+          steppedLine: "before", 
           data: [],
           borderColor: "rgba(" + Math.floor(Math.random()*255) + "," + Math.floor(Math.random()*255) + "," + Math.floor(Math.random()*255) + ",1)",
           fill: false, 
@@ -321,7 +359,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
   });
 
 
-
+  //function that initiates the graph with Historical Location Data
   $scope.loadLocationTrace = function(){
 
     // get information and construct the graph
@@ -335,7 +373,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         coordinateType: "Longitude",
         sourceType: "HistoricalLocations",
         show: true, 
-        steppedLine: "after", 
+        steppedLine: "before", 
         data: res.map(function(el){
           return ({x: el["time"], y: el.Locations[0]["location"]["coordinates"][0]})
         }),
@@ -348,7 +386,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         coordinateType: "Latitude",
         sourceType: "HistoricalLocations",
         show: true, 
-        steppedLine: "after", 
+        steppedLine: "before", 
         data: res.map(function(el){
           return ({x: el["time"], y: el.Locations[0]["location"]["coordinates"][1]})
         }),
@@ -361,7 +399,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         coordinateType: "Altitude",
         sourceType: "HistoricalLocations",
         show: true, 
-        steppedLine: "after", 
+        steppedLine: "before", 
         data: res.filter(el => el.Locations[0]["location"]["coordinates"][2]).map(function(el){
             return {x: el["time"], y: el.Locations[0]["location"]["coordinates"][2]}
           }),
@@ -369,7 +407,9 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
         fill: false, 
       }
 
-      var ctx = document.getElementById('LocationGraph').getContext('2d');
+      var canvas = document.getElementById('LocationGraph')
+      var ctx = canvas.getContext('2d');
+
       locationChart = new Chart(ctx, {
           type: 'line',
           data: {
@@ -378,11 +418,11 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
           }, 
           options: {
             tooltips: {
-              mode: 'index',
+              mode: 'x',
               intersect: false
               },
               hover: {
-                  mode: 'index',
+                  mode: 'x',
                   intersect: false
               },
               responsive: true,
@@ -419,6 +459,42 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
               }
           }
       });
+
+      canvas.onclick = function(evt) {
+        var activePoints = locationChart.getElementsAtXAxis(evt);
+        if(activePoints[0]){
+          //console.log(activePoints[0])
+            var idx = activePoints[0]['_index'];
+            var res = {}
+
+            var sets = activePoints[0]['_chart'].config.data.datasets
+
+            sets.map(function(el){
+              res[el.sourceType] = {}
+            })
+
+            sets.forEach(function(dataset){
+              if(dataset.data[idx]){
+                res[dataset.sourceType][dataset.coordinateType]=dataset.data[idx]["y"]
+                res[dataset.sourceType]["Timestamp"]=dataset.data[idx]["x"] //overwrites but is ok since its the same timestamp for lat lon alt
+              }
+            })
+  
+            console.log("------------")
+            Object.keys(res).forEach(function(st){
+              console.log(st)
+              console.log(res[st])
+              if(res[st]["Latitude"] && res[st]["Longitude"]){
+                console.log("Check on googlemaps:")
+                console.log("http://www.google.com/maps/place/" + res[st]["Latitude"] + "," + res[st]["Longitude"])
+              }
+              console.log("------------")
+            })
+
+
+        }
+      }
+
     });
   };
 
@@ -435,22 +511,13 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     $scope.updateChart()
   };
 
-  $scope.getdscount = function(dsid){
-    if(!$scope.FoIdisplay.count[dsid]){
+  $scope.onToggleSource = function(dsid){
+
+    //load total count only when the datastream is checked the first time
+    if(!$scope.FoIdisplay.count[dsid] && dsid!="HistoricalLocations"){
       $http.get(getUrl() + "/v1.0/Datastreams('" + dsid + "')/Observations?$top=1&$count=True").then(function(response){
         $scope.FoIdisplay.count[dsid] = parseInt(response.data["@iot.count"])
       });
-    };
-  };
-
-  $scope.toggleSource = function(dsid){
-
-    if(!$scope.FoIdisplay.nextLink[dsid]){
-      $scope.FoIdisplay.nextLink[dsid] = getUrl() + "/v1.0/Datastreams('" + dsid + "')/Observations?$orderby=resultTime asc&$expand=FeatureOfInterest($select=feature)&$select=resultTime,FeatureOfInterest&$top=" + $scope.FoItop + "&$skip=0"
-    }
-    
-    if(!$scope.FoIdisplay.count[dsid]){
-      $scope.getdscount(dsid)
     }
 
     Object.keys(locationData[dsid]).forEach(function(coord){
@@ -477,26 +544,33 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
 
 
-  $scope.FoItop=1000
-  $scope.FoIstart = ''
 
-  $scope.FoIdisplay = {}
-  $scope.FoIdisplay.querycount = {}
-  $scope.FoIdisplay.datalist = {}
-  $scope.FoIdisplay.count = {}
-  $scope.FoIdisplay.skip = {}
-  $scope.FoIdisplay.nextLink = {}
-
-
-  $scope.accumulationThreshold = 500 //in meters. change functions so that a threshold can be used
 
   //function that compares the two-dimensional distance between two lat-lon tuples, returns true when it concludes its the same (within errors) and false when its different points
   var geocompare = function(ar1,ar2){
-    return (ar1[0]==ar2[0] && ar1[1]==ar2[1])
+    let lon1 = ar1[0]
+    let lon2 = ar2[0]
+    let lat1 = ar1[1]
+    let lat2 = ar2[1]
+
+    let londiff = Math.abs(lon1-lon2) * 111320 * Math.cos(lat1) //assuming lat1 and lat2 are close enough
+    let latdiff = Math.abs(lat1-lat2) * 111320 //gives latitude difference in meters
+
+    let dist = Math.sqrt(londiff*londiff + latdiff*latdiff)
+
+    //let cond = ar1[0]==ar2[0] && ar1[1]==ar2[1]
+    let cond = dist < $scope.accumulationThreshold
+    
+    if(dist>0){
+      console.log(dist)
+    }
+    
+    return (cond)
   };
 
   //takes an array of the form [{..., y: [lon,lat,(alt)]}, ...] and produces a new array without adjacent duplicates in gps values
   var accumulator = function(arr){
+    console.log("Distances > 0 between successive GPS Coordinates in meters")
     let res=arr.reduce(function(acc,el){
       if(!geocompare(el["y"],acc[acc.length-1]["y"])){
         acc.push(el)
@@ -504,6 +578,8 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       return(acc)
     },[arr[0]])
 
+    console.log("Resulting Array of Locations with Timestamps")
+    console.log(res)
     return (res)
   };
   
@@ -538,48 +614,57 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
   //load FeatureOfInterest Data of datastream
   $scope.loadFoITrace = function(dsid){
-
+    console.log("old nextlink")
     console.log($scope.FoIdisplay.nextLink[dsid])
+    //if there is a (next)Link to load
     if($scope.FoIdisplay.nextLink[dsid]){
-
-    
-      if(!$scope.FoIdisplay.datalist[dsid]){
-        $scope.FoIdisplay.datalist[dsid]=[]
-      }
 
       $scope.requestIsLoading[dsid] = true
 
-      $.snackbar({content: "Requesting Data. This may take a bit.", timeout: 5000})
+      $scope.refreshTop(dsid)
+
+      $.snackbar({content: "Requesting Data. This may take a bit.", timeout: $scope.FoItop*10})
 
       // get information and add to dataset
       $http.get($scope.FoIdisplay.nextLink[dsid]).then(function(response){
+        if(response.data.value.length>0){
 
-        $scope.FoIdisplay.skip[dsid] = parseInt($scope.FoIdisplay.nextLink[dsid].split("$skip=")[1].split("&$")[0])
+          console.log("link that has just now been loaded")
+          console.log($scope.FoIdisplay.nextLink[dsid])
+          //retrieve skip parameter and calculate the current amount of loaded datapoints for display
+          $scope.FoIdisplay.skip[dsid] = parseInt($scope.FoIdisplay.nextLink[dsid].split("$skip=")[1].split("&$")[0])
 
-        if(response.data["@iot.nextLink"]){
-          $scope.FoIdisplay.nextLink[dsid] = response.data["@iot.nextLink"]
+          if($scope.FoIdisplay.skip[dsid] + $scope.FoItop > $scope.FoIdisplay.count[dsid]){
+            $scope.FoIdisplay.currentcount[dsid] = $scope.FoIdisplay.count[dsid]
+          } else {
+            $scope.FoIdisplay.currentcount[dsid] = $scope.FoIdisplay.skip[dsid] + $scope.FoItop
+          }
+
+          //get the next nextlink
+          if(response.data["@iot.nextLink"]){
+            $scope.FoIdisplay.nextLink[dsid] = response.data["@iot.nextLink"]
+          } else {
+            $scope.FoIdisplay.nextLink[dsid] = false
+          }
+
+          console.log("the new nextlink for next request. If you change the chunk size, top parameter will update on the loading request.")
+          console.log($scope.FoIdisplay.nextLink[dsid])
+
+          //attach loaded data to the array of datapoints
+          $scope.FoIdisplay.datalist[dsid]=$scope.FoIdisplay.datalist[dsid].concat(response.data.value.map(function(el){
+            return ({x: el["resultTime"], y: el["FeatureOfInterest"]["feature"]["coordinates"]})
+          }));
+
+          //update the graph
+          upLocData(dsid)
+                
+          $scope.requestIsLoading[dsid] = false
+
         } else {
-          $scope.FoIdisplay.nextLink[dsid] = false
-        }
+          $scope.requestIsLoading[dsid] = false
+          $.snackbar({content: "No Datapoints in this iterval.", timeout: 3000})
+        };
 
-        console.log($scope.FoIdisplay.nextLink[dsid])
-
-        $scope.FoIdisplay.datalist[dsid]=$scope.FoIdisplay.datalist[dsid].concat(response.data.value.map(function(el){
-          return ({x: el["resultTime"], y: el["FeatureOfInterest"]["feature"]["coordinates"]})
-        }));
-
-        let oldLength = $scope.FoIdisplay.datalist[dsid].length
-        $scope.FoIdisplay.datalist[dsid]=Array(new Set($scope.FoIdisplay.datalist[dsid]))
-        let diff = oldLength - $scope.FoIdisplay.datalist[dsid]
-
-        if(diff > 0){
-        $.snackbar({content: "Some Datapoints were already existing. Deleted " + diff + " duplicates.", timeout: 3000})
-        }
-
-        upLocData(dsid)
-              
-        $scope.requestIsLoading[dsid] = false
-      
       });
     } else {
       $.snackbar({content: "No more Datapoints for this request.", timeout: 3000})
@@ -602,18 +687,14 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       $scope.FoIstart = picker.startDate.toISOString()
       $scope.FoIend = picker.endDate.toISOString()
 
-      Object.keys($scope.locationtracedisplay).filter(el => el!="Latitude" && el != "Longitude" && el!= "Altitude" && el != "HistoricalLocations" && $scope.locationtracedisplay[el]).forEach(function(dsid){
-        $http.get(getUrl() + "/v1.0/Datastreams('" + dsid + "')/Observations?$orderby=resultTime asc&$expand=FeatureOfInterest($select=feature)&$select=resultTime,FeatureOfInterest&$top=1&$filter=resultTime gt " + $scope.FoIstart + " and resultTime lt " + $scope.FoIend + "&$count=True").then(function(response){
-          $scope.FoIdisplay.querycount[dsid] = parseInt(response.data["@iot.count"])
-        });
+      Object.keys($scope.locationtracedisplay).filter(el => el!="Latitude" && el != "Longitude" && el!= "Altitude" && el != "HistoricalLocations").forEach(function(dsid){
         $scope.FoIdisplay.nextLink[dsid] = getUrl() + "/v1.0/Datastreams('" + dsid + "')/Observations?$orderby=resultTime asc&$expand=FeatureOfInterest($select=feature)&$select=resultTime,FeatureOfInterest&$top=" + $scope.FoItop + "&$filter=resultTime gt " + $scope.FoIstart + " and resultTime lt " + $scope.FoIend + "&$skip=0"
-        
-        if(!$scope.FoIdisplay.datalist[dsid]){
+        if($scope.locationtracedisplay[dsid]){
           $scope.FoIdisplay.datalist[dsid]=[]
-        };
-
-        upLocData(dsid)
+          upLocData(dsid)
+        }
         });
+
       });
 
     $('#FoIcalendar').on('cancel.daterangepicker', function(ev, picker) {
@@ -621,16 +702,15 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       $scope.FoIstart = ''
       $scope.FoIend = ''
 
-      Object.keys($scope.locationtracedisplay).filter(el => el!="Latitude" && el != "Longitude" && el!= "Altitude" && el != "HistoricalLocations" && $scope.locationtracedisplay[el]).forEach(function(dsid){
-        $scope.FoIdisplay.querycount[dsid] = $scope.FoIdisplay.count[dsid]
+      Object.keys($scope.locationtracedisplay).filter(el => el!="Latitude" && el != "Longitude" && el!= "Altitude" && el != "HistoricalLocations").forEach(function(dsid){
         $scope.FoIdisplay.nextLink[dsid] = getUrl() + "/v1.0/Datastreams('" + dsid + "')/Observations?$orderby=resultTime asc&$expand=FeatureOfInterest($select=feature)&$select=resultTime,FeatureOfInterest&$top=" + $scope.FoItop + "&$skip=0"
-        
-        if(!$scope.FoIdisplay.datalist[dsid]){
+        if($scope.locationtracedisplay[dsid]){
           $scope.FoIdisplay.datalist[dsid]=[]
-        };
+          upLocData(dsid)
+        }
 
-        upLocData(dsid)
       });
+
     });
 
   });
