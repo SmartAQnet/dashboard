@@ -1,0 +1,82 @@
+<div class="card" ng-controller="MapCtrl" id="simulationmap" class="fullscreen-map">
+
+        <div id="card-body-map" ng-class="{isLoadingData: isLoadingData}">
+            <div id="map" class="map" height="400px" width="400px"></div>
+            <div ng-class="{nodisplay: isTooltipHidden}" ng-style="featureTooltipStyle" class="tooltip fade bs-tooltip-right show" role="tooltip" id="map-feature-tooltip" x-placement="right">
+                <div class="arrow" style="top: 8px;"></div>
+                <div class="tooltip-inner" ng-bind-html="featureTooltip"></div>
+            </div>
+            <div class="card" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
+                <div class="card-header" id="control-sidepanel-header"> 
+                    <div class="sidepanel-header-name">Controls</div>
+                    <div class="btn-group" role="group" aria-label="Sidebar buttons">
+                        <div style="display: none;" class="external-fullscreen"></div>
+                        <button ng-click="toggleControlSidepanel()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-times" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="sidepanel-subpanel-right" id="Layer-Panel">
+                        <div class="sidepanel-subtitle">Layers:</div>
+                        <div class="switch" ng-class="{disabled: isLoadingData}">
+                            <label>
+                                <input type="checkbox" id="Layer-Pins" name="Layer" ng-model="isLayerPinsActive" ng-change="changedLayerPinsActive()" ng-disabled="isLoadingData">
+                                Pins
+                            </label>
+                        </div>
+                        <div class="switch" ng-class="{disabled: isLoadingData}">
+                            <label>
+                                    <input type="checkbox" id="Layer-ColoredMarkers" name="Layer" ng-model="isColorMarkersActive" ng-change="changedColorMarkersActive()" ng-disabled="isLoadingData">
+                                Colored Markers
+                            </label>
+                        </div>
+                        <div class="switch" style="display: none">
+                            <label>
+                                    <input type="checkbox" id="Layer-Kriging" name="Layer" ng-model="isKrigingActive" ng-change="changedKrigingActive()">
+                                Kriging
+                            </label>
+                        </div>
+                    </div>
+                    <div class="sidepanel-subpanel-right" style="display: none" id="Source-Panel">
+                        <div class="sidepanel-subtitle">Data Source:</div>
+                        <div>
+                            <input type="radio" id="Source-Real" name="Source" ng-model="source" value="realsource" ng-change="sourceChanged()">
+                            <label for="Source-Real">Real Data</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="Source-Simulation" name="Source" ng-model="source" value="simulationsource" ng-change="sourceChanged()">
+                            <label for="Source-Simulation">Simulation Data</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="dropdown obspropertyList-dropdown">
+                        <button class="btn btn-secondary btn-raised dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-class="{disabled: isLoadingData}">
+                            {{obspropertyName}}
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a ng-repeat="property in obspropertyList" ng-click="selectedObsproperty(property)" class="dropdown-item" href="javascript:void(0);">{{property.name}}</a>
+                        </div>
+                    </div>
+                    <div ng-class="{nodisplay: !showOnlyLatest}" class="sidepanel-subpanel-right" id="Refresh-Panel">
+                        <div>
+                            <button class="btn btn-primary btn-raised refreshbutton" id="refreshbutton" ng-click="UpdateMap()" ng-class="{disabled: isLoadingData}" ng-disabled="isLoadingData">Refresh Map</button>
+                            <!-- disable for few sec or until loaded-->
+                        </div>
+                        <div class="checkbox" ng-class="{disabled: isLoadingData}">
+                            <label>
+                                    <input type="checkbox" id="auto-refresh" name="auto-refresh" ng-model="isAutoRefreshActive" ng-change="changedAutoRefreshActive()" ng-disabled="isLoadingData"> Auto-Refresh
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+</div>
+    
+    
+    
+    
+    

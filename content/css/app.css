@@ -358,6 +358,7 @@ html{
 #card-body-map{
   position: relative;
   overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 #observations .card-header{
@@ -5637,4 +5638,33 @@ span.rz-pointer {
 .locationColor{
   background-color: hsla(35, 50, 30, 0.5);
   border-color: hsl(35, 50, 20)
+}
+
+
+.nav-link-custom.active{
+  color: #03a9f4;
+  background-color: #fafafa;
+  border-color: #ccc;
+}
+
+.nav-link-custom-last::before, .nav-link-custom-mid::before{
+  content: ">";
+  color: #03a9f4;
+  position: absolute;
+  left: 0px;
+}
+
+.nav-link-custom-first::after, .nav-link-custom-mid::after{
+  content: ">";
+  color: #03a9f4;
+  position: absolute;
+  right: 0px;
+}
+
+.nav-link-custom-first.active{
+  border-radius: 20px 0px 0px 20px;
+}
+
+.nav-link-custom-last.active{
+  border-radius: 0px 20px 20px 0px;
 }

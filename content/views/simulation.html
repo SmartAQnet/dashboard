@@ -2,13 +2,15 @@
     <div class="card">
         <div class="card-header">
             <ul class="nav nav-tabs">
-                <li class="nav-item" ng-click="taboptions1clicked()"><a class="nav-link active show" data-target="#options1" data-toggle="tab">Options 1</a></li>
-                <li class="nav-item" ng-click="taboptions1clicked()"><a class="nav-link" data-target="#options2" data-toggle="tab">Options 2</a></li>
+                <li class="nav-item" ng-click="taboptions1clicked()"><a id="option1tab" class="nav-link nav-link-custom nav-link-custom-first active show" data-target="#options1" data-toggle="tab">1. Create Scenario</a></li>
+                <li class="nav-item" ng-click="taboptions2clicked()"><a id="option2tab" class="nav-link nav-link-custom nav-link-custom-mid" data-target="#options2" data-toggle="tab">2. Select Details</a></li>
+                <li class="nav-item" ng-click="taboptions3clicked()"><a id="option3tab" class="nav-link nav-link-custom nav-link-custom-mid" data-target="#options3" data-toggle="tab">3. Choose Area</a></li>
+                <li class="nav-item" ng-click="taboptions4clicked()"><a id="option4tab" class="nav-link nav-link-custom nav-link-custom-last" data-target="#options4" data-toggle="tab">4. Complete</a></li>
             </ul>
         </div>
         <div class="card-body">
             <div class="tab-content">
-                <div class="tab-pane active" id="options1">
+                <!-- <div class="tab-pane" id="options0">
                     <div class="entityInfo">
                         <span class="entityInfoHeader">Show Map</span> <br />
                         <pre class="entityInfoInfo">{{showMap}}</pre>
@@ -25,24 +27,181 @@
                         <button type="button" class="btn btn-primary" ng-click="showGraph=!showGraph">Toggle Graph</button>
 
                         <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#collapsibleoption">Collapsible Option</button>
-                         <!-- collapsible option -->
                          <div id="collapsibleoption" class="collapse" style="overflow:auto">
                             some collapsible option
                         </div>
-                        <!-- collapsible end -->
+                    </div> 
+                </div> -->
+
+                <div class="tab-pane fade show active" id="options1">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Create New Scenario</h3>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="form-group">
+                                    <div class="form-row align-items-center">
+                                        <div class="col-6">
+                                            <label class="btn btn-primary btn-raised btn-lg">Upload JSON <input type="file" hidden></label>
+                                        </div>
+                                        <div class="col-6">
+                                            <select ng-model="scenarioname" ng-options="item for item in scenarioTemplates" ng-init="scenarioname=scenarioTemplates[0]" class="custom-select mr-sm-2"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div ng-if="!simulationJSON">
+                                no File uploaded
+                            </div>
+                            <div ng-if="simulationJSON">
+                                File uploaded
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a type="button" class="btn btn-secondary">Cancel</a>
+                            <a type="button" class="btn btn-primary btn-raised" ng-click="">Next</a>
+                        </div>
                     </div>
                 </div>
-                <div class="tab-pane" id="options2">
+
+
+                <div class="tab-pane fade" id="options2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Select Details</h3>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div ng-repeat="(key, value) in sector">
+                                    <div class="form-row align-items-center">
+                                        <div class="col-6">
+                                            <button ng-disabled="!value.check" type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{key}}modal">{{key}}</button>
+                                        </div>
+                                        <div class="col-6">
+                                            <input class="form-check-input" type="checkbox" ng-model="value.check" id="{{key}}checkboxlabel">
+                                            <label class="form-check-label" for="{{key}}checkboxlabel">
+                                            Check
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal fade" id="{{key}}modal" role="dialog">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header p-3 mb-2 bg-primary text-white">
+                                                    <h2 class="modal-title"><i class="fa fa-globe"></i>{{key}}</h2>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div>
+                                                        <h3 class="modal-title">{{key}} scenario</h3>
+                                                        <select ng-model="activeScenario" ng-init="activeScenario=value.scenarios[0]" ng-options="scenario as scenario.name for scenario in value.scenarios" class="custom-select mr-sm-2"></select>
+                                                        <h3 class="modal-title">Pollutant Factors</h3>
+                                                        <div class="row">
+                                                            <div class="col-10">
+                                                                <div ng-repeat="(pollutant, percent) in activeScenario.pollutants">
+                                                                    <form class="form-inline">
+                                                                        <label class="my-3 mr-2" for="{{key}}{{pollutant}}" style="width:50px;">{{pollutant}}</label>
+                                                                        <input class="my-3" id="{{key}}{{pollutant}}" type="number" min="0" max="100" ng-model="percent">
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-2">
+                                                                Lock checkbox
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer border border-primary border-left-0 border-right-0 border-bottom-0">
+                                                    <input type="submit" class="btn btn-default" ng-click="outputSector()" value="Save" />
+                                                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Close" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer">
+                            <input type="button" class="btn btn-secondary" value="Close" />
+                            <input type="submit" class="btn btn-primary btn-raised" ng-click="" value="Next" />
+                        </div>
+                    </div>
                 </div>
+
+
+                <div class="tab-pane fade" id="options3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Set up Computational Domain</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="row py-2">
+                                        <div class="col-md-12">
+                                            <div ng-if="showSimulationMap" class="map-container" ng-include="$window.dashboardSettings.root + 'views/simulationmap.html'">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="mb-4">
+                                        <label for="selectDomainSize">Domain Size [km]</label>
+                                        <select id="selectDomainSize" ng-model="simulationDomain.size" ng-options="item for item in [10,20,30,40,50,60,70,80,90,100]" ng-init="simulationDomain.size=10" class="custom-select mr-sm-2"></select>
+                                    </div>
+                                    <div>
+                                        <label for="selectDomainCenter">Domain Center [lon,lat]</label>
+                                        <div id="selectDomainCenter" ng-if="simulationDomain.center">{{simulationDomain.center}}</div>
+                                        <div id="selectDomainCenter" ng-if="!simulationDomain.center">Please click on the map to define a center</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <input type="button" class="btn btn-secondary" value="Close" />
+                            <input type="submit" class="btn btn-primary btn-raised" ng-click="" value="Next" />
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="tab-pane" id="options4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Check Parameters and Start Simulation</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="entityInfo">
+                                        <span class="entityInfoHeader">Scenario Name</span> <br />
+                                        <pre class="entityInfoInfo">{{scenarioname}}</pre>
+                                        <span class="entityInfoHeader">Domain Center</span> <br />
+                                        <pre class="entityInfoInfo">{{simulationDomain.center}}</pre>
+                                        <span class="entityInfoHeader">Domain Size</span> <br />
+                                        <pre class="entityInfoInfo">{{simulationDomain.size}}</pre>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <input type="button" class="btn btn-secondary" value="Close" />
+                            <input type="Start Scenario Calculations" class="btn btn-primary btn-lg btn-raised" ng-click="" value="Next" />
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>
-    <div class="row py-2">
-        <div class="col-md-12">
-            <div ng-if="showMap" class="map-container" ng-include="$window.dashboardSettings.root + 'views/map.html'">
-            </div>
-        </div>
-    </div>
+
+
 
     <div class="row py-2">
         <div class="col-md-12">
