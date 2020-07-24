@@ -2,7 +2,7 @@ gostApp.controller('GraphCtrl', function ($scope, $http, $routeParams, Page) {
 
 
 
-
+/*
     $scope.$on("mapClickCoordinates", function(evt, data){
         console.log("User clicked on map at: ")
         console.log(data)
@@ -51,5 +51,5 @@ gostApp.controller('GraphCtrl', function ($scope, $http, $routeParams, Page) {
     
     });
 
-
+*/
 });
