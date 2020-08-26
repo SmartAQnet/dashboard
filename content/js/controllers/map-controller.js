@@ -1811,11 +1811,82 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         }
     }
 
+    
 
     olMap.on('click', function (evt) {
         let gpscoords = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326')
         $rootScope.$broadcast("mapClickCoordinates",gpscoords)
     });
+
+
+    //layer for polygon
+    var squareSource = new ol.source.Vector({
+        wrapX: false,
+    });
+    var squareLayer = new ol.layer.Vector({
+        source: squareSource
+    });
+
+
+
+    $scope.$on("drawPolygonRequest", function(evt, data){
+        console.log(data)
+
+        togglelayers(squareLayer, true);
+
+        var square = new ol.geom.Polygon([
+            data
+        ]);
+        var squareFeature = new ol.Feature({
+            geometry: square
+        });
+
+        squareFeature.setStyle(new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: 'blue',
+              width: 10
+            }),
+            fill: new ol.style.Fill({
+              color: 'rgba(0, 128, 255, 0.5)'
+            })
+          })
+        );
+
+        squareSource.addFeature(squareFeature);
+
+
+        var style = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: '#ffcc33',
+              width: 3
+            })
+          })
+      
+      
+      
+      var featurePoly = new ol.Feature(new ol.geom.Polygon([
+        [
+          [-12550727, 2281352],
+          [-11168471, 3244427],
+          [-10867077, 1986886],
+          [-12550727, 2281352]
+        ]
+      ]));
+      
+      
+      
+      var vectorSource12 = new ol.source.Vector({
+        features: [featurePoly]
+      });
+      var vectorLayer1 = new ol.layer.Vector({
+        style: style,
+        source: vectorSource12
+      });
+
+      olMap.addLayer(vectorLayer1)
+
+    });
+    
 
     /************************************ Obsproperty Selection ******************************/
     //                  creates the dropdown menu to select a observed property
