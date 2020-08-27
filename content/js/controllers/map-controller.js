@@ -796,25 +796,28 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
     //on drawend return list of things, store in a main scope parent variable and use in click link to build query and access these things via things page
 
-    olMap.on('click', function (evt) {
-        if(!$scope.drawingactive){
-
-            //console.log(filterparamPolygonextent(getextendPolygon(getcurrentextend())))
-            var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
-                return feature
-            });
-            if (feature) {
-                $scope.isInfoSidePanelClosed = false;
-                $scope.toggleInfoSidepanel;
-                if (feature.getProperties()['result']) {
-                    displayFeatureInfo(feature)
-                } else {
-                    displayreducedFeatureInfo(feature)
+    if($scope.normalMap){
+        olMap.on('click', function (evt) {
+            if(!$scope.drawingactive){
+    
+                //console.log(filterparamPolygonextent(getextendPolygon(getcurrentextend())))
+                var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
+                    return feature
+                });
+                if (feature) {
+                    $scope.isInfoSidePanelClosed = false;
+                    $scope.toggleInfoSidepanel;
+                    if (feature.getProperties()['result']) {
+                        displayFeatureInfo(feature)
+                    } else {
+                        displayreducedFeatureInfo(feature)
+                    };
                 };
             };
-        };
+    
+        });
+    }
 
-    });
     
 
     //processes the drawn polygon. the polygon coordinates are stored in $scope.polygonpointsRearranged and $scope.polygonpointsRearranged4 and emitted
@@ -1811,31 +1814,65 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         }
     }
 
-    
+    /************************************ Simulation stuff ******************************/
+    //                  handles map interaction in from simulation-controller (AUTH simulation)
+    /*****************************************************************************************/
 
+
+    var mapIsSetUp = false //flag that makes sure the map layers are only loaded once to prevent collisions
+
+
+    var squareSource
+    var squareLayer
+
+    $scope.$on('mapScope',function(evt,data){
+        if(data=='simulation' & !mapIsSetUp){
+            $scope.normalMap = false //deactivate features, feature click handlers, etc
+
+            //layer for polygon
+            squareSource = new ol.source.Vector({
+                wrapX: false,
+            });
+            squareLayer = new ol.layer.Vector({
+                source: squareSource
+            });
+
+            togglelayers(ColoredMarkerLayer, false);
+            togglelayers(PinLayer, false);
+            togglelayers(squareLayer, true);
+            mapIsSetUp = true //
+        }
+    })
+
+
+    // sends center of area to simulation-controller. Important functionaliy is that it tells the simulation controller that a click to the map happened so
+    // that the simulation controller is triggered to send the size of the area (from a dropdown menu in the view) back to the map controller (see below)
     olMap.on('click', function (evt) {
         let gpscoords = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326')
         $rootScope.$broadcast("mapClickCoordinates",gpscoords)
     });
 
 
-    //layer for polygon
-    var squareSource = new ol.source.Vector({
-        wrapX: false,
-    });
-    var squareLayer = new ol.layer.Vector({
-        source: squareSource
-    });
 
-
-
+    //listens to broadcast from simulation-controller and receives size of the area (and center)
     $scope.$on("drawPolygonRequest", function(evt, data){
-        console.log(data)
+        //console.log(data) //print center and size
 
-        togglelayers(squareLayer, true);
+        var center = ol.proj.transform(data[0], 'EPSG:4326', 'EPSG:3857')
+        var size = data[1]*1000 //kilometers
+
+
+        var corners = []
+
+        corners[0] = [center[0] - size/2, center[1] - size/2] 
+        corners[1] = [center[0] - size/2, center[1] + size/2] 
+        corners[2] = [center[0] + size/2, center[1] + size/2] 
+        corners[3] = [center[0] + size/2, center[1] - size/2] 
+        
+        squareSource.clear()
 
         var square = new ol.geom.Polygon([
-            data
+            corners
         ]);
         var squareFeature = new ol.Feature({
             geometry: square
@@ -1844,7 +1881,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         squareFeature.setStyle(new ol.style.Style({
             stroke: new ol.style.Stroke({
               color: 'blue',
-              width: 10
+              width: 1
             }),
             fill: new ol.style.Fill({
               color: 'rgba(0, 128, 255, 0.5)'
@@ -1853,37 +1890,6 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         );
 
         squareSource.addFeature(squareFeature);
-
-
-        var style = new ol.style.Style({
-            stroke: new ol.style.Stroke({
-              color: '#ffcc33',
-              width: 3
-            })
-          })
-      
-      
-      
-      var featurePoly = new ol.Feature(new ol.geom.Polygon([
-        [
-          [-12550727, 2281352],
-          [-11168471, 3244427],
-          [-10867077, 1986886],
-          [-12550727, 2281352]
-        ]
-      ]));
-      
-      
-      
-      var vectorSource12 = new ol.source.Vector({
-        features: [featurePoly]
-      });
-      var vectorLayer1 = new ol.layer.Vector({
-        style: style,
-        source: vectorSource12
-      });
-
-      olMap.addLayer(vectorLayer1)
 
     });
     

@@ -1,7 +1,7 @@
 <div class="card" ng-controller="MapCtrl" id="simulationmap" class="fullscreen-map">
 
         <div id="card-body-map" ng-class="{isLoadingData: isLoadingData}">
-            <div id="simulationmap" class="map" height="400px" width="400px"></div>
+            <div id="map" class="map" height="400px" width="400px"></div>
             <div ng-class="{nodisplay: isTooltipHidden}" ng-style="featureTooltipStyle" class="tooltip fade bs-tooltip-right show" role="tooltip" id="map-feature-tooltip" x-placement="right">
                 <div class="arrow" style="top: 8px;"></div>
                 <div class="tooltip-inner" ng-bind-html="featureTooltip"></div>

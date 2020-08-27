@@ -43,10 +43,10 @@
                                 <div class="form-group">
                                     <div class="form-row align-items-center">
                                         <div class="col-6">
-                                            <label class="btn btn-primary btn-raised btn-lg">Upload JSON <input type="file" hidden></label>
+                                            <label class="btn btn-primary btn-raised btn-lg">Upload JSON <input type="file" hidden></label> <!-- needs to parse the file and set it as $scope.chosenTemplate -->
                                         </div>
                                         <div class="col-6">
-                                            <select ng-model="scenarioname" ng-options="item for item in scenarioTemplates" ng-init="scenarioname=scenarioTemplates[0]" class="custom-select mr-sm-2"></select>
+                                            <select ng-model="chosenTemplate" ng-options="key for (key, value) in scenarioTemplates" ng-init="chosenTemplate=scenarioTemplates['Default']" class="custom-select mr-sm-2"></select>
                                         </div>
                                     </div>
                                 </div>
@@ -60,7 +60,7 @@
                         </div>
                         <div class="card-footer">
                             <a type="button" class="btn btn-secondary">Cancel</a>
-                            <a type="button" class="btn btn-primary btn-raised" ng-click="">Next</a>
+                            <a type="button" class="btn btn-primary btn-raised" ng-click="generateSector(chosenTemplate)">Next</a>
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                         </div>
                         <div class="card-body">
                             <form>
-                                <div ng-repeat="(key, value) in sector">
+                                <div ng-repeat="(key, value) in sectors">
                                     <div class="form-row align-items-center">
                                         <div class="col-6">
                                             <button ng-disabled="!value.check" type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{key}}modal">{{key}}</button>
@@ -95,19 +95,26 @@
                                                 <div class="modal-body">
                                                     <div>
                                                         <h3 class="modal-title">{{key}} scenario</h3>
-                                                        <select ng-model="activeScenario" ng-init="activeScenario=value.scenarios[0]" ng-options="scenario as scenario.name for scenario in value.scenarios" class="custom-select mr-sm-2"></select>
+                                                        <select ng-model="sectors[key]['activeScenario']" ng-init="sectors[key]['activeScenario']=value.scenarioNames[0]" ng-options="scenario for scenario in value.scenarioNames" class="custom-select mr-sm-2"></select>
                                                         <h3 class="modal-title">Pollutant Factors</h3>
                                                         <div class="row">
-                                                            <div class="col-10">
-                                                                <div ng-repeat="(pollutant, percent) in activeScenario.pollutants">
+                                                            <div class="col-6 border border-primary border-top-0 border-bottom-0 border-left-0 ">
+                                                                <div ng-repeat="(pollutant, percent) in value.pollutants">
                                                                     <form class="form-inline">
                                                                         <label class="my-3 mr-2" for="{{key}}{{pollutant}}" style="width:50px;">{{pollutant}}</label>
-                                                                        <input class="my-3" id="{{key}}{{pollutant}}" type="number" min="0" max="100" ng-model="percent">
+                                                                        <input class="my-3" id="{{key}}{{pollutant}}" type="number" min="0" max="100" ng-disabled="sectors[key]['locked']" ng-model="sectors[key]['pollutants'][pollutant]"> %
                                                                     </form>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-2">
-                                                                Lock checkbox
+                                                            <div class="col-6">
+                                                                <div style="height: 59px">
+                                                                    <input class="my-3" type="checkbox" id="{{key}}lockcheckbox"  ng-model="sectors[key]['locked']" >
+                                                                    <label class="my-3 pl-3" for="{{key}}lockcheckbox">Lock Pollutants</label>
+                                                                </div>
+                                                                <div style="height: 59px">
+                                                                    <label class="my-3" for="{{key}}locked" style="width:50px;">Value</label>
+                                                                    <input class="my-3" id="{{key}}locked" type="number" min="0" max="100" ng-disabled="!sectors[key]['locked']" ng-model="sectors[key]['lockedValue']" ng-change="adjustLockedPollutants(sectors[key])"> %
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -119,7 +126,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </form>
                         </div>
@@ -148,7 +154,7 @@
                                 </div>
                                 <div class="col-4">
                                     <div class="mb-4">
-                                        <label for="selectDomainSize">Domain Size [km]</label>
+                                        <label for="selectDomainSize">Domain Width/Height [km]</label>
                                         <select id="selectDomainSize" ng-model="simulationDomain.size" ng-options="item for item in [10,20,30,40,50,60,70,80,90,100]" ng-init="simulationDomain.size=10" class="custom-select mr-sm-2"></select>
                                     </div>
                                     <div>
@@ -178,10 +184,10 @@
                                     <div class="entityInfo">
                                         <span class="entityInfoHeader">Scenario Name</span> <br />
                                         <pre class="entityInfoInfo">{{scenarioname}}</pre>
-                                        <span class="entityInfoHeader">Domain Center</span> <br />
+                                        <span class="entityInfoHeader">Domain Center [lon,lat]</span> <br />
                                         <pre class="entityInfoInfo">{{simulationDomain.center}}</pre>
-                                        <span class="entityInfoHeader">Domain Size</span> <br />
-                                        <pre class="entityInfoInfo">{{simulationDomain.size}}</pre>
+                                        <span class="entityInfoHeader">Domain Size [km]</span> <br />
+                                        <pre class="entityInfoInfo">{{simulationDomain.size}} x {{simulationDomain.size}}</pre>
                                     </div>
                                 </div>
                                 <div class="col-6">

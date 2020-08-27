@@ -8,6 +8,7 @@ gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $tim
     $scope.simulationControl = false;
     $scope.showGraph = false
 
+
     var polygonPoints;
 
 
@@ -45,192 +46,164 @@ gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $tim
 
     $scope.taboptions1clicked = function(){
         $scope.showSimulationMap=false
-        console.log($scope.showSimulationMap)
     }
 
     $scope.taboptions2clicked = function(){
         $scope.showSimulationMap=false
-        console.log($scope.showSimulationMap)
     }
 
     $scope.taboptions3clicked = function(){
         $timeout(function() {
             $scope.showSimulationMap=true
-            console.log($scope.showSimulationMap)
         }, 100);
+
+        $timeout(function() {
+            $rootScope.$broadcast('mapScope','simulation')
+        }, 200);
 
     }
 
     $scope.taboptions4clicked = function(){
         $scope.showSimulationMap=false
-        console.log($scope.showSimulationMap)
     }
 
 
 
-    /** Map stuff
-     * 
-     * 
-     * 
-     * 
-     */
-    var augsburg = [10.8986971, 48.3668041];
-    var karlsruhe = [8.4, 49];
-
-    var params = {
-        mapCenter: augsburg,
-        maxValue: 100,
-        krigingModel: 'exponential', //model还可选'gaussian','spherical','exponential'
-        krigingSigma2: 0,
-        krigingAlpha: 100,
-        canvasAlpha: 0.35, //canvas图层透明度
-        colors: ["#006837", "#1a9850", "#66bd63", "#a6d96a", "#d9ef8b", "#ffffbf", "#fee08b", "#fdae61", "#f46d43", "#d73027", "#a50026"]
-    };
-
-
-    function setview(coordinates, mapzoom=13) {
-        let view = new ol.View({
-            zoom: mapzoom,
-            center: ol.proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857'),
-            maxZoom: 20
-        })
-        olMap.setView(view)
-    }
-
-
-    var defaultView = new ol.View({
-        zoom: 13,
-        center: ol.proj.transform(params.mapCenter, 'EPSG:4326', 'EPSG:3857'),
-        maxZoom: 20
-    })
-
-    
-    var map;
-    createMap();
-
-    function createMap(target) {
-        $(".simulationmap").empty();
-
-        //create the map to combine layers and view
-        olMap = new ol.Map({
-
-            //Set of controls included in maps by default. Unless configured otherwise, this returns a collection containing an instance of controls. Add with extend. 
-            controls: new ol.Collection([
-                new ol.control.FullScreen({
-                    className: "ol-fullscreen-custom",
-                    source: 'sensor-map',
-                    label: '\uf31e',
-                    labelActive: '\uf78c'
-                }),
-                new ol.control.Zoom({
-                    className: "ol-zoom-custom ol-custom-button"
-                }),
-                new ol.control.Attribution({
-                    collapsible: false
-                })
-            ]),
-
-            //Set layers
-            layers: [],
-
-            //Set Target, View and Interactions
-            target: 'simulationmap',
-            view: defaultView,
-            interactions: ol.interaction.defaults({
-                altShiftDragRotate: false,
-                pinchRotate: false
-            })
-        });
-    };
-
-
-
-
-    /*****************************************
-     * Map stuff end
-     */
-
-
-
-  var squareFromCenterSize = function(center,size){
-    
-    let r = (size/2)*1000 //in meters
-
-    let lon1 = center[0]
-    let lat1 = center[1]
-
-    let nw = [lon1 - r/(111320 * Math.cos(lat1)),lat1 - r/111320]
-    let ne = [lon1 - r/(111320 * Math.cos(lat1)),lat1 + r/111320]
-    let se = [lon1 + r/(111320 * Math.cos(lat1)),lat1 + r/111320]
-    let sw = [lon1 + r/(111320 * Math.cos(lat1)),lat1 - r/111320]
-
-    return([nw,ne,se,sw])
-  };
 
     $scope.$on("mapClickCoordinates", function(evt, data){
 
         $scope.simulationDomain.center = data
 
-        $rootScope.$broadcast("drawPolygonRequest",squareFromCenterSize($scope.simulationDomain.center,$scope.simulationDomain.size))
+        $rootScope.$broadcast("drawPolygonRequest",[$scope.simulationDomain.center,$scope.simulationDomain.size])
     });
 
 
-    
-
     $scope.simulationDomain = {}
 
-    var sectorDefault = {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100}
-
-    $scope.scenarioTemplates = ["template 1", "template 2", "template 3", "template 4", "template 5"]
-
-    $scope.outputSector = function(){
-        console.log($scope.sector)
-        console.log($scope.activeScenario)
+    $scope.scenarioNamesDict = {
+        "Heating": ["electric","hybrid","whatever"],
+        "Industrial": ["much industrial","semi industrial","not industrial so much"],
+        "Traffic": ["red traffic","yellow traffic","green traffic","purple traffic"],
+        "Option 4": ["parameter 1","parameter 2","parameter 3"],
+        "Option 5": ["parameter a","parameter b","parameter c"]
     }
 
-    $scope.sector = {
+    /**
+     * Enter Templates here
+     */
 
-        "Heating": {
-            "check": true, 
-            "scenarioNames": ["electric","hybrid","whatever"],
-            "pollutants": sectorDefault
-        }, 
 
-        "Industrial": {
-            "check": true, 
-            "scenarioNames": ["much industrial","semi industrial","not industrial so much"],
-            "pollutants": sectorDefault
-        }, 
+    $scope.scenarioTemplates = {
+        
+        "Default": {
 
-        "Traffic": {
-            "check": true, 
-            "scenarioNames": ["red traffic","yellow traffic","green traffic","purple traffic"],
-            "pollutants": sectorDefault
-        }, 
+            "Heating": {
+                "check": true, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "electric"
+            }, 
+    
+            "Industrial": {
+                "check": true, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "much industrial"
+            }, 
+    
+            "Traffic": {
+                "check": true, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "red traffic"
+            }, 
+    
+            "Option 4": {
+                "check": true, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "parameter 1"
+            }, 
+    
+            "Option 5": {
+                "check": true, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "parameter a"
+            }
+    
+        },
+        
+        "template 2": {
 
-        "option 4": {
-            "check": true, 
-            "scenarioNames": ["parameter 1","parameter 2","parameter 3"],
-            "pollutants": sectorDefault
-        }, 
-
-        "option 5": {
-            "check": true, 
-            "scenarioNames": ["parameter 1","parameter 2","parameter 3"],
-            "pollutants": sectorDefault
-        }, 
-
+            "Heating": {
+                "check": true, 
+                "pollutants": {"NO2": 56, "CO": 73, "SO2": 77, "VOC": 67, "PM10": 32, "PM2.5": 12},
+                "activeScenario": "electric"
+            }, 
+    
+            "Industrial": {
+                "check": true, 
+                "pollutants": {"NO2": 74, "CO": 76, "SO2": 7, "VOC": 10, "PM10": 15, "PM2.5": 66},
+                "activeScenario": "semi industrial"
+            }, 
+    
+            "Traffic": {
+                "check": false, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "purple traffic"
+            }, 
+    
+            "Option 4": {
+                "check": false, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "parameter 1"
+            }, 
+    
+            "Option 5": {
+                "check": false, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "parameter a"
+            }
+    
+        },
+        
+        "template 3": {}, 
+        
+        "template 4": {}, 
+        
+        "template 5": {}
+    
     };
+
+    // ---------------------------------------------------- end templates -------------------------------------
+
+
+
+
+    $scope.generateSector = function(template){
+        
+        $scope.sectors = template
+
+        Object.keys(template).forEach(function(key){
+
+            $scope.sectors[key]["scenarioNames"] = $scope.scenarioNamesDict[key]
+            $scope.sectors[key]["locked"] = false
+            $scope.sectors[key]["lockedValue"] = 100
+
+        })
+
+        console.log($scope.sectors)
+    }
+
+
+
+    //function that is called when editing a specific sector in the scenario
+    $scope.outputSector = function(){
+        console.log($scope.sector)
+    }
+
+    //function that applies changes in the collective pollutant input field to all respective pollutant fields
+    $scope.adjustLockedPollutants = function(sec){
+        Object.keys(sec["pollutants"]).forEach(key => sec["pollutants"][key] = sec["lockedValue"])
+    };
+
 
 });
 
-/*
-"Industrial": {
-    "check": true, 
-    "scenarios": [
-        {"name": "much industrial", "pollutants": sectorDefault}, 
-        {"name": "semi industrial", "pollutants": sectorDefault}, 
-        {"name": "not industrial so much", "pollutants": sectorDefault}
-    ],
-}, 
-*/
+
