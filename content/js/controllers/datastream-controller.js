@@ -53,11 +53,21 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, $loc
 
     function processDatastreamsStateChange(oldState, newState){
         if(oldState == Datastreams.states["main_loading"] && newState == Datastreams.states["main_loaded"]){
-            var startDate = moment().startOf('hour');
-            var endDate = moment().startOf('hour').add(32, 'hour');
+            var startDate = moment().startOf('hour').subtract(24, 'hour');
+            var endDate = moment().startOf('hour');
             if($scope.observationsList.length > 0){
-                var start = $scope.observationsList[$scope.observationsList.length - 1];
-                var end = $scope.observationsList[0];
+
+                let obs1 = $scope.observationsList[$scope.observationsList.length - 1]
+                let obs2 = $scope.observationsList[0]
+
+                if(moment(obs1["resultTime"]) < moment(obs2["resultTime"])){
+                    var start = obs1
+                    var end = obs2
+                } else {
+                    var start = obs2
+                    var end = obs1
+                }
+
                 startDate = start['resultTime'] ? moment(start['resultTime']) : moment(start['phenomenonTime'].split("/")[0]);
                 endDate = end['resultTime'] ? moment(end['resultTime']) : moment(end['phenomenonTime'].split("/")[0]);
                 setDate(startDate, endDate);
@@ -84,23 +94,24 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, $loc
     var i;
 
     for (i = 0; i < coll.length; i++) {
-    coll[i].addEventListener("click", function() {
-        this.classList.toggle("active");
-        var content = this.nextElementSibling;
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+
             if (content.style.maxHeight){
             content.style.maxHeight = null;
             } else {
             content.style.maxHeight = content.scrollHeight + "px";
-            } 
-    });
-    }/*
-        if (content.style.display === "block") {
-        content.style.display = "none";
-        } else {
-        content.style.display = "block";
-        }
-    });
-    }*/
+            }
+
+
+            if (content.style.display === "block") {
+            content.style.display = "none";
+            } else {
+            content.style.display = "block";
+            }
+        });
+    };
 
 
   
@@ -215,7 +226,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, $loc
 
     $scope.datastreamClicked = function(datastreamId, datastreamName) {
         /*TODO: Prepare datastream for diagram*/
-        console.log("Add " + datastreamId + "to diagram");
+        console.log("Add " + datastreamId + " to diagram");
         if($scope.startDateMoment && $scope.endDateMoment){
             $scope.secondObservationsList = datastreams.addStream(datastreamId, $scope.startDateMoment, $scope.endDateMoment).dataset;
         }
