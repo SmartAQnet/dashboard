@@ -18,78 +18,49 @@
     </div>
 
 
-    <div class="entityInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0">
-        <span class="entityInfoHeader">Total Number of Things: </span> <br />
-        <pre class="entityInfoInfo" ng-if="dataIsLoaded.Things">{{count}}</pre>
-        <pre class="entityInfoInfo" ng-if="!dataIsLoaded.Things">... loading ...</pre>
-        <span class="entityInfoHeader">Select Things Column Display: </span>
-        <form>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.Things['name']">Name
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.Things['description']">Description
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.Things['Locations']">Location
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.Things['HistoricalLocations']">Historical Locations
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.Things['@iot.id']">@iot.id
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.Things['Datastreams']">Datastreams
-            </label>
-            <label class="checkbox-inline">
-                <input type="checkbox" ng-model="selectparams.Things['properties']">Properties
-            </label>
-        </form>
-        <div ng-show="selectparams.Things['Datastreams']">
-            <span class="entityInfoHeader">Select Datastreams Column Display: </span>
-            <form>
-                <label class="checkbox-inline">
-                    <input type="checkbox" ng-model="selectparams.Datastreams['name']">Name
-                </label>
-                <label class="checkbox-inline">
-                    <input type="checkbox" ng-model="selectparams.Datastreams['description']">Description
-                </label>
-                <label class="checkbox-inline">
-                    <input type="checkbox" ng-model="selectparams.Datastreams['license']">License
-                </label>
-                <label class="checkbox-inline">
-                    <input type="checkbox" ng-model="selectparams.Datastreams['phenomenonTime']">Timespan
-                </label>
-                <label class="checkbox-inline">
-                    <input type="checkbox" ng-model="selectparams.Datastreams['@iot.id']">@iot.id
-                </label>
-                <label class="checkbox-inline">
-                    <input type="checkbox" ng-model="selectparams.Datastreams['Sensor']">Sensor
-                </label>
-                <label class="checkbox-inline">
-                    <input type="checkbox" ng-model="selectparams.Datastreams['ObservedProperty']">Observed Property
-                </label>
-                <label class="checkbox-inline">
-                    <input type="checkbox" ng-model="selectparams.Datastreams['unitOfMeasurement']">Unit of Measurement
-                </label>
-                <label class="checkbox-inline">
-                    <input type="checkbox" ng-model="selectparams.Datastreams['properties']">Properties
-                </label>
+    <div class="entityInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
+
+    <div class="card">
+        <div class="card-body">
+            <span class="entityInfoHeader">Total Number of {{category}}: </span> <br />
+            <pre class="entityInfoInfo" ng-if="dataIsLoaded[category]">{{count}}</pre>
+            <pre class="entityInfoInfo" ng-if="!dataIsLoaded[category]">... loading ...</pre>
+            <span class="entityInfoHeader">Select {{category}} Column Display: </span>
+            <div class="form-group">
+
+                <div class="form-check form-check-inline" ng-repeat="(key, val) in selectparams[category]">
+                    <input id="select{{category}}{{key}}" type="checkbox" class="form-check-input" ng-model="selectparams[category][key]">
+                    <label class="form-check-label" for="select{{category}}{{key}}" style="text-transform: capitalize;">{{key}}</label>
+                </div>
+
+            </div>
+            <div ng-repeat="(key, val) in selectparams">
+                <div ng-show="selectparams[category][key]">
+                    <span class="entityInfoHeader">Select <span style="text-transform: capitalize;">{{key}}</span> Column Display: </span>
+                        <div class="form-group">
+
+                            <div class="form-check form-check-inline" ng-repeat="(subkey, subval) in selectparams[key]">
+                                <input id="select{{key}}{{subkey}}" type="checkbox" class="form-check-input" ng-model="selectparams[key][subkey]">
+                                <label class="form-check-label" for="select{{key}}{{subkey}}" style="text-transform: capitalize;">{{subkey}}</label>
+                            </div>
+
+                        </div>
+                </div>
+            </div>
+            <span class="entityInfoHeader">Top parameter: </span>
+            <form class="form-inline">
+                <div class="form-group" style="padding-top: 0">
+                    <input type="text" class="form-control text-center" ng-model="newTop" style="width: 60px">
+                </div>
+                <div class="form-group mb-2" style="padding-top: 0">
+                    <input type="text" readonly class="form-control-plaintext" value="Items per Page">
+                </div>
+                <button type="button" class="btn btn-outline-primary" ng-click="setNewTop()">Refresh Table</button>
             </form>
         </div>
-        <span class="entityInfoHeader">Top parameter: </span>
-        <form class="form-inline">
-            <div class="form-group" style="padding-top: 0">
-                <input type="text" class="form-control text-center" ng-model="newTop" style="width: 60px">
-            </div>
-            <div class="form-group mb-2" style="padding-top: 0">
-                <input type="text" readonly class="form-control-plaintext" value="Items per Page">
-            </div>
-            <button type="button" class="btn btn-outline-primary" ng-click="setNewTop()">Refresh Table</button>
-        </form>
     </div>
 
+    <div class="entityInfo pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
 
     <div class="card">
         <div class="card-header">
@@ -182,12 +153,40 @@
         </thead>
         <tbody>
         <tr ng-repeat="x in dataList | filter: filterparameter | filter: filterproperties as filteredlist"> <!-- | filter: filterproperties"-->
-            <!-- Name Description Location -->
+            <!-- Name Description -->
             <td ng-if="selectparams.Things['name']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["name"]}}</td>
             <td ng-if="selectparams.Things['description']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["description"]}}</td>
-            <td ng-if="selectparams.Things['Locations']" ng-click="linkClicked('thing',x['@iot.id'])">{{x["Locations"][0]["name"]}}</td>
-            <!-- Name Description Location end -->
+            <!-- Name Description end -->
             
+            <!-- Location -->
+            <td ng-if="selectparams.Things['Locations']" ng-click="linkClicked('thing',x['@iot.id'])">
+                <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">
+                    <thead class="st-thead">
+                        <tr class="table-primary">
+                            <th ng-if="selectparams.Locations['name']">Name</th>
+                            <th ng-if="selectparams.Locations['description']">Descriptiony</th>
+                            <th ng-if="selectparams.Locations['properties']">Properties</th>
+                            <th ng-if="selectparams.Locations['encodingType']">Encoding Type</th>
+                            <th ng-if="selectparams.Locations['location']">Coordinates [Lon, Lat, (Alt)]</th>
+                            <th ng-if="selectparams.Locations['@iot.id']">@iot.id</th>
+                            <th ng-if="selectparams.Locations['@iot.selfLink']">@iot.selfLink</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="y in x['Locations']">
+                            <td ng-if="selectparams.Locations['name']">{{y["name"]}}</td>
+                            <td ng-if="selectparams.Locations['description']">{{y["description"]}}</td>
+                            <td ng-if="selectparams.Locations['properties']">{{y["properties"]}}</td>
+                            <td ng-if="selectparams.Locations['encodingType']">{{y["encodingType"]}}</td>
+                            <td ng-if="selectparams.Locations['location']">{{y["location"]["coordinates"]}}</td>
+                            <td ng-if="selectparams.Locations['@iot.id']">{{y["@iot.id"]}}</td>
+                            <td ng-if="selectparams.Locations['@iot.selfLink']" >{{y["@iot.selfLink"]}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+            <!-- Location -->
+
             <!-- Historical Locations -->
             <td ng-if="selectparams.Things['HistoricalLocations']" ng-click="linkClicked('thing',x['@iot.id'])">
                 <table class="table table-bordered table-hover table-primary st-table table-striped table-sm">

@@ -1,4 +1,4 @@
-gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $timeout, Page) {
+gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $timeout, Page, $rootScope) {
 
     $scope.Page.setHeaderIcon(iconThing);
 
@@ -7,6 +7,7 @@ gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $tim
     $scope.noMapControls = true;
     $scope.simulationControl = false;
     $scope.showGraph = false
+
 
     var polygonPoints;
 
@@ -45,93 +46,164 @@ gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $tim
 
     $scope.taboptions1clicked = function(){
         $scope.showSimulationMap=false
-        console.log($scope.showSimulationMap)
     }
 
     $scope.taboptions2clicked = function(){
         $scope.showSimulationMap=false
-        console.log($scope.showSimulationMap)
     }
 
     $scope.taboptions3clicked = function(){
         $timeout(function() {
             $scope.showSimulationMap=true
-            console.log($scope.showSimulationMap)
         }, 100);
+
+        $timeout(function() {
+            $rootScope.$broadcast('mapScope','simulation')
+        }, 200);
 
     }
 
     $scope.taboptions4clicked = function(){
         $scope.showSimulationMap=false
-        console.log($scope.showSimulationMap)
     }
+
 
 
 
     $scope.$on("mapClickCoordinates", function(evt, data){
 
         $scope.simulationDomain.center = data
+
+        $rootScope.$broadcast("drawPolygonRequest",[$scope.simulationDomain.center,$scope.simulationDomain.size])
     });
+
 
     $scope.simulationDomain = {}
 
-    var sectorDefault = {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100}
-
-    $scope.scenarioTemplates = ["template 1", "template 2", "template 3", "template 4", "template 5"]
-
-    $scope.outputSector = function(){
-        console.log($scope.sector)
-        console.log($scope.activeScenario)
+    $scope.scenarioNamesDict = {
+        "Heating": ["electric","hybrid","whatever"],
+        "Industrial": ["much industrial","semi industrial","not industrial so much"],
+        "Traffic": ["red traffic","yellow traffic","green traffic","purple traffic"],
+        "Option 4": ["parameter 1","parameter 2","parameter 3"],
+        "Option 5": ["parameter a","parameter b","parameter c"]
     }
 
-    $scope.sector = {
+    /**
+     * Enter Templates here
+     */
 
-        "Heating": {
-            "check": true, 
-            "scenarios": [
-                {"name": "electric", "pollutants": sectorDefault}, 
-                {"name": "hybrid", "pollutants": sectorDefault}, 
-                {"name": "whatever", "pollutants": sectorDefault}
-            ],
-        }, 
 
-        "Industrial": {
-            "check": true, 
-            "scenarios": [
-                {"name": "much industrial", "pollutants": sectorDefault}, 
-                {"name": "semi industrial", "pollutants": sectorDefault}, 
-                {"name": "not industrial so much", "pollutants": sectorDefault}
-            ],
-        }, 
+    $scope.scenarioTemplates = {
+        
+        "Default": {
 
-        "Traffic": {
-            "check": true, 
-            "scenarios": [
-                {"name": "red traffic", "pollutants": sectorDefault}, 
-                {"name": "yellow traffic", "pollutants": sectorDefault}, 
-                {"name": "green traffic", "pollutants": sectorDefault}, 
-                {"name": "purple traffic", "pollutants": sectorDefault}
-            ],
-        }, 
+            "Heating": {
+                "check": true, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "electric"
+            }, 
+    
+            "Industrial": {
+                "check": true, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "much industrial"
+            }, 
+    
+            "Traffic": {
+                "check": true, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "red traffic"
+            }, 
+    
+            "Option 4": {
+                "check": true, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "parameter 1"
+            }, 
+    
+            "Option 5": {
+                "check": true, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "parameter a"
+            }
+    
+        },
+        
+        "template 2": {
 
-        "option 4": {
-            "check": true, 
-            "scenarios": [
-                {"name": "parameter 1", "pollutants": sectorDefault}, 
-                {"name": "parameter 2", "pollutants": sectorDefault}, 
-                {"name": "parameter 3", "pollutants": sectorDefault}
-            ],
-        }, 
-
-        "option 5": {
-            "check": true, 
-            "scenarios": [
-                {"name": "parameter 1", "pollutants": sectorDefault}, 
-                {"name": "parameter 2", "pollutants": sectorDefault}, 
-                {"name": "parameter 3", "pollutants": sectorDefault}
-            ],
-        }, 
-
+            "Heating": {
+                "check": true, 
+                "pollutants": {"NO2": 56, "CO": 73, "SO2": 77, "VOC": 67, "PM10": 32, "PM2.5": 12},
+                "activeScenario": "electric"
+            }, 
+    
+            "Industrial": {
+                "check": true, 
+                "pollutants": {"NO2": 74, "CO": 76, "SO2": 7, "VOC": 10, "PM10": 15, "PM2.5": 66},
+                "activeScenario": "semi industrial"
+            }, 
+    
+            "Traffic": {
+                "check": false, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "purple traffic"
+            }, 
+    
+            "Option 4": {
+                "check": false, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "parameter 1"
+            }, 
+    
+            "Option 5": {
+                "check": false, 
+                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
+                "activeScenario": "parameter a"
+            }
+    
+        },
+        
+        "template 3": {}, 
+        
+        "template 4": {}, 
+        
+        "template 5": {}
+    
     };
 
+    // ---------------------------------------------------- end templates -------------------------------------
+
+
+
+
+    $scope.generateSector = function(template){
+        
+        $scope.sectors = template
+
+        Object.keys(template).forEach(function(key){
+
+            $scope.sectors[key]["scenarioNames"] = $scope.scenarioNamesDict[key]
+            $scope.sectors[key]["locked"] = false
+            $scope.sectors[key]["lockedValue"] = 100
+
+        })
+
+        console.log($scope.sectors)
+    }
+
+
+
+    //function that is called when editing a specific sector in the scenario
+    $scope.outputSector = function(){
+        console.log($scope.sector)
+    }
+
+    //function that applies changes in the collective pollutant input field to all respective pollutant fields
+    $scope.adjustLockedPollutants = function(sec){
+        Object.keys(sec["pollutants"]).forEach(key => sec["pollutants"][key] = sec["lockedValue"])
+    };
+
+
 });
+
+

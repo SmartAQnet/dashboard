@@ -39,8 +39,8 @@ Stream.prototype.getFromServer = function($http, handleHttpError, callback){
 }
 
 Stream.prototype.getFromServerDateTime = function($http, handleHttpError, start, end, callback){
-    //$http.get(getUrl() + "/function/aggregator" + this.basePath + "/Observations?$filter=phenomenonTime gt " + start.toISOString() + " and phenomenonTime lt "+ end.toISOString() +"&$orderby=phenomenonTime desc&$top=10000" + "&" + this.aggregateParameter).then(function (response) {
-    $http.get(this.baseURL + "/Observations?$filter=phenomenonTime gt " + start.toISOString() + " and phenomenonTime lt "+ end.toISOString() +"&$orderby=phenomenonTime desc&$top=10000").then(function (response) {
+    //$http.get(getUrl() + "/function/aggregator" + this.basePath + "/Observations?$filter=phenomenonTime gt " + start.toISOString() + " and phenomenonTime lt "+ end.toISOString() +"&$orderby=phenomenonTime desc" + "&" + this.aggregateParameter).then(function (response) {
+    $http.get(getUrl() + "/v1.0" + this.basePath + "/Observations?$filter=phenomenonTime gt " + start.toISOString() + " and phenomenonTime lt "+ end.toISOString() +"&$orderby=phenomenonTime desc&$top=10000").then(function (response) {
         this.dataset.length = 0;
         response.data.value.forEach(function (value, key) {
             this.addDataPoint(value, false);
