@@ -14,15 +14,6 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
     var defaulttop = 200;
 
 
-
-    //pure table manipulation, select is NOT transported into the query
-    if($scope.selectparams.Things.name == undefined){$scope.selectparams.Things.name = true};
-    if($scope.selectparams.Things.Locations == undefined){$scope.selectparams.Things.Locations = true};
-    if($scope.selectparams.Things.Datastreams == undefined){$scope.selectparams.Things.Datastreams = true};
-
-    if($scope.selectparams.Datastreams.ObservedProperty == undefined){$scope.selectparams.Datastreams.ObservedProperty = true};
-    if($scope.selectparams.Datastreams.phenomenonTime == undefined){$scope.selectparams.Datastreams.phenomenonTime = true};
-
     //expand stuff per default (expand IS necessarily transported into the query)
     $scope.expandparams.Things.Locations = true;
     $scope.expandparams.Things.HistoricalLocations = true;
@@ -274,6 +265,69 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
             thingtimesready = true
             $scope.checkThingsTimes($scope.dataList,$scope.timeframe.fromISO + "/" + $scope.timeframe.toISO)
+
+
+
+        
+
+            //generate select checkboxes or table manipulation
+            //dictionary that holds the selectable keys for each category
+            var selectKeys = {}
+            $scope.selectparams = {}
+
+            //main category first, here this is 'Things'
+            selectKeys[$scope.category] = $scope.dataList.reduce(function(acc, item){
+                Object.keys(item).forEach(i => acc.push(i))
+                return [...new Set(acc)].filter(item => !item.includes("@iot.navigationLink"))
+            }, []);
+
+
+            //now repeat process for subcategories
+            selectKeys[$scope.category].forEach(function(key){
+                selectKeys[key] = $scope.dataList.map(el => el[key]).reduce(function(acc, item){
+                    if(Array.isArray(item)){
+                        var itemkeys = item.reduce(function(subacc, subitem){
+                            Object.keys(subitem).forEach(i => subacc.push(i))
+                            return [...new Set(subacc)].filter(subitem => !subitem.includes("@iot.navigationLink"))
+                        }, []);
+                        itemkeys.forEach(i => acc.push(i))
+                    } else if(typeof item === 'object' && item !== null){
+                        Object.keys(item).forEach(i => acc.push(i))
+                    }
+
+                    return [...new Set(acc)].filter(item => !item.includes("@iot.navigationLink"))
+                }, []);
+            });
+
+            
+            //populate the scope variable that maps the checkboxes in the view
+            Object.keys(selectKeys).forEach(function(key){
+                if(selectKeys[key].length > 0){
+                    $scope.selectparams[key] = {}
+                    selectKeys[key].forEach(function(subkey){
+
+                            $scope.selectparams[key][subkey] = undefined
+                        
+                    });
+                }
+            });
+            
+            // console.log(selectKeys)
+            // console.log($scope.selectparams)
+
+
+            //manual adjustment
+            $scope.selectparams.properties = {}
+
+            if($scope.selectparams.Things.name == undefined){$scope.selectparams.Things.name = true};
+            if($scope.selectparams.Things.Locations == undefined){$scope.selectparams.Things.Locations = true};
+            if($scope.selectparams.Things.Datastreams == undefined){$scope.selectparams.Things.Datastreams = true};
+
+            if($scope.selectparams.Datastreams.ObservedProperty == undefined){$scope.selectparams.Datastreams.ObservedProperty = true};
+            if($scope.selectparams.Datastreams.phenomenonTime == undefined){$scope.selectparams.Datastreams.phenomenonTime = true};
+
+            if($scope.selectparams.Locations.name == undefined){$scope.selectparams.Locations.name = true};
+
 
             //pagination ---
             if($routeParams['$skip']){

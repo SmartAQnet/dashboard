@@ -55,15 +55,17 @@ gostApp.controller('MainCtrl', function ($scope, $location, $http, Page, $routeP
     $scope.selectedDatastreamIds = []
     $scope.selectedTimeframe = {}  
 
+    /*
     //select for table manipulation. NOT transported into query
     $scope.selectparams = {}
     $scope.selectparams.obs = {}
     $scope.selectparams.Datastreams = {}
     $scope.selectparams.Things = {}
+    */
 
     //expand parameters. ARE transported into the query
     $scope.expandparams = {}
-    $scope.expandparams.obs = {}
+    $scope.expandparams.obs = {} // ?
     $scope.expandparams.Things = {}
 
     
