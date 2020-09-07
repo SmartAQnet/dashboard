@@ -4,6 +4,11 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams, $timeout) 
 	$scope.Page.setHeaderIcon('');
 
 
+	$scope.disclaimer=true;
+	$scope.toggleDisclaimer=function(){
+		$scope.disclaimer=!$scope.disclaimer
+	}
+
 	/*
 	// fastest but least accurate: get number of observations and count with fixed +1 per 0.413 sec up (at ~40 devices)
 	$http.get(getUrl() + "/v1.0/Observations?$top=1&$count=true").then(function (response) {
