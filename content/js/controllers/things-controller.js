@@ -90,72 +90,82 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
 
     $scope.prepareObsPropFilter=function(){
-        $http.get(getUrl() + "/v1.0/ObservedProperties?$select=name&$count=true&$top=1000").then(function(response){
-            var thelist = response.data.value
-            var thecount = response.data["@iot.count"]
 
-            if(response.data["@iot.nextLink"]){
-                alert("Too many entities. Next Link present, filter may not be set up accurately")
-            };
+        if($scope.filterpropertieson["ObservedProperties"]){
+            $scope.filterpropertieson["ObservedProperties"]=false
+        } else {
+
+            $http.get(getUrl() + "/v1.0/ObservedProperties?$select=name&$count=true&$top=1000").then(function(response){
+                var thelist = response.data.value
+                var thecount = response.data["@iot.count"]
+
+                if(response.data["@iot.nextLink"]){
+                    alert("Too many entities. Next Link present, filter may not be set up accurately")
+                };
 
 
-            listvalidproperties = ["name"]
-            $scope.entityfilter.ObservedProperties = listvalidproperties
+                listvalidproperties = ["name"]
+                $scope.entityfilter.ObservedProperties = listvalidproperties
 
-            listvalidproperties.forEach(function(el){
-                $scope.entityfiltervalues.ObservedProperties[el] = thelist.reduce(function(acc,item){acc[item[el]]=false; return acc},{})
+                listvalidproperties.forEach(function(el){
+                    $scope.entityfiltervalues.ObservedProperties[el] = thelist.reduce(function(acc,item){acc[item[el]]=false; return acc},{})
+                });
+
             });
-
-        })
-    }
+        };
+    };
 
     $scope.prepareThingsPropertiesFilter = function(cat){
 
-        let threshold = 0.8
+        if($scope.filterpropertieson[cat]){
+            $scope.filterpropertieson[cat]=false
+        } else {
 
-        $http.get(getUrl() + "/v1.0/" + cat + "?$select=properties&$count=true&$top=1000").then(function(response){
-            var thelist = response.data.value
-            var thecount = response.data["@iot.count"]
+            let threshold = 0.8
 
-            if(response.data["@iot.nextLink"]){
-                alert("Too many entities. Next Link present, filter may not be set up accurately")
-            };
-        
-            //list of all property keys
-            let proplist = flattenDeep(
-                thelist.reduce(function(acc, th){
-                    th.properties ? acc = acc.concat(Object.keys(th.properties)) : acc = acc
-                    return acc
-                },[])
-            );
+            $http.get(getUrl() + "/v1.0/" + cat + "?$select=properties&$count=true&$top=1000").then(function(response){
+                var thelist = response.data.value
+                var thecount = response.data["@iot.count"]
 
-            //json of all property keys and their number of occurrence of the form {key1 : count1, key2 : count2, ...}
-            var propcounts = proplist.reduce(function (acc, item) {
-                acc[item] ? acc[item]++ : acc[item] = 1
-                return acc
-            }, {});
-
-            //list of properties which occur in more than xx% of things (threshold)
-            let listvalidproperties = Object.keys(propcounts).filter(key => propcounts[key]/thecount > threshold);
-
-            $scope.entityfilter[cat] = listvalidproperties
-
-            /**
-             * fills $scope.entityfiltervalues[cat] with a json with boolean values for each valid keys values
-             * e.g. : {key A: {val1 : false, val2 : false, val3 : false}, keyB: {...}, ...}
-             * these boolean values are accessed by checkboxes in the view and then read out
-             * to define the query filter for properties
-             */
+                if(response.data["@iot.nextLink"]){
+                    alert("Too many entities. Next Link present, filter may not be set up accurately")
+                };
             
-            listvalidproperties.forEach(function(el){
-                $scope.entityfiltervalues[cat][el] = thelist.reduce(function(acc,item){
-                    item.properties && item.properties[el] ? acc[item.properties[el]]=false : acc=acc
-                    return acc
-                },{})
-            });
+                //list of all property keys
+                let proplist = flattenDeep(
+                    thelist.reduce(function(acc, th){
+                        th.properties ? acc = acc.concat(Object.keys(th.properties)) : acc = acc
+                        return acc
+                    },[])
+                );
 
-            
-        }); 
+                //json of all property keys and their number of occurrence of the form {key1 : count1, key2 : count2, ...}
+                var propcounts = proplist.reduce(function (acc, item) {
+                    acc[item] ? acc[item]++ : acc[item] = 1
+                    return acc
+                }, {});
+
+                //list of properties which occur in more than xx% of things (threshold)
+                let listvalidproperties = Object.keys(propcounts).filter(key => propcounts[key]/thecount > threshold);
+
+                $scope.entityfilter[cat] = listvalidproperties
+
+                /**
+                 * fills $scope.entityfiltervalues[cat] with a json with boolean values for each valid keys values
+                 * e.g. : {key A: {val1 : false, val2 : false, val3 : false}, keyB: {...}, ...}
+                 * these boolean values are accessed by checkboxes in the view and then read out
+                 * to define the query filter for properties
+                 */
+                
+                listvalidproperties.forEach(function(el){
+                    $scope.entityfiltervalues[cat][el] = thelist.reduce(function(acc,item){
+                        item.properties && item.properties[el] ? acc[item.properties[el]]=false : acc=acc
+                        return acc
+                    },{})
+                });
+
+            }); 
+        };
     };
 
     var thingtimesready;
