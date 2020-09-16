@@ -689,6 +689,16 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
     /* --------------------------------------------------Click Tooltip Detailed Info (Sideboard Bottom)---------------------------------------------------------------------- */
 
+    var goToThing = function(feature){
+        $scope.Page.go("thing/" + feature.getProperties()['@iot.id'])
+    }
+
+    var goToDatastream = function(feature){
+        $http.get(getUrl() + "/v1.0/Observations('" + feature.getProperties()['@iot.id'] + "')?$expand=Datastream($select=@iot.id)&$select=Datastream").then(function (response) {
+            let dsid=response.data['Datastream']['@iot.id']
+            $scope.Page.go("datastream/" + dsid)
+        });
+    }
 
     var displayFeatureInfo = function (feature) {
         var observationId = feature.getProperties()['@iot.id'];
@@ -796,7 +806,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
     //on drawend return list of things, store in a main scope parent variable and use in click link to build query and access these things via things page
 
-    if($scope.normalMap){
+    if(!$scope.noFeatures){
         olMap.on('click', function (evt) {
             if(!$scope.drawingactive){
     
@@ -808,9 +818,11 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
                     $scope.isInfoSidePanelClosed = false;
                     $scope.toggleInfoSidepanel;
                     if (feature.getProperties()['result']) {
-                        displayFeatureInfo(feature)
+                        //displayFeatureInfo(feature)
+                        goToDatastream(feature)
                     } else {
-                        displayreducedFeatureInfo(feature)
+                        //displayreducedFeatureInfo(feature)
+                        goToThing(feature)
                     };
                 };
             };
@@ -1827,7 +1839,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
     $scope.$on('mapScope',function(evt,data){
         if(data=='simulation' & !mapIsSetUp){
-            $scope.normalMap = false //deactivate features, feature click handlers, etc
+            $scope.noFeatures = true //deactivate features, feature click handlers, etc
 
             //layer for polygon
             squareSource = new ol.source.Vector({

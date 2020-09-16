@@ -5169,13 +5169,13 @@ ul.notifications {
 
 /* ****************************   Map Sidepanel  **************************** */
 
-.custom-control {
+/* .custom-control {
   top: 20px;
   right: 20px;
   width: 70px;
   height: 70px;
   background: no-repeat url('http://openlayers.org/en/latest/examples/resources/logo-70x70.png')
-}
+} */
 
 
 
@@ -5667,4 +5667,29 @@ span.rz-pointer {
 
 .nav-link-custom-last.active{
   border-radius: 0px 20px 20px 0px;
+}
+
+
+
+
+.opendisclaimer{
+  position: fixed;
+  top: 33%;
+  border-radius: 0px 10px 10px 0px;
+
+}
+
+.opendisclaimer-enabled{
+  left: -5px;
+  transition: all 1s ease;
+}
+
+.opendisclaimer-disabled{
+  left: -50px;
+  transition: all 1s ease;
+}
+
+
+.custom-control-label {
+  padding-top: 0.25rem;
 }
