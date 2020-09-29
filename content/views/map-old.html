@@ -1,0 +1,256 @@
+<div class="card" ng-controller="MapCtrl" id="sensor-map" class="fullscreen-map">
+        <div ng-if="!noMapControls" id="calendarHost"></div>
+        <div ng-if="!noMapControls" class="card-header"> 
+            <a href="{{filterRecentLink}}" role="button" class="btn btn-primary btn-block btn-lg gradient-border pulse-button">Active Sensors within the last 24 hours: <span class="text-info">{{active_devices}}</span></a>
+        </div>
+        <div ng-if="simulationControl" class="card-header"> 
+            <h5>Simulation</h5>
+        </div>
+
+        <div class="card-body" id="card-body-map" ng-class="{isLoadingData: isLoadingData}">
+            <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}"></div>
+            <div id="mapOverlay" ng-class="{active: isMapOverlayVisible}">
+                <div id="mapOverlayUI">
+                    <div id="mapOverlayLabel">
+                        <div class="alert alert-primary" role="alert">
+                            Please adjust the map to capture the area of interest
+                        </div>
+                    </div>
+                    <div id="mapOverlayButtons">
+                            <button ng-click="cancelHistoricDataSelection()"  class="btn btn-secondary btn-raised"  type="button">Cancel</button>
+                            <button ng-click="confirmHistoricDataSelection()" class="btn btn-primary btn-raised"  type="button">Load data of this area</button>
+                    </div>
+                </div>
+                <div class="map-viewfinder map-viewfinder-lt"></div>
+                <div class="map-viewfinder map-viewfinder-rt"></div>
+                <div class="map-viewfinder map-viewfinder-lb"></div>
+                <div class="map-viewfinder map-viewfinder-rb"></div>
+            </div>
+            <!-- <div id="map-feature-tooltip" ng-style="featureTooltipStyle" ng-class="{nodisplay: isTooltipHidden}">{{featureTooltip}}</div> -->
+            <div ng-class="{nodisplay: isTooltipHidden}" ng-style="featureTooltipStyle" class="tooltip fade bs-tooltip-right show" role="tooltip" id="map-feature-tooltip" x-placement="right">
+                <div class="arrow" style="top: 8px;"></div>
+                <div class="tooltip-inner" ng-bind-html="featureTooltip"></div>
+            </div>
+            <button id="controlPanelButton" ng-click="toggleControlSidepanel(); $event.stopPropagation();" type="button" class="btn btn-primary bmd-btn-fab">
+                <i class="fas fa-layer-group"></i>
+            </button>
+            <button id="legendButton" ng-click="toggleLegendSidepanel();" type="button" class="btn btn-secondary bmd-btn-fab bmd-btn-fab-sm" ng-class="{invisible: isLegendInvisible}">
+                    <i class="fas fa-ruler-vertical"></i>
+                </button>
+            <div class="card" id="ControlSidepanel" ng-class="{opened: isControlSidePanelOpen}">
+                <div class="card-header" id="control-sidepanel-header">
+                    <div class="sidepanel-header-name">Controls</div>
+                    <div class="btn-group" role="group" aria-label="Sidebar buttons">
+                        <div style="display: none;" class="external-fullscreen"></div>
+                        <button ng-click="toggleControlSidepanel()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-times" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="sidepanel-subpanel-right" id="Layer-Panel">
+                        <div class="sidepanel-subtitle">Layers:</div>
+                        <div class="switch" ng-class="{disabled: isLoadingData}">
+                            <label>
+                                <input type="checkbox" id="Layer-Pins" name="Layer" ng-model="isLayerPinsActive" ng-change="changedLayerPinsActive()" ng-disabled="isLoadingData">
+                                Pins
+                            </label>
+                        </div>
+                        <div class="switch" ng-class="{disabled: isLoadingData}">
+                            <label>
+                                    <input type="checkbox" id="Layer-ColoredMarkers" name="Layer" ng-model="isColorMarkersActive" ng-change="changedColorMarkersActive()" ng-disabled="isLoadingData">
+                                Colored Markers
+                            </label>
+                        </div>
+                        <div class="switch" style="display: none">
+                            <label>
+                                    <input type="checkbox" id="Layer-Kriging" name="Layer" ng-model="isKrigingActive" ng-change="changedKrigingActive()">
+                                Kriging
+                            </label>
+                        </div>
+                    </div>
+                    <div class="sidepanel-subpanel-right" style="display: none" id="Source-Panel">
+                        <div class="sidepanel-subtitle">Data Source:</div>
+                        <div>
+                            <input type="radio" id="Source-Real" name="Source" ng-model="source" value="realsource" ng-change="sourceChanged()">
+                            <label for="Source-Real">Real Data</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="Source-Simulation" name="Source" ng-model="source" value="simulationsource" ng-change="sourceChanged()">
+                            <label for="Source-Simulation">Simulation Data</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="dropdown obspropertyList-dropdown">
+                        <button class="btn btn-secondary btn-raised dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-class="{disabled: isLoadingData}">
+                            {{obspropertyName}}
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a ng-repeat="property in obspropertyList" ng-click="selectedObsproperty(property)" class="dropdown-item" href="javascript:void(0);">{{property.name}}</a>
+                        </div>
+                    </div>
+                    <div ng-class="{nodisplay: !showOnlyLatest}" class="sidepanel-subpanel-right" id="Refresh-Panel">
+                        <div>
+                            <button class="btn btn-primary btn-raised refreshbutton" id="refreshbutton" ng-click="UpdateMap()" ng-class="{disabled: isLoadingData}" ng-disabled="isLoadingData">Refresh Map</button>
+                            <!-- disable for few sec or until loaded-->
+                        </div>
+                        <div class="checkbox" ng-class="{disabled: isLoadingData}">
+                            <label>
+                                    <input type="checkbox" id="auto-refresh" name="auto-refresh" ng-model="isAutoRefreshActive" ng-change="changedAutoRefreshActive()" ng-disabled="isLoadingData"> Auto-Refresh
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" id="LegendSidepanel" ng-class="{opened: isLegendSidePanelOpen, invisible: isLegendInvisible}">
+                <div class="card-header" id="legend-sidepanel-header">
+                    <div id="LegendTitle">Legend</div>
+                    <button ng-click="toggleLegendSidepanel()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-times" aria-hidden="true"></i></button>
+                </div>
+                <div class="card-body">
+                    <div class="sidepanel-subpanel-left" id="Legend">
+                        <div class="legend-container-container">
+                            <div class="legend-container">
+                                <div class="legend-scale" ng-style="scaleStyle"></div>
+                            </div>
+                            <div class="legend-text-container">
+                                <!-- <div ng-style="{'bottom': point.relativeLocation+'%'}" class="legend-textbox" ng-repeat="point in relativePoints">{{point.value}}</div> -->
+                                <div ng-if="limitColors.end" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.end}}</div>
+                                <div class="legend-label-container">
+                                    <div class="legend-textbox" ng-repeat="label in scaleLabels">{{label}}</div>
+                                </div>
+                                <div ng-if="limitColors.start" ng-style="{'height': scaleOvershoot+'%'}" class="legend-textbox legend-space">{{scaleLabelsLimits.start}}</div>
+                            </div>
+                        </div>
+                        <div id="scaleCaption">
+                            {{obspropertyName}}<br>[{{obspropertyUnit.replace("degC","°C")}}]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="!noMapControls" class="card-body card-body-slider">
+            <div id="loading-screen" ng-if="isLoadingData">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    <span ng-if="!loadedPercent">LOADING...</span>
+                    <span ng-if="loadedPercent">PREPARING DATA ({{loadedPercent}}/100)</span>
+            </div>
+            <div id="#map-timeline-ui-elements" ng-if="!isLoadingData">
+                <h5 class="mb-4 text-primary">Show Air Quality Data on Map</h5>
+                <div id="slider-container" ng-class="{isAutoPlayActive: isAutoPlayActive}" ng-if="!showOnlyLatest">
+                    <rzslider rz-slider-model="slider.minValue"
+                        rz-slider-high="slider.maxValue"
+                        rz-slider-options="slider.options"></rzslider>
+                        <button class="btn-raised btn text-primary ml-2" ng-click="toggleAutoPlay()">
+                            <i class="fas" ng-class="{'fa-play': !isAutoPlayActive, 'fa-pause': isAutoPlayActive}"></i>
+                        </button>
+                </div>
+                <button id="historicDataButton" class="btn btn-raised dropdown-toggle"  type="button" aria-haspopup="true" aria-expanded="false">
+                    Loaded data: 
+                        <span ng-if="showOnlyLatest">Latest</span>
+                        <span ng-if="!showOnlyLatest">{{startDate}} - {{endDate}}</span>
+                </button>
+                <div ng-if="!showOnlyLatest" class="dropdown obspropertyList-dropdown col">
+                    <button class="btn btn-raised  dropdown-toggle" type="button" id="dropdownDurationButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Displayed data: {{timeRange}}
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownDurationButton">
+                        <a ng-repeat="(label, duration) in selectableDurations" ng-click="selectDuration(duration)" class="dropdown-item" href="javascript:void(0);">{{label}}</a>
+                    </div>
+                </div>
+
+            
+                <h5 class="my-4 text-primary">Geographical Selection</h5>
+                <div class="row">
+                    <div class="col-4" style="padding-left: 10px">
+                        <button ng-if="!drawingactive" type="button" class="btn btn-raised" ng-click="selectGeography('things')">Select Things via Map</button>
+                        <button ng-if="drawingactive" type="button" class="btn btn-raised" ng-click="selectGeographyCancel()">Cancel Selection</button>
+                    </div>
+                    <div class="col-4">
+                        <button ng-if="loadingGeoSelection" type="button" class="alert alert-primary">loading selection...</button>
+                        <button ng-if="(!within_geo_devices) && (!loadingGeoSelection)" type="button" class="alert alert-primary">No Things Selected</button>
+                        <button ng-if="(within_geo_devices==1) && (!loadingGeoSelection)" type="button" class="alert alert-primary">{{within_geo_devices}} Thing within Selection</button>
+                        <button ng-if="(within_geo_devices>1) && (!loadingGeoSelection)" type="button" class="alert alert-primary">{{within_geo_devices}} Things within Selection</button>
+                    </div>
+                    <div class="col-4" style="padding-right: 10px">
+                        <a ng-if="(!within_geo_devices) || loadingGeoSelection" type="button" class="btn btn-raised disabled" aria-disabled="true"> </a>
+                        <a ng-if="within_geo_devices && (!loadingGeoSelection)" type="button" class="btn btn-raised" href="{{filterGeographyLink}}">Go To Selection</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div ng-if="simulationControl" class="card-body card-body-slider">
+            <div id="loading-screen" ng-if="isLoadingData">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    <span ng-if="!loadedPercent">LOADING...</span>
+                    <span ng-if="loadedPercent">PREPARING DATA ({{loadedPercent}}/100)</span>
+            </div>
+            <div id="#map-simulation-ui-elements" ng-if="!isLoadingData">
+                <h5 class="mb-4 text-primary">Simulation Controls</h5>
+                <div class="row">
+                    <div class="col-4" style="padding-left: 10px">
+                        <button ng-if="!drawingactive" type="button" class="btn btn-raised" ng-click="selectGeography()">Select Simulation Area</button>
+                        <button ng-if="drawingactive" type="button" class="btn btn-raised" ng-click="selectGeographyCancel()">Cancel Selection</button>
+                    </div>
+                    <div class="col-4"></div>
+                    <div class="col-4" style="padding-right: 10px">
+                        <a ng-if="(loadingGeoSelection) || (!polygonpointsRearranged)" type="button" class="btn btn-raised disabled" aria-disabled="true">Simulate</a>
+                        <a ng-if="(!loadingGeoSelection) && (polygonpointsRearranged)" type="button" class="btn btn-raised" ng-click="startSimulation()">Simulate</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- <div ng-if="!noMapControls" class="card-footer" id="card-footer-map">
+            <div class="alert alert-primary" role="alert" ng-class="{nodisplay: !isInfoSidePanelClosed}">
+                Please select a feature on the map above to see more information here.
+            </div>
+            <div class="card" id="InfoSidepanel"  ng-class="{nodisplay: isInfoSidePanelClosed}">
+                <div class="card-header" id="info-sidepanel-header">
+                    <div class="sidepanel-header-name">Information</div>
+                    <button ng-click="toggleInfoSidepanel()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-times" aria-hidden="true"></i></button>
+                </div>
+                <div class="card-body" id="InfoPanelBody" ng-class="{closed: isInfoSidePanelClosed}">
+                    <ul class="list-group bmd-list-group-sm">
+                        <div class="list-group-item">
+                            <div class="bmd-list-group-col">
+                                <p class="list-group-item-heading">Detailed Information</p>
+                                <ul class="list-group-item-text">
+                                    <li ng-if="information.observation">{{information.observation}}</li>
+                                    <li ng-if="information.phenomenonTime">Phenomenon Time (UTC): {{information.phenomenonTime}}</li>
+    
+                                    <li ng-if="information.locationname">Location Name: {{information.locationname}}</li>
+                                    <li ng-if="information.coordinates">GPS Coordinates:
+                                        <ul>
+                                            <li>Latitude: {{information.coordinates.lat}}</li>
+                                            <li>Longitude: {{information.coordinates.long}}</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="bmd-list-group-col">
+                                <p class="list-group-item-heading">Links</p>
+                                <ul class="list-group-item-text">
+                                    <li ng-if="information.thingLink">Thing: <a ng-href="{{information.thingLink}}" target="_blank">{{information.thingLinkName}}</a></li>
+                                    <li ng-if="information.datastreamLink">Datastream: <a ng-href="{{information.datastreamLink}}" target="_blank">{{information.datastreamLinkName}}</a></li>
+                                    <li ng-if="information.observedPropertyLink">Observed Property: <a ng-href="{{information.observedPropertyLink}}" target="_blank">{{information.observedPropertyLinkName}}</a></li>
+                                    <li ng-if="information.sensorLink">Sensor: <a ng-href="{{information.sensorLink}}" target="_blank">{{information.sensorLinkName}}</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </div> -->
+
+    </div>
+    
+    
+    
+    
+    
