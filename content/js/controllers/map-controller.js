@@ -152,7 +152,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
 
 
-    // ???
+    //lets other controllers center the map on a location
     $scope.$on("centerOn", function (event, location) {
         setview(location.coordinates);
     });
@@ -203,7 +203,16 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
     //                               create Markers
     /********************************************************************************/
 
-
+    var grayMarkerStyle = new ol.style.Style({
+        image: new ol.style.Icon(({
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            scale: 0.9,
+            //color: [127,127,0,0.1],
+            src: window.dashboardSettings.root + 'assets/img/map_marker_gray.svg'
+        })), zIndex: 1
+    });
 
 
     var defaultMarkerStyle = new ol.style.Style({
@@ -217,22 +226,33 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         })), zIndex: 2
     });
 
-    var selectedMarkerStyle = new ol.style.Style({
+
+    var redMarkerStyle = new ol.style.Style({
         image: new ol.style.Icon(({
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
             scale: 1.2,
+            //color: [127,127,0,0.1],
+            src: window.dashboardSettings.root + 'assets/img/map_marker_red.svg'
+        })), zIndex: 3
+    });
+
+    var selectedMarkerStyle = new ol.style.Style({
+        image: new ol.style.Icon(({
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            scale: 1.4,
             //color: [255,64,64,1],
             src: window.dashboardSettings.root + 'assets/img/map_marker_emph.svg'
-        })), zIndex: 3
+        })), zIndex: 4
     });
 
 
 
-
-    //function that can be used to add gps pins to the map
-    function addPinFeature(thing) {
+    //function that can be used to add gps pins to the map, optional parameter style
+    function addPinFeature(thing,style="default") {
         var defaultGeoJSONProjection = 'EPSG:4326';
         var mapProjection = olMap.getView().getProjection();
         var geom = (new ol.format.GeoJSON()).readGeometry(thing["Locations"][0]["location"], {
@@ -241,13 +261,46 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         });
 
         var feature = new ol.Feature(geom);
-        feature.setStyle(defaultMarkerStyle);
+
+        if(style=="red"){
+            feature.setStyle(redMarkerStyle);
+        } else if(style=="gray"){
+            feature.setStyle(grayMarkerStyle);
+        } else {
+            feature.setStyle(defaultMarkerStyle);
+        }
+        
         feature.setProperties(thing);
         feature.setProperties({"tooltip": thing["name"]});
         feature.setId(thing["@iot.id"])
 
         PinCollection.push(feature);
-    }
+    };
+
+    //changes feature (by featureID == @iot.id) style to a different style
+    var changeFeatureStyle = function(featureID,style){
+        PinLayer.getSource().forEachFeature(function(f){
+            if(f.getId()==featureID){
+                if(style=="red"){
+                    f.setStyle(redMarkerStyle)
+                } else if(style=="gray"){
+                    f.setStyle(grayMarkerStyle);
+                } else if(style=="default"){
+                    f.setStyle(defaultMarkerStyle)
+                } else if(style=="emph"){
+                    f.setStyle(selectedMarkerStyle)
+                }
+            }
+        })
+    };
+
+
+    //angular event listener if a feature on the map should be changed. expects data as e.g. {"@iot.id": "saqn:t:...", "style": "red"}
+    $scope.$on('changeFeatureStyle',function(evt,data){
+        //console.log("changing style of " + data["@iot.id"] + " to " + data["style"])
+        changeFeatureStyle(data["@iot.id"],data["style"])
+    });
+
 
 
     /* --------------------------------------------------Tooltip Info---------------------------------------------------------------------- */
@@ -427,11 +480,26 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
                     };
                 };
             };
-    
         });
-    }
+    };
 
-    
+    function filterparamPolygonextent(polyext){
+        return ("st_within(Locations/location,geography'POLYGON" + polyext + "')")
+    };
+
+
+    function getextendPolygon(ext){
+        let topright = ext[0]
+        let topleft = ext[1]
+        let bottomleft = ext[2]
+        let bottomright = ext[3]
+        return ( "((" + topright[0].toString() + " " + topright[1].toString() + 
+        "," + topleft[0].toString() + " " + topleft[1].toString() +
+        "," + bottomleft[0].toString() + " " + bottomleft[1].toString() +
+        "," + bottomright[0].toString() + " " + bottomright[1].toString() + 
+        "," + topright[0].toString() + " " + topright[1].toString() + "))"
+        );
+    };
 
     //processes the drawn polygon. the polygon coordinates are stored in $scope.polygonpointsRearranged and $scope.polygonpointsRearranged4 and emitted
     $scope.loadingGeoSelection = false
@@ -479,33 +547,46 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
     /* ------------------------------------------------------------------------------------------------------------------------ */
 
-    //sets up a map with all things which have at least one observation
+    //adds all things to the map which have at least one observations, used to initialize the map on the main page
     var initialMap = function(){
         $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$expand=Locations").then(function (response) {
             addThingsToMap(response.data.value);
         });
+        console.log("Features are Ready")
+        $rootScope.$broadcast("featuresAreReady")
     };
 
     $scope.$on('addToMap',function(evt,data){
         addThingsToMap(data)
+        console.log("Features are Ready")
+        $rootScope.$broadcast("featuresAreReady")
     });
 
     var addThingsToMap = function(things){
         things.forEach(function(thing){
-            addPinFeature(thing)
+            if(thing["Locations"].length>0){
+                addPinFeature(thing)
+            }
         }) 
     };
 
 
+    //removes all pins from the map
     var resetMap = function(){
-        //cant get that to work either
-    }
-
-    var removeThingFromMap = function(featureID){
-        //cant get it to work
+        PinLayer.getSource().clear()
     };
 
-    initialMap()
+    //remove thing based on iot id, e.g. removeThingFromMap('saqn:t:8b9b677')
+    var removeThingFromMap = function(featureID){
+        console.log("now")
+        PinLayer.getSource().forEachFeature(function(f){
+            if(f.getId()==featureID){
+                PinLayer.getSource().removeFeature(f)
+            }
+        })
+    };
+
+    //initialMap()
 
 
     /************************************ Simulation stuff ***********************************/
@@ -585,5 +666,8 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
         squareSource.addFeature(squareFeature);
 
     });
+
+    console.log("Map is Ready")
+    $rootScope.$broadcast("mapIsReady")
 
 });

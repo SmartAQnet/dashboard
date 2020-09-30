@@ -1,4 +1,4 @@
-gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams, $timeout) {
+gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams, $timeout, $rootScope) {
 	$scope.id = "saqn:home:";
 	$scope.Page.setTitle('smartAQnet');
 	$scope.Page.setHeaderIcon('');
@@ -8,6 +8,14 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams, $timeout) 
 	$scope.toggleDisclaimer=function(){
 		$scope.disclaimer=!$scope.disclaimer
 	}
+
+	//populate the map with all things
+	$scope.$on("mapIsReady", function(){
+		$http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$expand=Locations").then(function (response) {
+			$rootScope.$broadcast("addToMap",response.data.value)
+		});
+	});
+
 
 	/*
 	// fastest but least accurate: get number of observations and count with fixed +1 per 0.413 sec up (at ~40 devices)

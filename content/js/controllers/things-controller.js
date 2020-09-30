@@ -1,6 +1,20 @@
-gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) {
+gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route, $rootScope) {
     $scope.Page.setTitle('THINGS');
     $scope.Page.setHeaderIcon(iconThing);
+
+    //toggle map displays
+    $scope.noMapControls = true
+    $scope.showMap = true
+    $scope.mapVisible = true;
+
+    var mapIsReady
+
+    $scope.$on("mapIsReady", function(){
+        mapIsReady = true
+    })
+
+    $scope.filteredlist = []
+
 
     $scope.category = "Things" //variable used for in url and table loading and manipulation
     $scope.entitycount = {} //used to hold counts for things, sensors, ...
@@ -170,37 +184,41 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
 
     var thingtimesready;
     $scope.thingtimes = {}
-    $scope.checkThingsTimes = function(thingslist,interval){
+
+    //fills the scope variable $scope.thingtimes for each thing with true/false whether it has any data in the given interval
+    var checkThingsTimes = function(thingslist,interval){
         var intstart
         var intend
         [intstart, intend] = interval.split("/")
-        if(thingslist){
-            thingslist.map(function(thisthing){
+        if(thingslist.length>0){
+            thingslist.forEach(function(thisthing){
                 var thingstart;
                 var thingend;
-                thisthing["Datastreams"].forEach(function(ds){
-                    if(ds["phenomenonTime"]){
-                        var start;
-                        var end;
-                        [start, end] = ds["phenomenonTime"].split("/")
+                if(thisthing["Datastreams"].length>0){
+                    thisthing["Datastreams"].forEach(function(ds){
+                        if(ds["phenomenonTime"]){
+                            var start;
+                            var end;
+                            [start, end] = ds["phenomenonTime"].split("/")
 
-                        if(!thingstart){
-                            thingstart = start
-                        } else if(moment(start) < moment(thingstart)){
-                            thingstart = start
-                        }
+                            if(!thingstart){
+                                thingstart = start
+                            } else if(moment(start) < moment(thingstart)){
+                                thingstart = start
+                            }
 
-                        if(!thingend){
-                            thingend = end
-                        } else if(moment(end) > moment(thingend)){
-                            thingend = end
+                            if(!thingend){
+                                thingend = end
+                            } else if(moment(end) > moment(thingend)){
+                                thingend = end
+                            }
                         }
+                    });
+                    if((moment(intstart) > moment(thingend)) | (moment(thingstart) > moment(intend))){
+                        $scope.thingtimes[thisthing["@iot.id"]] = false
+                    } else {
+                        $scope.thingtimes[thisthing["@iot.id"]] = true
                     }
-                });
-                if((moment(intstart) > moment(thingend)) | (moment(thingstart) > moment(intend))){
-                    $scope.thingtimes[thisthing["@iot.id"]] = false
-                } else {
-                    $scope.thingtimes[thisthing["@iot.id"]] = true
                 }
             })
         }
@@ -274,7 +292,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
             $scope.dataList = response.data.value;
 
             thingtimesready = true
-            $scope.checkThingsTimes($scope.dataList,$scope.timeframe.fromISO + "/" + $scope.timeframe.toISO)
+            checkThingsTimes($scope.dataList,$scope.timeframe.fromISO + "/" + $scope.timeframe.toISO)
 
 
 
@@ -363,9 +381,30 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
             }
             //pagination end ---
 
+            //populate the map with all things
+            //if the map is already ready set up watch service
+            if(mapIsReady){
+                console.log("Requesting to add Things to Map")
+                $rootScope.$broadcast("addToMap",$scope.dataList)
+            };
 
+            //watch for angular filter on the list and gray out all things that are filtered out
+            $scope.$watch('filteredlist.length', function(newVal,oldVal){
+
+                //color everything default
+                $scope.dataList.forEach(function(el){
+                    $rootScope.$broadcast('changeFeatureStyle',{"@iot.id": el["@iot.id"], "style": "default"})
+                });
+
+                //color the difference of the lists gray
+                $scope.dataList.filter(el => !$scope.filteredlist.includes(el)).forEach(function(el){
+                    $rootScope.$broadcast('changeFeatureStyle',{"@iot.id": el["@iot.id"], "style": "gray"})
+                });
+
+            });
 
         });
+
     };
     
     //filter for properties
@@ -448,7 +487,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route) 
         $scope.timeframe.toISO = end.toISOString()
 
         if(thingtimesready){
-            $scope.checkThingsTimes($scope.dataList,$scope.timeframe.fromISO + "/" + $scope.timeframe.toISO)
+            checkThingsTimes($scope.dataList,$scope.timeframe.fromISO + "/" + $scope.timeframe.toISO)
         }
 
         /*
