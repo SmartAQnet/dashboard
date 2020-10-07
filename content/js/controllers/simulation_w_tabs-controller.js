@@ -40,35 +40,30 @@ gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $tim
                 return;
             }
 
-            $scope.simulationJSON = file.name
-            $scope.$apply($scope.simulationJSON)
+            if($scope.fullscenario["correct_filetype"]){
 
-            var fileReader = new FileReader();
+                $scope.simulationJSON = file.name
+                $scope.$apply($scope.simulationJSON)
 
-            fileReader.onload = function (e) {
-                $scope.fullscenario = JSON.parse(e.target.result);
-                $scope.chosenTemplate = $scope.fullscenario["sectors"]
-                $scope.simulationDomain = $scope.fullscenario["geometry"]
-                $scope.scenarioname = $scope.simulationJSON
-            }; 
+                var fileReader = new FileReader();
 
-            fileReader.readAsText(this.files[0]);
+                fileReader.onload = function (e) {
+                    $scope.fullscenario = JSON.parse(e.target.result);
+                    $scope.chosenTemplate = $scope.fullscenario["sectors"]
+                    $scope.simulationDomain = $scope.fullscenario["geometry"]
+                    
+                }; 
+
+                fileReader.readAsText(this.files[0]);
+            } else {
+                alert("Filetype incorrect")
+            }
 
         });
 
     });
 
-    //initiation
-    $scope.scenarioname = "Default"
-    //this is so awkward...
-    $scope.reversengineerkey = function(obj,val){
-        Object.keys(obj).forEach(function(key){
-            if(obj[key]===val){
-                $scope.scenarioname = key
-                console.log($scope.scenarioname)
-            }
-        })
-    }
+
 
     
     //Collapsibles 
@@ -87,25 +82,32 @@ gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $tim
         });
     };
 
-    //tab logic
-    $scope.showTabs = {"1": true, "2": false, "3": false, "4": false}
-    $scope.currentTab = 1
 
-    $scope.goToTab = function(nr){
-        Object.keys($scope.showTabs).forEach(key => $scope.showTabs[key] = false)
-        $scope.showTabs[nr.toString()] = true
-        $scope.currentTab = nr
-        $rootScope.$broadcast('mapScope','simulation')
-    };
-
-
-
-    $scope.adjustZoom = function(km){
-        //set zoom via broadcast to map controller to -0.1 * km + 13
-        let z = -0.1 * km + 13
-        $rootScope.$broadcast("setZoom",z)
-        console.log("requesting Zoom adjustment")
+    $scope.taboptions1clicked = function(){
+        $scope.showSimulationMap=false
     }
+
+    $scope.taboptions2clicked = function(){
+        $scope.showSimulationMap=false
+    }
+
+    $scope.taboptions3clicked = function(){
+        $timeout(function() {
+            $scope.showSimulationMap=true
+        }, 100);
+
+        $timeout(function() {
+            $rootScope.$broadcast('mapScope','simulation')
+        }, 200);
+
+    }
+
+    $scope.taboptions4clicked = function(){
+        $scope.showSimulationMap=false
+    }
+
+
+
 
     $scope.$on("mapClickCoordinates", function(evt, data){
 

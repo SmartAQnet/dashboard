@@ -614,7 +614,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
             togglelayers(PinLayer, false);
             togglelayers(squareLayer, true);
-            mapIsSetUp = true //
+            mapIsSetUp = true //flag so this function gets triggered only once
         }
     })
 
@@ -627,6 +627,12 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
     });
 
 
+    $scope.$on("setZoom", function(evt, data){
+        console.log("request to change zoom obtained")
+        if(olMap.getView().getZoom() > data){
+            olMap.getView().setZoom(data)
+        }
+    });
 
     //listens to broadcast from simulation-controller and receives size of the area (and center)
     $scope.$on("drawPolygonRequest", function(evt, data){
