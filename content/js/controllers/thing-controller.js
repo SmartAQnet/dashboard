@@ -1,4 +1,4 @@
-gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location, $timeout, $window, Page) {
+gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location, $timeout, $rootScope, $window, Page) {
     $scope.id = $routeParams.id;
     $scope.Page.setTitle('THING(' + $scope.id + ')');
     $scope.Page.setHeaderIcon(iconThing);
@@ -14,6 +14,12 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     //remove query params
     $location.search({})
 
+    //populate the map with all things
+    $scope.$on("mapIsReady", function(){
+      $http.get(getUrl() + "/v1.0/Things?$filter=not%20Datastreams/phenomenonTime%20lt%20now()%20sub%20duration%27P1d%27&$expand=Locations").then(function (response) {
+        $rootScope.$broadcast("addToMap",response.data.value)
+      });
+    });
 
     //Load Data
     $http.get(getUrl() + "/v1.0/Things(" + getId($scope.id) + ")?$expand=Locations").then(function (response) {
@@ -27,11 +33,19 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
       $scope.locationsList = response.data["Locations"];
 
       if($scope.locationsList.length!= 0){
-      //display current thing location in another color --> change color of the respective pin
-      //not working atm, cant find the functions which are defined in the map controller... maybe add this function to the map controller where the view is centered and check the current scope
-      //highlightCurrentFeature($scope.locationsList[0]["location"]["coordinates"])         
-      //} else {
-        //alert("no location defined, please use 'move to new location' to define one")
+
+        //waits until the map is ready, then sends request to change the style and center the view on the current thing
+        //for some reason still needs the timeout to apply the new marker style
+        $scope.$on("featuresAreReady",function(evt,data){
+          $timeout(function(){
+            console.log("Requested changing style of " + $scope.id + " to red")
+            $rootScope.$broadcast('changeFeatureStyle',{"@iot.id": $scope.id, "style": "red"})
+            $rootScope.$broadcast('centerOn',$scope.locationsList[0]["location"])
+          },200)
+        });
+
+      } else {
+        console.log("no location defined, please use 'move to new location' to define one")
       }
     });
 
@@ -714,7 +728,6 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     });
 
   });
-
 
 
 

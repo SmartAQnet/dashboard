@@ -158,6 +158,15 @@
 
     <div class="pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
 
+    <div class="row py-2">
+        <div class="col-md-12">
+            <div ng-if="showMap" class="map-container" ng-include="$window.dashboardSettings.root + 'views/map.html'">
+            </div>
+        </div>
+    </div>
+
+    <div class="pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
+
     <!-- Table Start -->
     <div ng-include="$window.dashboardSettings.root + 'views/include_tablenavigation.html'"></div>
     <table class="table table-bordered table-hover st-table table-striped table-sm">
@@ -390,5 +399,4 @@
         </div>
     </div> -->
 
-</div>
 
