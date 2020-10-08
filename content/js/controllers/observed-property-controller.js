@@ -17,7 +17,7 @@ gostApp.controller('ObservedPropertyCtrl', function ($scope, $http, $routeParams
     });
 
 
-    $scope.mapVisible = true;
+    $scope.showMap = true;
 
     $scope.tabPropertiesClicked = function () {
 

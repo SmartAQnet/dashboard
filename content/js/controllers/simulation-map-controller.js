@@ -1,12 +1,19 @@
-gostApp.controller('GraphCtrl', function ($scope, $http, $routeParams, Page) {
+gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, Page, $rootScope) {
 
+    $scope.showMap = true
+    $scope.showMapControls = false
 
+    $scope.showSimulationControls = true;
+    $scope.showSimulationGraph = false;
 
-/*
+    $scope.startSimulation = function(){
+        $rootScope.$broadcast("startSimulation")
+    }
+
     $scope.$on("mapClickCoordinates", function(evt, data){
         console.log("User clicked on map at: ")
         console.log(data)
-        $scope.$parent.showGraph = true
+        $scope.showSimulationGraph = true
         var gpsdata = data
 
         // get information and construct the graph
@@ -51,5 +58,5 @@ gostApp.controller('GraphCtrl', function ($scope, $http, $routeParams, Page) {
     
     });
 
-*/
+
 });

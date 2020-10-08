@@ -11,7 +11,7 @@ gostApp.controller('SensorCtrl', function ($scope, $http, $routeParams, Page) {
     });
 
 
-    $scope.mapVisible = true;
+    $scope.showMap = true;
 
     $scope.tabPropertiesClicked = function () {
 

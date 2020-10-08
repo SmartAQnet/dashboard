@@ -1,13 +1,9 @@
-gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $timeout, Page, $rootScope) {
+gostApp.controller('SimulationConfigCtrl', function ($scope, $http, $routeParams, $timeout, Page, $rootScope) {
 
     $scope.Page.setHeaderIcon(iconThing);
 
-    $scope.mapVisible = true;
     $scope.showMap = true;
-    $scope.noMapControls = true;
-    $scope.simulationControl = false;
-    $scope.showGraph = false
-
+    $scope.showMapControls = false;
 
     var polygonPoints;
 
@@ -252,7 +248,12 @@ gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $tim
         
         el=document.getElementById("downloadbutton")
         el.setAttribute("href", "data:" + data);
-        el.setAttribute("download", "data.json");    
+        if($scope.exportName){
+            el.setAttribute("download", $scope.exportName + ".json");    
+        } else {
+            el.setAttribute("download", "data.json"); 
+        }
+        
     };
 
 

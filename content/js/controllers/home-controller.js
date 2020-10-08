@@ -109,6 +109,6 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams, $timeout, 
 		//interval=0;
 	});
 
-	$scope.mapVisible = true;
+	$scope.showMap = true;
 	
 });

@@ -5147,7 +5147,7 @@ ul.notifications {
   position: relative;
 }
 
-#sensor-map:fullscreen #ControlSidepanel{
+#sensor-map:fullscreen #InfoSidepanel{
   height: 100%;
   top: 0;
 }
@@ -5205,26 +5205,29 @@ ul.notifications {
 
 
   /* ----------------------------- Sidepanels -----------------------------*/
-#ControlSidepanel {
+#InfoSidepanel {
   position: absolute;
   height: calc(100% - 40px); 
   width: 250px; 
   top: 20px;
   right: 0;
   overflow: visible;
-  transform: translateX(100%) translatex(10px);
-  transition: transform 0.2s;
+  transition: right 0.2s;
 }
 
-#ControlSidepanel.opened{
-  transform: none;
+#InfoSidepanel.opened{
+  right: 0;
+} 
+
+#InfoSidepanel.closed{
+  right: -255px;
 }
 
-#LegendSidepanel .card-header, #ControlSidepanel .card-header{
+#LegendSidepanel .card-header, #InfoSidepanel .card-header{
   padding: 10px;
 }
 
-#ControlSidepanel .btn-group .ol-control{
+#InfoSidepanel .btn-group .ol-control{
   position: relative;
   font-family: "Font Awesome 5 Free";
   font-size: 13px;
@@ -5255,25 +5258,25 @@ ul.notifications {
   align-items: center;
 }
 
-#ControlSidepanel #refreshbutton{
+#InfoSidepanel #refreshbutton{
   width: 100%;
   padding: 20px;
   margin: 20px 0;
 }
 
-#ControlSidepanel #dropdownMenuButton{
+#InfoSidepanel #dropdownMenuButton{
   width: 100%;
   text-align: left;
 }
 
-#ControlSidepanel #dropdownMenuButton::after{
+#InfoSidepanel #dropdownMenuButton::after{
   position: absolute;
   top: 50%;
   right: 10px;
   transform: translateY(-50%);
 }
 
-#ControlSidepanel .dropdown-menu{
+#InfoSidepanel .dropdown-menu{
   max-height: 300px;
   overflow-y: auto;
 }
@@ -5364,11 +5367,11 @@ ul.notifications {
   flex-shrink: 0;
 }
 
-#InfoSidepanel .list-group-item-text{
+#InfoSidepanelOld .list-group-item-text{
   max-height: unset;
 }
 
-#InfoSidepanel .bmd-list-group-col>ul{
+#InfoSidepanelOld .bmd-list-group-col>ul{
   list-style-type: none;
   line-height: 1.2rem;
 }
@@ -5647,7 +5650,7 @@ span.rz-pointer {
   border-color: #ccc;
 }
 
-.nav-link-custom-last::before, .nav-link-custom-mid::before{
+/* .nav-link-custom-last::before, .nav-link-custom-mid::before{
   content: ">";
   color: #03a9f4;
   position: absolute;
@@ -5659,7 +5662,7 @@ span.rz-pointer {
   color: #03a9f4;
   position: absolute;
   right: 0px;
-}
+} */
 
 .nav-link-custom-first.active{
   border-radius: 20px 0px 0px 20px;

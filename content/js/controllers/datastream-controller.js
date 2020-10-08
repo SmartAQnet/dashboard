@@ -7,7 +7,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, $loc
     $location.search({})
     
     //toggle map displays
-    $scope.noMapControls = true
+    $scope.showMapControls = false
 
 
 /*
@@ -137,7 +137,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, $loc
         $scope.showMap = true;
     });
 
-    $scope.mapVisible = true;
+    
 
 
     //$scope.tabPropertiesClicked = function () {};

@@ -1,14 +1,14 @@
 <div class="card" ng-controller="MapCtrl" id="sensor-map" class="fullscreen-map">
-        <div ng-if="!noMapControls" id="calendarHost"></div>
-        <div ng-if="!noMapControls" class="card-header"> 
+        <div ng-if="showMapControls" id="calendarHost"></div>
+        <div ng-if="showMapControls" class="card-header"> 
             <a href="{{filterRecentLink}}" role="button" class="btn btn-primary btn-block btn-lg gradient-border pulse-button">Active Sensors within the last 24 hours: <span class="text-info">{{active_devices}}</span></a>
         </div>
-        <div ng-if="simulationControl" class="card-header"> 
+        <div ng-if="showSimulationControls" class="card-header"> 
             <h5>Simulation</h5>
         </div>
 
         <div class="card-body" id="card-body-map" ng-class="{isLoadingData: isLoadingData}">
-            <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}"></div>
+            <div id="map" ng-show="showMap" class="map" height="400px" width="400px" ng-class="{isControlSidePanelOpen: isControlSidePanelOpen}"></div>
             <div id="mapOverlay" ng-class="{active: isMapOverlayVisible}">
                 <div id="mapOverlayUI">
                     <div id="mapOverlayLabel">
@@ -129,7 +129,7 @@
             </div>
         </div>
 
-        <div ng-if="!noMapControls" class="card-body card-body-slider">
+        <div ng-if="showMapControls" class="card-body card-body-slider">
             <div id="loading-screen" ng-if="isLoadingData">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                     <span ng-if="!loadedPercent">LOADING...</span>
@@ -181,7 +181,7 @@
             </div>
         </div>
 
-        <div ng-if="simulationControl" class="card-body card-body-slider">
+        <div ng-if="showSimulationControls" class="card-body card-body-slider">
             <div id="loading-screen" ng-if="isLoadingData">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                     <span ng-if="!loadedPercent">LOADING...</span>
@@ -204,7 +204,7 @@
             </div>
         </div>
 
-        <!-- <div ng-if="!noMapControls" class="card-footer" id="card-footer-map">
+        <!-- <div ng-if="showMapControls" class="card-footer" id="card-footer-map">
             <div class="alert alert-primary" role="alert" ng-class="{nodisplay: !isInfoSidePanelClosed}">
                 Please select a feature on the map above to see more information here.
             </div>
