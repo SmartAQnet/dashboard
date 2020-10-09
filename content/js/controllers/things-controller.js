@@ -4,7 +4,7 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route, 
 
     //toggle map displays
     $scope.showMap = true;
-    $scope.showMapControls = false
+    $scope.showMapControls = true;
 
     var mapIsReady
 

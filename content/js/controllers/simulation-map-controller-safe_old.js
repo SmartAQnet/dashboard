@@ -4,7 +4,11 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     $scope.showMapControls = false
 
     $scope.showSimulationControls = true;
-    $scope.showSimulationGraph = false; //initial. show on click
+    $scope.showSimulationGraph = false;
+
+    $scope.startSimulation = function(){
+        $rootScope.$broadcast("startSimulation")
+    }
 
     $scope.$on("mapClickCoordinates", function(evt, data){
         console.log("User clicked on map at: ")
@@ -105,7 +109,7 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     createMap();
 
     function createMap(target) {
-        $(".map").empty();
+        $(".simulationMap").empty();
 
         //create the map to combine layers and view
         olMap = new ol.Map({
@@ -130,7 +134,7 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
             layers: [],
 
             //Set Target, View and Interactions
-            target: 'map',
+            target: 'simulationMap',
             view: defaultView,
             interactions: ol.interaction.defaults({
                 altShiftDragRotate: false,
@@ -191,12 +195,38 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
             url: 'https://api.mapbox.com/styles/v1/edenhalperin/cih84uopy000a95m41htugsnm/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWRlbmhhbHBlcmluIiwiYSI6IlFRZG0zMWMifQ.QUNKx4tIMjZfwmrE8SE6Bg'
         })
     })
-
-    //default layers at map start
     togglelayers(tileLayer, true);
-    togglelayers(ColoredMarkerLayer, true);
-    togglelayers(canvasLayer, true);
 
+
+
+    //lets other controllers center the map on a location
+    $scope.$on("centerOn", function (event, location) {
+        setview(location.coordinates);
+    });
+    
+    
+
+
+    $scope.isLayerPinsActive = true
+    
+
+    /*
+    if ($scope.location) {
+        setview($scope.location);
+    }*/
+
+
+    //Default Layers at page loading: activate/deactivate layers
+    togglelayers(PinLayer, $scope.isLayerPinsActive);
+
+
+
+    /* ------------------------------------------------------------------------------------------------------------------------ */
+
+
+    $scope.changedLayerPinsActive = function () {
+        togglelayers(PinLayer, $scope.isLayerPinsActive);
+    }
 
 
 
@@ -235,9 +265,11 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     //                               calculate Kriging
     /*********************************************************************************/
 
-
-
-
+    $scope.$on("startSimulation",function(evt,data){
+        togglelayers(ColoredMarkerLayer, true);
+        togglelayers(canvasLayer, true);
+        console.log("Simulation Started")
+    })
 
 
     //creating colors 

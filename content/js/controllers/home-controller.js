@@ -3,6 +3,8 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams, $timeout, 
 	$scope.Page.setTitle('smartAQnet');
 	$scope.Page.setHeaderIcon('');
 
+	$scope.showMap = true;
+	$scope.showMapControls = true;
 
 	$scope.disclaimer=true;
 	$scope.toggleDisclaimer=function(){
@@ -109,6 +111,6 @@ gostApp.controller('HomeCtrl', function ($scope, $http, $routeParams, $timeout, 
 		//interval=0;
 	});
 
-	$scope.showMap = true;
+
 	
 });

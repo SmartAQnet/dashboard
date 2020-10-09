@@ -1,4 +1,4 @@
-<div class="main">
+<div class="main" ng-controller="SimulationMapCtrl">
     <div class="card">
         <div class="card-header">
 
@@ -6,21 +6,34 @@
         <div class="card-body">
             <div class="row py-2">
                 <div class="col-md-12">
-                    <div class="map-container" ng-include="$window.dashboardSettings.root + 'views/map.html'">
+
+
+                    <div class="card" id="sensor-map" class="fullscreen-map">
+                        <div class="card-header"> 
+                            <h5>Simulation</h5>
+                        </div>
+                    
+                        <div class="card-body" id="card-body-map">
+                            <div id="map" class="map" height="400px" width="400px"></div>
+                        </div>
+                    
+                        <div class="card-footer">
+                            <button class="btn btn-primary" ng-click="">Load Simulation Data</button>
+                        </div>
+                    
                     </div>
+
                 </div>
             </div>
             <div class="row py-2">
                 <div class="col-md-12">
-                    <div ng-controller="SimulationMapCtrl">
-                        <div class="card" id="graph-container" ng-show="showSimulationGraph">
-                            <div class="card-header"> 
-                                <div class="card-header">
-                                    <h5>Graph</h5>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="simulationGraph"></canvas>
-                                </div>
+                    <div class="card" id="graph-container" ng-show="showSimulationGraph">
+                        <div class="card-header"> 
+                            <div class="card-header">
+                                <h5>Graph</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="simulationGraph"></canvas>
                             </div>
                         </div>
                     </div>
