@@ -1,4 +1,4 @@
-gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, Page, $rootScope) {
+gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, Page, $rootScope, $timeout) {
 
     $scope.showMap = true
     $scope.showMapControls = false
@@ -193,9 +193,12 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     })
 
     //default layers at map start
-    togglelayers(tileLayer, true);
-    togglelayers(ColoredMarkerLayer, true);
-    togglelayers(canvasLayer, true);
+    $timeout(function(){
+        togglelayers(tileLayer, true);
+        togglelayers(ColoredMarkerLayer, true);
+        //togglelayers(canvasLayer, true);
+    },0)
+
 
 
 
@@ -236,9 +239,125 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     /*********************************************************************************/
 
 
+    //simulation source and layers
+    var SimulationSource = new ol.source.Vector({
+        format: new ol.format.GeoJSON(),
+        features: SimulationCollection = new ol.Collection()
+    })
+
+    var ColoredMarkerLayer = new ol.layer.Vector({
+        source: SimulationSource,
+        renderMode: 'image'
+    });
+    
+    
+    /*
+    var SimulationInvisibleLayer = new ol.layer.Vector({
+        source: SimulationInvisibleSource = new ol.source.Vector({
+            format: new ol.format.GeoJSON(),
+            features: SimulationInvisibleCollection = new ol.Collection()
+        })
+    });
+    */
+
+    //from https://codepen.io/jianxunrao/pen/oadBPq
+    //添加选择和框选控件，按住Ctrl/⌘键，使用鼠标框选采样点
+    let select = new ol.interaction.Select();
+    olMap.addInteraction(select);
+    let dragBox = new ol.interaction.DragBox({
+        condition: ol.events.condition.platformModifierKeyOnly
+    });
+    olMap.addInteraction(dragBox);
+
+
+    //创建10个位置随机、属性值随机的特征点
+    for (let i = 0; i < 10; i++) {
+        let feature = new ol.Feature({
+            geometry: new ol.geom.Point([params.mapCenter[0]+Math.random()*0.01-.005,params.mapCenter[1]+Math.random()*0.01-.005]), value: Math.round(Math.random()*params.maxValue)
+        });
+        feature.setStyle(new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 6,
+                fill: new ol.style.Fill({color: "#00F"})
+            })
+        }));
+        SimulationSource.addFeature(feature);
+    }
+
+    //设置框选事件
+    let selectedFeatures = select.getFeatures();
+    dragBox.on('boxend', ()=>{
+        let extent = dragBox.getGeometry().getExtent();
+        SimulationSource.forEachFeatureIntersectingExtent(extent, (feature)=> {
+            selectedFeatures.push(feature);
+        });
+        drawKriging(extent);
+    });
+    dragBox.on('boxstart', ()=>{
+        selectedFeatures.clear();
+    });
+
+    //绘制kriging插值图
+    let canvasLayer=null;
+    const drawKriging=(extent)=>{
+        let values=[],lngs=[],lats=[];
+        selectedFeatures.forEach(feature=>{
+            values.push(feature.values_.value);
+            lngs.push(feature.values_.geometry.flatCoordinates[0]);
+            lats.push(feature.values_.geometry.flatCoordinates[1]);
+        });
+        if (values.length>3){
+            let variogram=kriging.train(values,lngs,lats,
+                params.krigingModel,params.krigingSigma2,params.krigingAlpha);
+
+            let polygons=[];
+            polygons.push([[extent[0],extent[1]],[extent[0],extent[3]],
+                [extent[2],extent[3]],[extent[2],extent[1]]]);
+            let grid=kriging.grid(polygons,variogram,(extent[2]-extent[0])/200);
+
+            let dragboxExtent=extent;
+            //移除已有图层
+            if (canvasLayer !== null){
+                olMap.removeLayer(canvasLayer);
+            }
+            //创建新图层
+            canvasLayer=new ol.layer.Image({
+                source: new ol.source.ImageCanvas({
+                    canvasFunction:(extent, resolution, pixelRatio, size, projection) =>{
+                        let canvas = document.createElement('canvas');
+                        canvas.width = size[0];
+                        canvas.height = size[1];
+                        canvas.style.display='block';
+                        //设置canvas透明度
+                        canvas.getContext('2d').globalAlpha=params.canvasAlpha;                          
+
+                        //使用分层设色渲染
+                        kriging.plot(canvas,grid,
+                            [extent[0],extent[2]],[extent[1],extent[3]],params.colors);
+
+                        return canvas;
+                    },
+                    projection: 'EPSG:4326'
+                })
+            })
+            canvasLayer.setZIndex(1000);
+            //向map添加图层
+            olMap.addLayer(canvasLayer);
+        }else {
+            alert("有效样点个数不足，无法插值");
+        }
+    }
+    //首次加载，自动渲染一次差值图
+    let extent = [params.mapCenter[0]-.005,params.mapCenter[1]-.005,params.mapCenter[0]+.005,params.mapCenter[1]+.005];
+        SimulationSource.forEachFeatureIntersectingExtent(extent, (feature)=> {
+            selectedFeatures.push(feature);
+        });
+    drawKriging(extent);
 
 
 
+
+    /*
 
     //creating colors 
 
@@ -378,25 +497,7 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
         return (colormarker)
     };
 
-    //simulation source and layers
-    var SimulationSource = new ol.source.Vector({
-        format: new ol.format.GeoJSON(),
-        features: SimulationCollection = new ol.Collection()
-    })
 
-    var ColoredMarkerLayer = new ol.layer.Vector({
-        source: SimulationSource,
-        renderMode: 'image'
-    });
-
-
-
-    var SimulationInvisibleLayer = new ol.layer.Vector({
-        source: SimulationInvisibleSource = new ol.source.Vector({
-            format: new ol.format.GeoJSON(),
-            features: SimulationInvisibleCollection = new ol.Collection()
-        })
-    });
 
 
     //canvas layer for kriging
@@ -478,13 +579,13 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
 
 
 
-
+    */
 
     /******************************** fake Simulation ***********************************/
     //                               create Simulation
     /************************************************************************************/
 
-
+    /*
 
     var idcounter = 1;
     var randomlocation = [];
@@ -537,7 +638,7 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     };
 
 
-
+    */
     /*
     function SimulationSourceUpdate(){
         SimulationSource.clear();
@@ -546,8 +647,8 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
         canvasLayer.getSource().changed();
     };
     */
-
-
+    /*
+    
 
 
     var refreshrate = 10000; //initial refresh rate
@@ -576,11 +677,11 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
             SimulationSource.addFeatures(SimulationInvisibleSource.getFeatures());
         } else {
             updateFeatures();
-        }
+        }*/
         /*if (realradio.checked){ //cant get it to work properly, need to rework this
         	getAllObservations; //function that grabs new features
         	//need function here that removes old features
-        };*/
+        };*/ /*
         ColoredMarkerLayer.getSource().changed();
         canvasLayer.getSource().changed();
 
@@ -615,7 +716,7 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     }
 
 
-
+    */
 
 
 
