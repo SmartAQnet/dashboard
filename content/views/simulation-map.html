@@ -18,7 +18,11 @@
                         </div>
                     
                         <div class="card-footer">
-                            <button class="btn btn-primary" ng-click="">Load Simulation Data</button>
+                            <label class="btn btn-primary">Load Simulation Data <input type="file" id="JSONupload" value="Import" hidden></label> <!-- needs to parse the file and set it as $scope.chosenTemplate -->
+                            <button class="btn btn-primary" ng-click="startSimulation()">Start Simulation</button>
+                            <div class="progress" style="height: 16px">
+                                <div class="progress-bar bg-primary" role="progressbar" ng-style="{width : ( loadingProgress + '%' ) }" aria-valuenow="{{ loadingProgress }}" aria-valuemin="0" aria-valuemax="100">{{ loadingProgress }}%</div>
+                            </div>
                         </div>
                     
                     </div>

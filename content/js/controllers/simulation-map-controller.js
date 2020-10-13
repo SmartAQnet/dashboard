@@ -6,6 +6,9 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     $scope.showSimulationControls = true;
     $scope.showSimulationGraph = false; //initial. show on click
 
+
+    $scope.loadingProgress = 0
+
     $scope.$on("mapClickCoordinates", function(evt, data){
         console.log("User clicked on map at: ")
         console.log(data)
@@ -52,6 +55,33 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
             });
         });
     
+    });
+
+
+    var simulationData
+    var simulationDataHeader
+    //Read JSON File
+    $(document).ready(function () {
+        $('[type=file]').change(function () {
+            if (!("files" in this)) {
+                alert("File reading not supported in this browser");
+            }
+            var file = this.files && this.files[0];
+            if (!file) {
+                return;
+            }
+
+            var fileReader = new FileReader();
+
+            fileReader.onload = function (e) {
+                simulationData = e.target.result.split(/[\r\n]+/)
+                simulationDataHeader = simulationData.shift() //removes first element from simulationData
+            }; 
+
+            fileReader.readAsText(this.files[0]);
+
+        });
+
     });
 
 
@@ -161,14 +191,25 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     /********************************************************************************/
 
     //function that toggles layers on and off
-    function togglelayers(layer, toggle) {
+    function togglelayers(layer, toggle, z=0) {
         if (toggle == true) {
+            layer.setZIndex(z);
             olMap.addLayer(layer)
         }
         if (toggle == false) {
             olMap.removeLayer(layer)
         }
     };
+
+
+    //default layers at map start
+    $timeout(function(){
+        togglelayers(tileLayer, true, 0);
+        togglelayers(ColoredMarkerLayer, true, 2);
+    },0)
+
+
+
 
 
     //pin layer for locations of things
@@ -179,6 +220,19 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     var PinLayer = new ol.layer.Vector({
         source: PinSource
     });
+
+
+    //simulation source and layers
+    var SimulationSource = new ol.source.Vector({
+        format: new ol.format.GeoJSON(),
+        features: SimulationCollection = new ol.Collection()
+    })
+
+    var ColoredMarkerLayer = new ol.layer.Vector({
+        source: SimulationSource,
+        renderMode: 'image'
+    });
+        
 
 
 
@@ -192,12 +246,7 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
         })
     })
 
-    //default layers at map start
-    $timeout(function(){
-        togglelayers(tileLayer, true);
-        togglelayers(ColoredMarkerLayer, true);
-        //togglelayers(canvasLayer, true);
-    },0)
+
 
 
 
@@ -239,17 +288,7 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     /*********************************************************************************/
 
 
-    //simulation source and layers
-    var SimulationSource = new ol.source.Vector({
-        format: new ol.format.GeoJSON(),
-        features: SimulationCollection = new ol.Collection()
-    })
 
-    var ColoredMarkerLayer = new ol.layer.Vector({
-        source: SimulationSource,
-        renderMode: 'image'
-    });
-    
     
     /*
     var SimulationInvisibleLayer = new ol.layer.Vector({
@@ -260,8 +299,10 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     });
     */
 
-    //from https://codepen.io/jianxunrao/pen/oadBPq
-    //添加选择和框选控件，按住Ctrl/⌘键，使用鼠标框选采样点
+    //from http://www.trojx.me/2018/10/19/openlayers-kriging/
+    //codepen link: https://codepen.io/jianxunrao/pen/oadBPq
+ 
+    //add interaction to select a number of features for a new calculation by pressing ctrl
     let select = new ol.interaction.Select();
     olMap.addInteraction(select);
     let dragBox = new ol.interaction.DragBox({
@@ -270,10 +311,12 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     olMap.addInteraction(dragBox);
 
 
-    //创建10个位置随机、属性值随机的特征点
+    //adding features --> random simulation
+    /*
     for (let i = 0; i < 10; i++) {
         let feature = new ol.Feature({
-            geometry: new ol.geom.Point([params.mapCenter[0]+Math.random()*0.01-.005,params.mapCenter[1]+Math.random()*0.01-.005]), value: Math.round(Math.random()*params.maxValue)
+            geometry: new ol.geom.Point(ol.proj.transform([params.mapCenter[0]+Math.random()*0.01-.005,params.mapCenter[1]+Math.random()*0.01-.005], 'EPSG:4326', 'EPSG:3857')), 
+            value: Math.round(Math.random()*params.maxValue)
         });
         feature.setStyle(new ol.style.Style({
             image: new ol.style.Circle({
@@ -282,9 +325,117 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
             })
         }));
         SimulationSource.addFeature(feature);
+    }*/
+
+
+    /*
+    var marker = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.transform([16.9071388, 52.4901917], 'EPSG:4326', 'EPSG:3857')),
+    });
+
+    SimulationSource.addFeature(marker)
+    */
+
+
+
+
+
+
+    var simulationExtent
+    //load data from txt file
+    $scope.startSimulation = function(){
+        if(simulationData){
+
+            
+            console.log(simulationData[0].split(", "))
+            var utm = "+proj=utm +zone=32";
+            var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+
+            
+            let firstline = simulationData[0].split(", ")
+            let secondline = simulationData[1].split(", ")
+            let lastline = simulationData[simulationData.length-2].split(", ")
+
+            let firstcoords= proj4(utm,wgs84,[parseFloat(firstline[2]),parseFloat(firstline[3])])
+            let secondcoords = proj4(utm,wgs84,[parseFloat(secondline[2]),parseFloat(secondline[3])])
+            let lastcoords= proj4(utm,wgs84,[parseFloat(lastline[2]),parseFloat(lastline[3])])
+
+            var a = Math.abs(ol.proj.transform(firstcoords, 'EPSG:4326', 'EPSG:3857')[1] - ol.proj.transform(secondcoords, 'EPSG:4326', 'EPSG:3857')[1])*0.5
+            console.log(a)
+            simulationExtent = ol.proj.transform(lastcoords, 'EPSG:4326', 'EPSG:3857').map(el=>el+a).concat(ol.proj.transform(firstcoords, 'EPSG:4326', 'EPSG:3857').map(el=>el-a))
+
+            console.log(simulationExtent)
+
+            var generatePolygonFromPoint = function(coords,a){
+                let x = coords[0]
+                let y = coords[1]
+
+                let topleft = [x-a,y+a]
+                let topright = [x+a,y+a]
+                let bottomleft = [x-a,y-a]
+                let bottomright = [x+a,y-a]
+
+                return [[topleft,topright,bottomright,bottomleft,topleft]]
+            }
+                       
+            simulationData.forEach(function(el,idx){
+                if(el!=""){
+                    if(idx % (simulationData/100) == 0){
+                        $scope.loadingProgress = parseInt((idx/simulationData.length) * 100)
+                        console.log($scope.loadingProgress)
+                    };
+
+                    let arr = el.split(", ")
+                    let coords = [parseFloat(arr[2]),parseFloat(arr[3])]
+                    let feature = new ol.Feature({
+                        geometry:  new ol.geom.Polygon(generatePolygonFromPoint(ol.proj.transform(proj4(utm,wgs84,coords), 'EPSG:4326', 'EPSG:3857'),a)),
+                        value: parseFloat(arr[4])
+                    });
+                    var col = "rgba(" + String(Math.random()*255) + ","+ String(Math.random()*255) + ","+ String(Math.random()*255) + "," + "0.3)"
+                    var col = getColor(parseFloat(arr[4]),examplecolors)
+                    feature.setStyle(new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                        color: col,
+                        width: 0,
+                      }),
+                      fill: new ol.style.Fill({
+                        color: col,
+                      }),
+                    }));
+                    SimulationSource.addFeature(feature);
+
+                    /*
+                    //extent generation for kriging
+                    if(idx==0){
+                        simulationExtent = feature.getGeometry().getExtent();
+                    } else {
+                        ol.extent.extend(simulationExtent, feature.getGeometry().getExtent());
+                    }
+                    */
+                    
+                }
+            })
+
+            console.log(simulationExtent)
+            
+
+            //TOO MANY FEATURES TO USE KRIGING
+            /*
+            //on first load, automatically render the map
+            let extent = simulationExtent//[params.mapCenter[0]-.005,params.mapCenter[1]-.005,params.mapCenter[0]+.005,params.mapCenter[1]+.005];
+            SimulationSource.forEachFeatureIntersectingExtent(extent, (feature)=> {
+                selectedFeatures.push(feature);
+            });
+            drawKriging(extent);
+            */
+
+        } else {
+            alert("no Data loaded.")
+        }
     }
 
-    //设置框选事件
+
+    //add selection event
     let selectedFeatures = select.getFeatures();
     dragBox.on('boxend', ()=>{
         let extent = dragBox.getGeometry().getExtent();
@@ -297,8 +448,8 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
         selectedFeatures.clear();
     });
 
-    //绘制kriging插值图
-    let canvasLayer=null;
+    //kriging
+    var canvasLayer=null
     const drawKriging=(extent)=>{
         let values=[],lngs=[],lats=[];
         selectedFeatures.forEach(feature=>{
@@ -316,11 +467,11 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
             let grid=kriging.grid(polygons,variogram,(extent[2]-extent[0])/200);
 
             let dragboxExtent=extent;
-            //移除已有图层
+            //remove existing layer
             if (canvasLayer !== null){
                 olMap.removeLayer(canvasLayer);
             }
-            //创建新图层
+            //create new layer
             canvasLayer=new ol.layer.Image({
                 source: new ol.source.ImageCanvas({
                     canvasFunction:(extent, resolution, pixelRatio, size, projection) =>{
@@ -328,31 +479,76 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
                         canvas.width = size[0];
                         canvas.height = size[1];
                         canvas.style.display='block';
-                        //设置canvas透明度
+                        //set canvas transparency
                         canvas.getContext('2d').globalAlpha=params.canvasAlpha;                          
 
-                        //使用分层设色渲染
+                        //render
                         kriging.plot(canvas,grid,
                             [extent[0],extent[2]],[extent[1],extent[3]],params.colors);
 
                         return canvas;
                     },
-                    projection: 'EPSG:4326'
+                    projection: 'EPSG:4326' //original code 'EPSG:4326' but using 'EPSG:3857' 
                 })
             })
-            canvasLayer.setZIndex(1000);
-            //向map添加图层
             olMap.addLayer(canvasLayer);
-        }else {
-            alert("有效样点个数不足，无法插值");
+        } else {
+            alert("It looks like there are not enough datapoints in the specified region");
         }
+        
     }
-    //首次加载，自动渲染一次差值图
-    let extent = [params.mapCenter[0]-.005,params.mapCenter[1]-.005,params.mapCenter[0]+.005,params.mapCenter[1]+.005];
-        SimulationSource.forEachFeatureIntersectingExtent(extent, (feature)=> {
-            selectedFeatures.push(feature);
+
+    console.log(olMap.getView().calculateExtent(olMap.getSize()));
+
+
+    
+    //example for testing https://api.smartaq.net/v1.0/ObservedProperties('saqn:op:hur')
+    var examplecolors = {
+            "0": "#0f8a0f",
+            "5": "#2db00c",
+            "10": "#59d408",
+            "15": "#8fec04",
+            "20": "#c7f901",
+            "25": "#ffff00",
+            "30": "#f9c701",
+            "40": "#ec8f04",
+            "50": "#d45908",
+            "100": "#b02d0c",
+            "2147483647": "#8a0f0f"
+        }
+
+
+    //https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null;
+    };
+
+    var getColor = function(nr,scale){
+        let twoClosest = Object.keys(scale).map(el=>parseInt(el)).sort((a, b) => {
+                return Math.abs(a - nr) - Math.abs(b - nr);
+            }).slice(0, 2);
+
+        let small = twoClosest.sort()[0]
+        let big = twoClosest.sort()[1]
+        let percentage = 100 * (nr-small)/(big-small)
+
+        let left = hexToRgb(scale[String(small)])
+        let right = hexToRgb(scale[String(big)])
+
+        newColor = {};
+        ["r", "g", "b"].forEach(function(c){
+            newColor[c] = Math.round(left[c] + (right[c] - left[c]) * percentage / 100);
         });
-    drawKriging(extent);
+        
+        return "rgba(" + newColor["r"] + "," + newColor["g"] + "," + newColor["b"] + ",0.3)";
+    }
+    
+    console.log(getColor(36.4,examplecolors))
 
 
 
@@ -360,21 +556,6 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     /*
 
     //creating colors 
-
-    //example for testing https://api.smartaq.net/v1.0/ObservedProperties('saqn:op:hur')
-    var examplecolors = {
-        "0": "#ffd500",
-        "10": "#f6f609",
-        "20": "#c2ee11",
-        "30": "#8ee916",
-        "40": "#56e718",
-        "50": "#19e619",
-        "60": "#18e75d",
-        "70": "#16e9aa",
-        "80": "#11d8ee",
-        "90": "#0978f6",
-        "100": "#0000ff"
-        };
 
 
     function getLimitsAndValidPoints(fixedPoints) {
