@@ -377,15 +377,13 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
 
                 return [[topleft,topright,bottomright,bottomleft,topleft]]
             }
-                       
-            simulationData.forEach(function(el,idx){
-                if(el!=""){
-                    if(idx % (simulationData/100) == 0){
-                        $scope.loadingProgress = parseInt((idx/simulationData.length) * 100)
-                        console.log($scope.loadingProgress)
-                    };
 
-                    let arr = el.split(", ")
+
+
+            function addFeaturePromise(line) {
+                return new Promise(resolve => {
+
+                    let arr = line.split(", ")
                     let coords = [parseFloat(arr[2]),parseFloat(arr[3])]
                     let feature = new ol.Feature({
                         geometry:  new ol.geom.Polygon(generatePolygonFromPoint(ol.proj.transform(proj4(utm,wgs84,coords), 'EPSG:4326', 'EPSG:3857'),a)),
@@ -403,6 +401,24 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
                       }),
                     }));
                     SimulationSource.addFeature(feature);
+
+                    resolve('resolved');
+                });
+              }
+              
+              async function asyncCall(element) {
+                await addFeaturePromise(element);
+              };
+
+                       
+            simulationData.forEach(function(el,idx){
+                if(el!=""){
+                    if(idx % (simulationData/100) == 0){
+                        $scope.loadingProgress = parseInt((idx/simulationData.length) * 100)
+                        console.log($scope.loadingProgress)
+                    };
+
+                    asyncCall(el)
 
                     /*
                     //extent generation for kriging
