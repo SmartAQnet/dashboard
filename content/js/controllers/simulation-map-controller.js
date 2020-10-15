@@ -339,18 +339,35 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
 
 
 
-
-
     var simulationExtent
+    var AsyncCounter = 0
+
+    var generatePolygonFromPoint = function(coords,a){
+        let x = coords[0]
+        let y = coords[1]
+
+        let topleft = [x-a,y+a]
+        let topright = [x+a,y+a]
+        let bottomleft = [x-a,y-a]
+        let bottomright = [x+a,y-a]
+
+        return [[topleft,topright,bottomright,bottomleft,topleft]]
+    }
+
+
+
     //load data from txt file
     $scope.startSimulation = function(){
         if(simulationData){
 
-            
-            console.log(simulationData[0].split(", "))
             var utm = "+proj=utm +zone=32";
             var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
 
+
+            var listOfValues = simulationData.map(el=>parseFloat(el.split(", ")[4])).filter(val => !Number.isNaN(val))
+
+            var scalemax = Math.max(...listOfValues)
+            var scalemin = Math.min(...listOfValues)
             
             let firstline = simulationData[0].split(", ")
             let secondline = simulationData[1].split(", ")
@@ -361,36 +378,21 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
             let lastcoords= proj4(utm,wgs84,[parseFloat(lastline[2]),parseFloat(lastline[3])])
 
             var a = Math.abs(ol.proj.transform(firstcoords, 'EPSG:4326', 'EPSG:3857')[1] - ol.proj.transform(secondcoords, 'EPSG:4326', 'EPSG:3857')[1])*0.5
-            console.log(a)
             simulationExtent = ol.proj.transform(lastcoords, 'EPSG:4326', 'EPSG:3857').map(el=>el+a).concat(ol.proj.transform(firstcoords, 'EPSG:4326', 'EPSG:3857').map(el=>el-a))
 
-            console.log(simulationExtent)
-
-            var generatePolygonFromPoint = function(coords,a){
-                let x = coords[0]
-                let y = coords[1]
-
-                let topleft = [x-a,y+a]
-                let topright = [x+a,y+a]
-                let bottomleft = [x-a,y-a]
-                let bottomright = [x+a,y-a]
-
-                return [[topleft,topright,bottomright,bottomleft,topleft]]
-            }
-
-
+            var adjustedColorScale = compressColorScale(examplecolors,scalemax,scalemin)
 
             function addFeaturePromise(line) {
                 return new Promise(resolve => {
-
+        
                     let arr = line.split(", ")
                     let coords = [parseFloat(arr[2]),parseFloat(arr[3])]
                     let feature = new ol.Feature({
                         geometry:  new ol.geom.Polygon(generatePolygonFromPoint(ol.proj.transform(proj4(utm,wgs84,coords), 'EPSG:4326', 'EPSG:3857'),a)),
                         value: parseFloat(arr[4])
                     });
-                    var col = "rgba(" + String(Math.random()*255) + ","+ String(Math.random()*255) + ","+ String(Math.random()*255) + "," + "0.3)"
-                    var col = getColor(parseFloat(arr[4]),examplecolors)
+                    //var col = "rgba(" + String(Math.random()*255) + ","+ String(Math.random()*255) + ","+ String(Math.random()*255) + "," + "0.3)"
+                    var col = getColor(parseFloat(arr[4]),adjustedColorScale)
                     feature.setStyle(new ol.style.Style({
                         stroke: new ol.style.Stroke({
                         color: col,
@@ -401,24 +403,25 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
                       }),
                     }));
                     SimulationSource.addFeature(feature);
-
-                    resolve('resolved');
+                    AsyncCounter++
+                    resolve(1);
                 });
-              }
+            }
               
-              async function asyncCall(element) {
+            async function asyncCallFeatures(element) {
                 await addFeaturePromise(element);
-              };
+                if(AsyncCounter % parseInt(simulationData.length/100) == 0){
+                    $scope.loadingProgress = parseInt((AsyncCounter/(simulationData.length-1)) * 100)
+                    $scope.$apply($scope.loadingProgress)
+                };
+            };
 
                        
             simulationData.forEach(function(el,idx){
                 if(el!=""){
-                    if(idx % (simulationData/100) == 0){
-                        $scope.loadingProgress = parseInt((idx/simulationData.length) * 100)
-                        console.log($scope.loadingProgress)
-                    };
 
-                    asyncCall(el)
+
+                    asyncCallFeatures(el)
 
                     /*
                     //extent generation for kriging
@@ -432,7 +435,6 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
                 }
             })
 
-            console.log(simulationExtent)
             
 
             //TOO MANY FEATURES TO USE KRIGING
@@ -514,11 +516,11 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
         
     }
 
-    console.log(olMap.getView().calculateExtent(olMap.getSize()));
+    //console.log(olMap.getView().calculateExtent(olMap.getSize()));
 
 
     
-    //example for testing https://api.smartaq.net/v1.0/ObservedProperties('saqn:op:hur')
+    //example for testing https://api.smartaq.net/v1.0/ObservedProperties('saqn:op:hur') but without the maxint value!
     var examplecolors = {
             "0": "#0f8a0f",
             "5": "#2db00c",
@@ -529,10 +531,28 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
             "30": "#f9c701",
             "40": "#ec8f04",
             "50": "#d45908",
-            "100": "#b02d0c",
-            "2147483647": "#8a0f0f"
+            "100": "#b02d0c"
         }
 
+    
+    var compressColorScale = function(scale,nmx,nmn){
+
+        let newmax = Math.ceil(nmx)
+        let newmin = Math.floor(nmn)
+
+        let oldkeylist = Object.keys(scale).map(el => parseFloat(el))
+        let oldmin = oldkeylist[0]
+        let oldmax = oldkeylist[oldkeylist.length - 1]
+        let newkeylist = oldkeylist.map(el => (el-oldmin)/(oldmax-oldmin)).map(el => (el*(newmax-newmin) + newmin))
+
+        let newscale = {}
+        newkeylist.forEach(function(el, idx){
+            newscale[String(el)] = scale[String(oldkeylist[idx])]
+        })
+        return newscale
+    }
+
+    //console.log(compressColorScale(examplecolors,60,40))
 
     //https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
     function hexToRgb(hex) {
@@ -545,13 +565,29 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
     };
 
     var getColor = function(nr,scale){
-        let twoClosest = Object.keys(scale).map(el=>parseInt(el)).sort((a, b) => {
-                return Math.abs(a - nr) - Math.abs(b - nr);
-            }).slice(0, 2);
 
-        let small = twoClosest.sort()[0]
+        var keylist = Object.keys(scale).map(el=>parseFloat(el))
+
+        let twoClosest = keylist.sort((a, b) => {
+            return Math.abs(a - nr) - Math.abs(b - nr)
+        }).slice(0, 2);
+
+        var minval = Math.min(...keylist)
+        var maxval = Math.max(...keylist)
+
+        //if the number is outside of the interval, indentify it with the respective boundary
+        if(nr < minval){
+            var newnr = minval
+        } else if(nr > maxval){
+            var newnr = maxval
+        } else {
+            var newnr = nr
+        }
+    
         let big = twoClosest.sort()[1]
-        let percentage = 100 * (nr-small)/(big-small)
+        let small = twoClosest.sort()[0]
+
+        let percentage = 100 * (newnr-small)/(big-small)
 
         let left = hexToRgb(scale[String(small)])
         let right = hexToRgb(scale[String(big)])
@@ -560,11 +596,14 @@ gostApp.controller('SimulationMapCtrl', function ($scope, $http, $routeParams, P
         ["r", "g", "b"].forEach(function(c){
             newColor[c] = Math.round(left[c] + (right[c] - left[c]) * percentage / 100);
         });
-        
+
         return "rgba(" + newColor["r"] + "," + newColor["g"] + "," + newColor["b"] + ",0.3)";
-    }
+    };
+        
     
-    console.log(getColor(36.4,examplecolors))
+    
+    //[10,20,30,40,50,60,70,80,90].forEach(el => console.log(getColor(el,compressColorScale(examplecolors,53.4,97.65))))
+    
 
 
 
