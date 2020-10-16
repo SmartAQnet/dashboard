@@ -198,6 +198,12 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
     olMap.addControl(external_fullscreen);
 
 
+    // added function call to click event on feature to open the panel; togglebutton only closes
+    $scope.isInfoSidepanelClosed = true;
+    $scope.toggleInfoSidepanel = function () {
+        $scope.isInfoSidepanelClosed = !$scope.isInfoSidepanelClosed
+    };
+
 
     /************************************ Marker ************************************/
     //                               create Markers
@@ -383,7 +389,8 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
 
 
-
+    //to store reset the style when another feature is clicked
+    var displayedInfoFeatureId
 
     var displayreducedFeatureInfo = function (feature) {
         var thingId = feature.getProperties()['@iot.id'];
@@ -400,14 +407,13 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
                 thingLinkName: ThingInfo['name']
             }
 
-            //var info = document.getElementById('map-detailed-tooltip');
-            //var crosslinks = document.getElementById('map-crosslinks');
-            // feature.setStyle({color: 'rgba(255,64,64,1.0)'});
 
-
-            //info.innerHTML = 'Location Name: ' + ThingInfo['Locations'][0]['name'] + "<br />" + "<p>" + 'GPS Coordinates: ' + "<br />" + '&emsp; - Latitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["1"] + "<br />" + '&emsp; - Longitude: ' + ThingInfo['Locations'][0]['location']['coordinates']["0"] + "</p>";
-            //crosslinks.innerHTML = 'Thing: <a href="#/thing/' + ThingInfo['@iot.id'] + '?$expand=Locations" target="_blank">' + ThingInfo['name'] + '</a>';
-        });
+            if(displayedInfoFeatureId){
+                changeFeatureStyle(displayedInfoFeatureId,"default")
+            }
+            displayedInfoFeatureId = feature.getProperties()['@iot.id']
+            changeFeatureStyle(displayedInfoFeatureId,"emph")
+       });
     };
 
     
@@ -459,29 +465,24 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
 
     //on drawend return list of things, store in a main scope parent variable and use in click link to build query and access these things via things page
+    olMap.on('click', function (evt) {
+        if(!$scope.drawingactive){
 
-    if(!$scope.noFeatures){
-        olMap.on('click', function (evt) {
-            if(!$scope.drawingactive){
-    
-                //console.log(filterparamPolygonextent(getextendPolygon(getcurrentextend())))
-                var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
-                    return feature
-                });
-                if (feature) {
-                    $scope.isInfoSidePanelClosed = false;
-                    $scope.toggleInfoSidepanel;
-                    if (feature.getProperties()['result']) {
-                        //displayFeatureInfo(feature)
-                        goToDatastream(feature)
-                    } else {
-                        //displayreducedFeatureInfo(feature)
-                        goToThing(feature)
-                    };
+            //console.log(filterparamPolygonextent(getextendPolygon(getcurrentextend())))
+            var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
+                return feature
+            });
+            if (feature) {
+                $scope.isInfoSidepanelClosed = false;
+                $scope.toggleInfoSidepanel();
+
+                if(feature.getProperties()['@iot.id']){
+                    displayreducedFeatureInfo(feature)
+                    //goToThing(feature)
                 };
             };
-        });
-    };
+        };
+    });
 
     function filterparamPolygonextent(polyext){
         return ("st_within(Locations/location,geography'POLYGON" + polyext + "')")
@@ -590,7 +591,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
 
     /************************************ Simulation stuff ***********************************/
-    //             handles map interaction from simulation-controller (AUTH simulation)
+    //             handles map interaction from simulation-config-controller (AUTH simulation)
     /*****************************************************************************************/
 
 
@@ -675,5 +676,7 @@ gostApp.controller('MapCtrl', function ($scope, $http, $routeParams, $sce, $inte
 
     console.log("Map is Ready")
     $rootScope.$broadcast("mapIsReady")
+
+
 
 });

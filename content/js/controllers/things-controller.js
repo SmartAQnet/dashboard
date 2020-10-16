@@ -3,9 +3,8 @@ gostApp.controller('ThingsCtrl', function ($scope, $http, $routeParams, $route, 
     $scope.Page.setHeaderIcon(iconThing);
 
     //toggle map displays
-    $scope.noMapControls = true
-    $scope.showMap = true
-    $scope.mapVisible = true;
+    $scope.showMap = true;
+    $scope.showMapControls = true;
 
     var mapIsReady
 

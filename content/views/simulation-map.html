@@ -1,0 +1,50 @@
+<div class="main" ng-controller="SimulationMapCtrl">
+    <div class="card">
+        <div class="card-header">
+
+        </div>
+        <div class="card-body">
+            <div class="row py-2">
+                <div class="col-md-12">
+
+
+                    <div class="card" id="sensor-map" class="fullscreen-map">
+                        <div class="card-header"> 
+                            <h5>Simulation</h5>
+                        </div>
+                    
+                        <div class="card-body" id="card-body-map">
+                            <div id="map" class="map" height="400px" width="400px"></div>
+                        </div>
+                    
+                        <div class="card-footer">
+                            <label class="btn btn-primary">Load Simulation Data <input type="file" id="JSONupload" value="Import" hidden></label> <!-- needs to parse the file and set it as $scope.chosenTemplate -->
+                            <button class="btn btn-primary" ng-click="startSimulation()">Start Simulation</button>
+                            <div class="progress" style="height: 16px">
+                                <div class="progress-bar bg-primary" role="progressbar" ng-style="{width : ( loadingProgress + '%' ) }" aria-valuenow="{{ loadingProgress }}" aria-valuemin="0" aria-valuemax="100">{{ loadingProgress }}%</div>
+                            </div>
+                        </div>
+                    
+                    </div>
+
+                </div>
+            </div>
+            <div class="row py-2">
+                <div class="col-md-12">
+                    <div class="card" id="graph-container" ng-show="showSimulationGraph">
+                        <div class="card-header"> 
+                            <div class="card-header">
+                                <h5>Graph</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="simulationGraph"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

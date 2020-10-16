@@ -6,7 +6,7 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     $scope.category = 'Thing'
 
     //toggle map displays
-    $scope.noMapControls = true
+    $scope.showMapControls = false
 
     //pagination example for ng-repeat tables
     //http://jsfiddle.net/2ZzZB/56/
@@ -160,8 +160,6 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
     // ----------------------------------------------------------------------------------------------
 
 
-
-    $scope.mapVisible = true;
 
     $scope.tabPropertiesClicked = function () {
     };

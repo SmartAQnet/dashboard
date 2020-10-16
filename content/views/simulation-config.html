@@ -168,7 +168,17 @@
                         </div>
 
                         <div class="pt-3 mt-3 border border-primary border-left-0 border-right-0 border-bottom-0"></div>
-                        <a type="button" class="btn btn-primary btn-raised btn-block" id="downloadbutton" ng-click="exportJson()">Download Scenario as Template</a>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group mb-3">
+                                    <input ng-model="exportName" type="text" class="form-control" placeholder="...type filename here" aria-label="Filename" style="text-align:center">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <a type="button" class="btn btn-primary btn-raised btn-block" id="downloadbutton" ng-click="exportJson()">Download Scenario as Template</a>
+                            </div>
+                        </div>
+                        
                     </div>
                     <div class="card-footer">
                         <a type="button" class="btn btn-secondary" ng-click="goToTab(currentTab-1)">Back</a>
@@ -176,28 +186,9 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
-
-
-    <div class="row py-2">
-        <div class="col-md-12">
-            <div ng-controller="GraphCtrl">
-                <div class="card" id="graph-container" ng-show="showGraph">
-                    <div class="card-header"> 
-                        <div class="card-header">
-                            <h5>Graph</h5>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="simulationGraph"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
     
 

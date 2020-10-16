@@ -2,11 +2,10 @@ gostApp.controller('SimulationCtrl', function ($scope, $http, $routeParams, $tim
 
     $scope.Page.setHeaderIcon(iconThing);
 
-    $scope.mapVisible = true;
     $scope.showMap = true;
-    $scope.noMapControls = true;
-    $scope.simulationControl = false;
-    $scope.showGraph = false
+    $scope.showMapControls = false;
+    $scope.showSimulationControls = false;
+    $scope.showSimulationGraph = false
 
 
     var polygonPoints;

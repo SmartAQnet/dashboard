@@ -44,7 +44,8 @@ gostApp.config(function ($routeProvider) {
 		when('/featuresofinterest', { templateUrl: window.dashboardSettings.root + 'views/featuresofinterest.html', controller: "FeaturesOfInterestCtrl" }).
 		when('/create_new', { templateUrl: window.dashboardSettings.root + 'views/create_new.html', controller: "CreateNewCtrl" }).
 		when('/saqn_model', { templateUrl: window.dashboardSettings.root + 'views/saqn_model.html', controller: "saqnModelCtrl" }).
-		when('/simulation', { templateUrl: window.dashboardSettings.root + 'views/simulation.html', controller: "SimulationCtrl" }).
+		when('/simulation-config', { templateUrl: window.dashboardSettings.root + 'views/simulation-config.html', controller: "SimulationConfigCtrl" }).
+		when('/simulation-map', { templateUrl: window.dashboardSettings.root + 'views/simulation-map.html', controller: "SimulationMapCtrl" }).
 		//when('/:type/:id/patch', { templateUrl: window.dashboardSettings.root + 'views/patch.html', controller: "PatchCtrl" }).
 		when('/mqtt', { templateUrl: window.dashboardSettings.root + 'views/mqtt.html', controller: "MqttCtrl" }).
 		otherwise({redirectTo: '/home' });
