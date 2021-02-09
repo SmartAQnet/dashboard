@@ -114,11 +114,19 @@ gostApp.controller('SimulationConfigCtrl', function ($scope, $http, $routeParams
     $scope.simulationDomain = {}
 
     $scope.scenarioNamesDict = {
-        "Heating": ["electric","hybrid","whatever"],
-        "Industrial": ["much industrial","semi industrial","not industrial so much"],
-        "Traffic": ["red traffic","yellow traffic","green traffic","purple traffic"],
-        "Option 4": ["parameter 1","parameter 2","parameter 3"],
-        "Option 5": ["parameter a","parameter b","parameter c"]
+        'Heating': ['baseline', 'electric', 'hybrid'],
+        'Industrial': ['baseline', '75% industrial', '50% industry', '25% industry'],
+        'Traffic': ['baseline', 'electric', 'hybrid', 'no HDVs', 'no buses'],
+        'Traffic Evaporation': ['baseline', 'no diurnal', 'no traffic'],
+        'Agriculture': ['baseline', 'no off agr', 'no processes'],
+        'Railroads': ['baseline', 'no passenger', 'no cargo'],
+        'Shipping': ['baseline', 'no port', 'no fishing', ''],
+        'Solvents': ['baseline','no ResPaint','no ResSolv','no DryClean','no Industrial'],
+        'Gas Stations': ['baseline','no storage','no transportation','no distribution'],
+        'Aviation': ['baseline', 'no cargo', 'no passenger'],
+        'Processes in large industrial units': ['baseline','no combustion','no production'],
+        'Waste': ['baseline', 'no disposal', 'no trensportation'],
+        'Paints': ['baseline','no car paints','no industrial paints','no domestic paints']
     }
 
     /**
@@ -130,71 +138,178 @@ gostApp.controller('SimulationConfigCtrl', function ($scope, $http, $routeParams
         
         "Default": {
 
-            "Heating": {
-                "check": true, 
-                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
-                "activeScenario": "electric"
-            }, 
-    
-            "Industrial": {
-                "check": true, 
-                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
-                "activeScenario": "much industrial"
-            }, 
-    
-            "Traffic": {
-                "check": true, 
-                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
-                "activeScenario": "red traffic"
-            }, 
-    
-            "Option 4": {
-                "check": true, 
-                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
-                "activeScenario": "parameter 1"
-            }, 
-    
-            "Option 5": {
-                "check": true, 
-                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
-                "activeScenario": "parameter a"
+            'Heating': {
+                'check': 'true',
+                'pollutants': {
+                    'NO2': 100,
+                    'CO': 100,
+                    'SO2': 100,
+                    'VOC': 100,
+                    'PM10': 100,
+                    'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
+                },
+            
+            'Industrial': {
+                'check': 'true',
+                'pollutants': {
+                    'NO2': 100,
+                    'CO': 100,
+                    'SO2': 100,
+                    'VOC': 100,
+                    'PM10': 100,
+                    'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
+                },
+                
+                'Traffic': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                        },
+                    'activeScenario': 'baseline'
+                },
+                
+                'Traffic Evaporation': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                        },
+                    'activeScenario': 'baseline'
+                },
+                
+                'Agriculture': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
+                },
+                    
+                'Railroads': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
+                },
+                    
+                'Shipping': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
+                },
+                    
+                'Solvents': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
+                },
+                    
+                'Gas Stations': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
+                },
+                    
+                'Aviation': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
+                },
+                    
+                'Processes in large industrial units': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
+                },
+                    
+                'Waste': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
+                },
+                    
+                'Paints': {
+                    'check': 'true',
+                    'pollutants': {
+                        'NO2': 100,
+                        'CO': 100,
+                        'SO2': 100,
+                        'VOC': 100,
+                        'PM10': 100,
+                        'PM2.5': 100
+                    },
+                    'activeScenario': 'baseline'
             }
     
         },
         
-        "template 2": {
-
-            "Heating": {
-                "check": true, 
-                "pollutants": {"NO2": 56, "CO": 73, "SO2": 77, "VOC": 67, "PM10": 32, "PM2.5": 12},
-                "activeScenario": "electric"
-            }, 
-    
-            "Industrial": {
-                "check": true, 
-                "pollutants": {"NO2": 74, "CO": 76, "SO2": 7, "VOC": 10, "PM10": 15, "PM2.5": 66},
-                "activeScenario": "semi industrial"
-            }, 
-    
-            "Traffic": {
-                "check": false, 
-                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
-                "activeScenario": "purple traffic"
-            }, 
-    
-            "Option 4": {
-                "check": false, 
-                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
-                "activeScenario": "parameter 1"
-            }, 
-    
-            "Option 5": {
-                "check": false, 
-                "pollutants": {"NO2": 100, "CO": 100, "SO2": 100, "VOC": 100, "PM10": 100, "PM2.5": 100},
-                "activeScenario": "parameter a"
-            }
-    
-        },
+        "template 2": {},
         
         "template 3": {}, 
         
