@@ -193,9 +193,39 @@ gostApp.controller('ThingCtrl', function ($scope, $http, $routeParams, $location
 
 
     $scope.tabHistoricalLocationsClicked = function () {
-        $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/HistoricalLocations?$expand=Locations").then(function (response) {
-            $scope.historicalLocationsList = response.data.value;
-        });
+
+      // Load Historical Locations of the thing with locations expanded and reduce the ["Locations"][0] into the HistoricalLocations toplevel, while also removing all "@iot" navigation keys
+      $http.get(getUrl() + "/v1.0/Things(" + getId($scope.Page.selectedThing["@iot.id"]) + ")/HistoricalLocations?$expand=Locations").then(function (response) {
+        $scope.historicalLocationsList = response.data.value.map(function(hl){
+          let thishl = Object.keys(hl).reduce(function(acc,key){
+            if(key=="Locations"){
+              Object.keys(hl[key][0]).forEach(function(i){
+                if(!i.includes("@iot")){acc[i] = (hl[key][0][i])}
+              })
+            }else{
+              if(!key.includes("@iot")){
+                acc[key] = hl[key]
+              }
+            }
+            return(acc)
+          },{})
+          console.log(thishl)
+          return thishl
+        })
+
+
+        // create list of keys for selection in view. take the first object to derive the keys. might miss properties. 
+        $scope.selectparams = {}
+        $scope.selectparams.HistoricalLocations = Object.keys($scope.historicalLocationsList[0]).reduce(function(acc,item){
+          acc[item]=false
+          return acc
+        },{})
+
+        // manually set defaults
+        $scope.selectparams.HistoricalLocations["name"] = true
+        $scope.selectparams.HistoricalLocations["time"] = true
+        $scope.selectparams.HistoricalLocations["description"] = true
+      });       
     };
 
     $scope.tabDatastreamsClicked = function () {

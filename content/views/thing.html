@@ -285,23 +285,37 @@
                 </div>
 
                 <div class="tab-pane" id="historicallocations">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <span class="entityInfoHeader">Select HistoricalLocations Column Display: </span>
+                            <div class="form-group">
+                
+                                <div class="form-check form-check-inline" ng-repeat="(key, val) in selectparams.HistoricalLocations">
+                                    <input id="selectHistoricalLocations{{key}}" type="checkbox" class="form-check-input" ng-model="selectparams.HistoricalLocations[key]">
+                                    <label class="form-check-label" for="selectHistoricalLocations{{key}}" style="text-transform: capitalize;">{{key}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <table class="table table-bordered table-hover st-table table-striped table-sm">
                         <thead class="st-thead">
                         <tr>
-                            <th>Name</th>
-                            <th>From</th>
+                            <th ng-repeat="(key, val) in selectparams.HistoricalLocations" ng-if="selectparams.HistoricalLocations[key]" style="text-transform: capitalize;">{{key}}</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr ng-repeat="x in historicalLocationsList | orderBy:'-time'">
-                            <td>{{x["Locations"][0]["name"]}}</td>
-                            <td>{{x["time"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                            <td ng-repeat="(key, val) in x" ng-if="selectparams.HistoricalLocations[key]">{{x[key] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
                         </tr>
                         </tbody>
                     </table>
+                    <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#locationtrace">Show/Hide Location Graphs</button>
                     
                     <!-- Graph Content -->
-                    <div id="locationtrace">
+                    <div id="locationtrace" class="collapse">
                         <div class="card" id="location-graph-container">
                             <div class="card-header">
                                 <h5>Locations Graph</h5>
